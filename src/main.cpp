@@ -136,7 +136,9 @@ std::string rgb_to_hex(int r, int g, int b)
  ******************************************************************************/
 int main(int argc, char *argv[])
 {
-    std::cout << "=== The result is: " << rgb_to_hex(-20, 275, 3) << " ===" << std::endl;
+    int x = 1;
+
+    std::cout << "=== The result is: " << rgb_to_hex(-20, 275, 20) << " ===" << std::endl;
 
     return 0;
 }
