@@ -1,13 +1,11 @@
 /*===========================================================================*/
 /**
- * @file test_suite.cpp
+ * @file katas.cpp
  *
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * Unit tests
- * 
- * @todo Divide this file content using an abstraction layers concept
+ * Develop the code to solve the kata in this file
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
@@ -30,12 +28,15 @@
  *===========================================================================*/
 #include <iostream>
 #include <memory>
-#include "acutest.h"
-#include "katas.h"
+#include <string>
+#include <cstdint>
+#include <sstream>
+#include <vector>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
+#define NDEBUG
 
 /*===========================================================================*
  * Local Preprocessor #define MACROS
@@ -43,6 +44,10 @@
 
 /*===========================================================================*
  * Local Type Declarations
+ *===========================================================================*/
+
+/*===========================================================================*
+ * Local Object Declarations
  *===========================================================================*/
 
 /*===========================================================================*
@@ -58,80 +63,61 @@
  *===========================================================================*/
 
 /*===========================================================================*
- * Test cases
+ * Function Definitions
  *===========================================================================*/
-#include "acutest.h"
-#include <string.h>
-#include <string>
-#include "katas.h"
 
-void test_SomeTest(void)
+/*****************************************************************************
+ * Name         highAndLow
+ * Description  Extracts "<max> <min>" from a space-separated number string.
+ *****************************************************************************/
+std::string highAndLow(const std::string &numbers)
 {
-    TEST_CHECK(strcmp(highAndLow("4 5 29 54 4 0 -214 542 -64 1 -3 6 -6").c_str(),
-                      "542 -214") == 0);
+    std::vector<std::string> words;
+    std::string word;
+    std::stringstream ss(numbers); // Create a stringstream object from the numbers string
+    int num;
+    int max = INT32_MIN;
+    int min = INT32_MAX;
+
+    // Extract words one by one using the extraction operator (>>)
+    // The extraction operator by default uses whitespace as a delimiter.
+    while (ss >> word)
+    {
+        words.push_back(word);
+    }
+
+    // Analyze the split words
+    for (const std::string &w : words)
+    {
+        try
+        {
+            num = std::stoi(w); // Convert the string to an integer
+            #ifndef NDEBUG
+            std::cout << "Converted integer: " << num << std::endl;
+            #endif
+
+            if(num>max)
+            {
+                max = num;
+            }
+            if(num<min)
+            {
+                min = num;
+            }
+        }
+        catch (const std::invalid_argument &e)
+        {
+            #ifndef NDEBUG
+            std::cerr << "Invalid argument: " << e.what() << std::endl;
+            #endif
+        }
+        catch (const std::out_of_range &e)
+        {
+            #ifndef NDEBUG
+            std::cerr << "Out of range: " << e.what() << std::endl;
+            #endif
+        }
+    }
+
+    return std::to_string(max) + " " + std::to_string(min);
 }
-
-void test_SortTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("10 2 -1 -20").c_str(),
-                      "10 -20") == 0);
-}
-
-void test_PlusMinusTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("1 -1").c_str(),
-                      "1 -1") == 0);
-}
-
-void test_PlusPlusTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("1 1").c_str(),
-                      "1 1") == 0);
-}
-
-void test_MinusMinusTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("-1 -1").c_str(),
-                      "-1 -1") == 0);
-}
-
-void test_PlusMinusZeroTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("1 -1 0").c_str(),
-                      "1 -1") == 0);
-}
-
-void test_PlusPlusZeroTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("1 1 0").c_str(),
-                      "1 0") == 0);
-}
-
-void test_MinusMinusZeroTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("-1 -1 0").c_str(),
-                      "0 -1") == 0);
-}
-
-void test_SingleTest(void)
-{
-    TEST_CHECK(strcmp(highAndLow("42").c_str(),
-                      "42 42") == 0);
-}
-
-
-/*===========================================================================*
- * Test list
- *===========================================================================*/
-TEST_LIST = {
-    { "SomeTest", test_SomeTest },
-    { "SortTest", test_SortTest },
-    { "PlusMinusTest", test_PlusMinusTest },
-    { "PlusPlusTest", test_PlusPlusTest },
-    { "MinusMinusTest", test_MinusMinusTest },
-    { "PlusMinusZeroTest", test_PlusMinusZeroTest },
-    { "PlusPlusZeroTest", test_PlusPlusZeroTest },
-    { "MinusMinusZeroTest", test_MinusMinusZeroTest },
-    { "SingleTest", test_SingleTest },
-    { NULL, NULL }
-};

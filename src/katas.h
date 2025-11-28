@@ -1,20 +1,15 @@
+#ifndef KATAS_H
+#define KATAS_H
+
 /*===========================================================================*/
 /**
- * @file main.cpp
+ * @file kata.h
  *
  *------------------------------------------------------------------------------
  *
- * @section DESC DESCRIPTION:
- * You are given a string of space separated numbers, and have to return the highest and lowest number.
- * 
- * Examples
- * Input: "1 2 3 4 5"   =>  Output: "5 1"
- * Input: "1 2 -3 4 5"  =>  Output: "5 -3"
- * Input: "1 9 3 4 -5"  =>  Output: "9 -5"
- * Notes
- * All numbers are valid Int32, no need to validate them.
- * There will always be at least one number in the input string.
- * Output string must be two numbers separated by a single space, and highest number is first.
+ * @section DESC DESCRIPTION: API for the Person module
+ *
+ * @todo Add full description here
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
@@ -33,59 +28,64 @@
 /*==========================================================================*/
 
 /*===========================================================================*
- * Header Files
+ * Header Files (Common to C and C++)
  *===========================================================================*/
-#include <iostream>
-#include <memory>
+#include <stdint.h>
+#include <stddef.h>
+
+#ifdef __cplusplus
+/*===========================================================================*
+ * Header Files (C++ only)
+ *===========================================================================*/
 #include <string>
-#include <cstdint>
-#include "katas.h"
+#endif
 
 /*===========================================================================*
- * Local Preprocessor #define Constants
- *===========================================================================*/
-#define NDEBUG
-
-/*===========================================================================*
- * Local Preprocessor #define MACROS
+ * Exported Preprocessor #define Constants
  *===========================================================================*/
 
 /*===========================================================================*
- * Local Type Declarations
+ * Exported Preprocessor #define MACROS
  *===========================================================================*/
 
 /*===========================================================================*
- * Local Object Declarations
+ * Exported Type Declarations
  *===========================================================================*/
 
 /*===========================================================================*
- * Local Variables Definitions
+ * Exported Classes (C++ only)
  *===========================================================================*/
+#ifdef __cplusplus
+// @todo: Add C++ class declarations here.
+#endif
 
 /*===========================================================================*
- * Local Function Prototypes
+ * Exported C Function Prototypes
  *===========================================================================*/
+#ifdef __cplusplus
+extern "C" {
+#endif
+// @todo: Add pure C function prototypes here.
 
-/*===========================================================================*
- * Local Inline Function Definitions and Function-Like Macros
- *===========================================================================*/
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
-/*===========================================================================*
- * Function Definitions
+ /*===========================================================================*
+ * Exported C++ Function Prototypes
  *===========================================================================*/
+#ifdef __cplusplus
+// @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         main
- * @brief      The main entry point
- * @param [in] void
- * @return     0 -success, -1 -Error
- *****************************************************************************/
-int main(int argc, char *argv[])
-{
-    // WARNING. Remove the variable
-    int x = 1;
+ * @fn         highAndLow
+ * @brief      Get the highest and lowest numbers in a numbered string
+ * @param [in] numbers
+ * @return     The max and min as "[max] [min]"
+ ******************************************************************************/
+std::string highAndLow(const std::string &numbers);
+#endif /* __cplusplus */
 
-    std::cout << "=== The result is: " << highAndLow("8 3 -5 42 -1 0 0 -9 4 7 4 -4") << " ===" << std::endl;
-
-    return 0;
-}
+/*===========================================================================*/
+/*===========================================================================*/
+#endif /* KATAS_H */
