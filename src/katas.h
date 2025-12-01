@@ -78,12 +78,17 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         highAndLow
- * @brief      Get the highest and lowest numbers in a numbered string
- * @param [in] numbers
- * @return     The max and min as "[max] [min]"
+ * @fn         array_diff
+ * @brief      Computes the difference between two lists. 
+ *             Remove all occurrences of elements from the first list (arr1) 
+ *             that are present in the second list (arr2). 
+ *             The order of elements in the first list is preserved in the result.
+ * @param [in] arr1
+ * @param [in] arr2
+ * @return     The resulted array. This array shall be freed by the caller.
  ******************************************************************************/
-std::string highAndLow(const std::string &numbers);
+int *array_diff(const int *arr1, size_t n1, const int *arr2, size_t n2, size_t *z);
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

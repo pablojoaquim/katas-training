@@ -26,12 +26,9 @@
 /*===========================================================================*
  * Header Files
  *===========================================================================*/
-#include <iostream>
-#include <memory>
-#include <string>
-#include <cstdint>
-#include <sstream>
-#include <vector>
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -53,6 +50,7 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
+// int working_arr[100];
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -66,58 +64,47 @@
  * Function Definitions
  *===========================================================================*/
 
+
 /*****************************************************************************
- * Name         highAndLow
- * Description  Extracts "<max> <min>" from a space-separated number string.
+ * Name         array_diff
+ * Description  Computes the difference between two lists.
+ *              The length of the returned array goes to *z, and the returned 
+ *              array shall be freed by the caller
  *****************************************************************************/
-std::string highAndLow(const std::string &numbers)
+int *array_diff(const int *arr1, size_t n1, const int *arr2, size_t n2, size_t *z)
 {
-    std::vector<std::string> words;
-    std::string word;
-    std::stringstream ss(numbers); // Create a stringstream object from the numbers string
-    int num;
-    int max = INT32_MIN;
-    int min = INT32_MAX;
-
-    // Extract words one by one using the extraction operator (>>)
-    // The extraction operator by default uses whitespace as a delimiter.
-    while (ss >> word)
+    int index;
+    int working_index = 0;
+    int* working_arr = (int*) malloc(n1 * sizeof(int));
+    // Check for lack of available memory
+    if(NULL == (working_arr))
     {
-        words.push_back(word);
+        *z = 0;
+        return NULL;
     }
 
-    // Analyze the split words
-    for (const std::string &w : words)
+    // Move thorugh the arr1
+    for (index=0; index<n1; index++)
     {
-        try
+        bool found = false;
+        // Check if the current element is present in arr2 
+        for (int j=0; j<n2; j++)
         {
-            num = std::stoi(w); // Convert the string to an integer
-            #ifndef NDEBUG
-            std::cout << "Converted integer: " << num << std::endl;
-            #endif
-
-            if(num>max)
+            if(arr1[index] == arr2[j])
             {
-                max = num;
-            }
-            if(num<min)
-            {
-                min = num;
+                found=true;
+                break;
             }
         }
-        catch (const std::invalid_argument &e)
+        if(found==false)
         {
-            #ifndef NDEBUG
-            std::cerr << "Invalid argument: " << e.what() << std::endl;
-            #endif
-        }
-        catch (const std::out_of_range &e)
-        {
-            #ifndef NDEBUG
-            std::cerr << "Out of range: " << e.what() << std::endl;
-            #endif
+            working_arr[working_index] = arr1[index];
+            working_index++;
         }
     }
-
-    return std::to_string(max) + " " + std::to_string(min);
+    
+    // Resize the array before returning
+    working_arr = (int*)realloc(working_arr, sizeof(int) * working_index);
+    *z = working_index;
+    return working_arr;
 }
