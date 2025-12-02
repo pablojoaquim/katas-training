@@ -1,14 +1,14 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef DLIST_H
+#define DLIST_H
 
 /*===========================================================================*/
 /**
- * @file list.h
+ * @file dlist.h
  *
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * API for the Simple Linked Lists implementation
+ * API for the Double Linked Lists implementation
  *
  * @todo Add full description here
  *
@@ -51,27 +51,28 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
-typedef struct ListNode
+typedef struct DListNode
 {
     void *data;
-    struct ListNode *next;
-} ListNode;
+    struct DListNode *next;
+    struct DListNode *prev;
+} DListNode;
 
 typedef struct
 {
-    ListNode *head;
-    ListNode *tail;
-} List;
+    DListNode *head;
+    DListNode *tail;
+} DList;
 
 /*****************************************************************************
- * @typedef    list_match_fn
+ * @typedef    dlist_match_fn
  * @brief      Callback used by list_contains() to compare node data against
  *             a user-provided criteria.
  * @param[in]  node_data   Pointer to the data stored in the list node.
  * @param[in]  criteria    Pointer to the matching criteria.
  * @return     true if node_data matches criteria, false otherwise.
  ******************************************************************************/
-typedef bool (*list_match_fn)(const void *node_data, const void *criteria);
+typedef bool (*dlist_match_fn)(const void *node_data, const void *criteria);
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -89,51 +90,51 @@ extern "C"
 #endif
 // @todo: Add pure C function prototypes here.
 /*****************************************************************************
- * @fn         list_init
+ * @fn         dlist_init
  * @brief      Initializes a list structure, setting it to an empty state.
  * @param [in] list   Pointer to the list instance to initialize.
  * @return     None
  ******************************************************************************/
-void list_init(List *list);
+void dlist_init(DList *list);
 
 /*****************************************************************************
- * @fn         list_push_head
+ * @fn         dlist_push_head
  * @brief      Inserts a new element at the beginning of the list.
  * @param[in]  list   Pointer to the list instance.
  * @param[in]  data   Pointer to the data to be stored in the new node.
  * @return     None.
  ******************************************************************************/
-void list_push_head(List *list, void *data);
+void dlist_push_head(DList *list, void *data);
 
 /*****************************************************************************
- * @fn         list_push_tail
+ * @fn         dlist_push_tail
  * @brief      Inserts a new element at the end of the list.
  * @param[in]  list   Pointer to the list instance.
  * @param[in]  data   Pointer to the data to be stored in the new node.
  * @return     None.
  ******************************************************************************/
-void list_push_tail(List *list, void *data);
+void dlist_push_tail(DList *list, void *data);
 
 /*****************************************************************************
- * @fn         list_pop_head
+ * @fn         dlist_pop_head
  * @brief      Removes and returns the element stored at the beginning
  *             of the list.
  * @param[in]  list   Pointer to the list instance.
  * @return     Pointer to the removed data, or NULL if the list is empty.
  ******************************************************************************/
-void *list_pop_head(List *list);
+void *dlist_pop_head(DList *list);
 
 /*****************************************************************************
- * @fn         list_pop_tail
+ * @fn         dlist_pop_tail
  * @brief      Removes and returns the element stored at the end
  *             of the list.
  * @param[in]  list   Pointer to the list instance.
  * @return     Pointer to the removed data, or NULL if the list is empty.
  ******************************************************************************/
-void *list_pop_tail(List *list);
+void *dlist_pop_tail(DList *list);
 
 /*****************************************************************************
- * @fn         list_contains
+ * @fn         dlist_contains
  * @brief      Checks whether the list contains at least one element that
  *             matches the given criteria, using a user-provided callback.
  * @param[in]  list      Pointer to the list instance.
@@ -141,7 +142,7 @@ void *list_pop_tail(List *list);
  * @param[in]  match     Function used to compare node_data vs criteria.
  * @return     true if a matching element is found, false otherwise.
  ******************************************************************************/
-bool list_contains(const List *list, const void *criteria, list_match_fn match);
+bool dlist_contains(const DList *list, const void *criteria, dlist_match_fn match);
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -157,4 +158,4 @@ bool list_contains(const List *list, const void *criteria, list_match_fn match);
 
 /*===========================================================================*/
 /*===========================================================================*/
-#endif /* LIST_H */
+#endif /* DLIST_H */
