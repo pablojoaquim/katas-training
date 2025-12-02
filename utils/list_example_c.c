@@ -1,0 +1,70 @@
+/*===========================================================================*/
+/**
+ * @file list_example.c
+ *
+ *------------------------------------------------------------------------------
+ *
+ * @section DESC DESCRIPTION:
+ * Example on how to use the FSM module
+ *
+ * @section ABBR ABBREVIATIONS:
+ *   - @todo List any abbreviations, precede each with a dash ('-').
+ *
+ * @section TRACE TRACEABILITY INFO:
+ *   - Design Document(s):
+ *     - @todo Update list of design document(s).
+ *
+ *   - Requirements Document(s):
+ *     - @todo Update list of requirements document(s)
+ *
+ *   - Applicable Standards (in order of precedence: highest first):
+ *     - @todo Update list of other applicable standards
+ *
+ */
+/*==========================================================================*/
+
+/*===========================================================================*
+ * Header Files
+ *===========================================================================*/
+#include <stdio.h>
+#include "list.h"
+
+/*===========================================================================*
+ * The matching function
+ *===========================================================================*/
+bool match_int(const void *node_data, const void *criteria)
+{
+    return *(const int *)node_data == *(const int *)criteria;
+}
+
+/*===========================================================================*
+ * The usage example
+ *===========================================================================*/
+int list_example (void)
+{
+    List l;
+    list_init(&l);
+    int a = 10, b = 20, c = 30;
+
+    printf("push head: %d\n", a);
+    list_push_head(&l, &a);
+
+    printf("push tail: %d\n", b);
+    list_push_tail(&l, &b);
+
+    printf("push tail: %d\n", c);
+    list_push_tail(&l, &c);
+
+    int key = 20;
+    printf("Contains 20? %s\n", list_contains(&l, &key, match_int) ? "yes" : "no");
+
+    int *p = list_pop_head(&l);
+    if (p)
+        printf("pop head: %d\n", *p);
+
+    p = list_pop_tail(&l);
+    if (p)
+        printf("pop tail: %d\n", *p);
+
+    return 0;
+}

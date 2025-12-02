@@ -1,0 +1,171 @@
+#ifndef LIST_H
+#define LIST_H
+
+/*===========================================================================*/
+/**
+ * @file list.h
+ *
+ *------------------------------------------------------------------------------
+ *
+ * @section DESC DESCRIPTION:
+ * API for the Simple Linked Lists implementation
+ *
+ * @todo Add full description here
+ *
+ * @section ABBR ABBREVIATIONS:
+ *   - @todo List any abbreviations, precede each with a dash ('-').
+ *
+ * @section TRACE TRACEABILITY INFO:
+ *   - Design Document(s):
+ *     - @todo Update list of design document(s).
+ *
+ *   - Requirements Document(s):
+ *     - @todo Update list of requirements document(s)
+ *
+ *   - Applicable Standards (in order of precedence: highest first):
+ *     - @todo Update list of other applicable standards
+ *
+ */
+/*==========================================================================*/
+
+/*===========================================================================*
+ * Header Files (Common to C and C++)
+ *===========================================================================*/
+#include <stddef.h>
+#include <stdbool.h>
+
+#ifdef __cplusplus
+/*===========================================================================*
+ * Header Files (C++ only)
+ *===========================================================================*/
+#endif
+
+/*===========================================================================*
+ * Exported Preprocessor #define Constants
+ *===========================================================================*/
+
+/*===========================================================================*
+ * Exported Preprocessor #define MACROS
+ *===========================================================================*/
+
+/*===========================================================================*
+ * Exported Type Declarations
+ *===========================================================================*/
+typedef struct ListNode
+{
+    void *data;
+    struct ListNode *next;
+} ListNode;
+
+typedef struct
+{
+    ListNode *head;
+    ListNode *tail;
+} List;
+
+/*****************************************************************************
+ * @typedef    list_match_fn
+ * @brief      Callback used by list_contains() to compare node data against
+ *             a user-provided criteria.
+ * @param[in]  node_data   Pointer to the data stored in the list node.
+ * @param[in]  criteria    Pointer to the matching criteria.
+ * @return     true if node_data matches criteria, false otherwise.
+ ******************************************************************************/
+typedef bool (*list_match_fn)(const void *node_data, const void *criteria);
+
+/*===========================================================================*
+ * Exported Classes (C++ only)
+ *===========================================================================*/
+#ifdef __cplusplus
+// @todo: Add C++ class declarations here.
+#endif
+
+/*===========================================================================*
+ * Exported C Function Prototypes
+ *===========================================================================*/
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+// @todo: Add pure C function prototypes here.
+/*****************************************************************************
+ * @fn         list_init
+ * @brief      Initializes a list structure, setting it to an empty state.
+ * @param [in] list   Pointer to the list instance to initialize.
+ * @return     None
+ ******************************************************************************/
+void list_init(List *list);
+
+/*****************************************************************************
+ * @fn         list_push_head
+ * @brief      Inserts a new element at the beginning of the list.
+ * @param[in]  list   Pointer to the list instance.
+ * @param[in]  data   Pointer to the data to be stored in the new node.
+ * @return     None.
+ ******************************************************************************/
+void list_push_head(List *list, void *data);
+
+/*****************************************************************************
+ * @fn         list_push_tail
+ * @brief      Inserts a new element at the end of the list.
+ * @param[in]  list   Pointer to the list instance.
+ * @param[in]  data   Pointer to the data to be stored in the new node.
+ * @return     None.
+ ******************************************************************************/
+void list_push_tail(List *list, void *data);
+
+/*****************************************************************************
+ * @fn         list_pop_head
+ * @brief      Removes and returns the element stored at the beginning
+ *             of the list.
+ * @param[in]  list   Pointer to the list instance.
+ * @return     Pointer to the removed data, or NULL if the list is empty.
+ ******************************************************************************/
+void *list_pop_head(List *list);
+
+/*****************************************************************************
+ * @fn         list_pop_tail
+ * @brief      Removes and returns the element stored at the end
+ *             of the list.
+ * @param[in]  list   Pointer to the list instance.
+ * @return     Pointer to the removed data, or NULL if the list is empty.
+ ******************************************************************************/
+void *list_pop_tail(List *list);
+
+/*****************************************************************************
+ * @fn         list_contains
+ * @brief      Checks whether the list contains at least one element that
+ *             matches the given criteria, using a user-provided callback.
+ * @param[in]  list      Pointer to the list instance.
+ * @param[in]  criteria  Pointer to the user-provided comparison data.
+ * @param[in]  match     Function used to compare node_data vs criteria.
+ * @return     true if a matching element is found, false otherwise.
+ ******************************************************************************/
+bool list_contains(const List *list, const void *criteria, list_match_fn match);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+/*===========================================================================*
+ * Exported C++ Function Prototypes
+ *===========================================================================*/
+#ifdef __cplusplus
+// @todo: Add pure C++ function prototypes here.
+
+/*****************************************************************************
+ * @fn         array_diff
+ * @brief      Computes the difference between two lists.
+ *             Remove all occurrences of elements from the first list (arr1)
+ *             that are present in the second list (arr2).
+ *             The order of elements in the first list is preserved in the result.
+ * @param [in] arr1
+ * @param [in] arr2
+ * @return     The resulted array. This array shall be freed by the caller.
+ ******************************************************************************/
+
+#endif /* __cplusplus */
+
+/*===========================================================================*/
+/*===========================================================================*/
+#endif /* LIST_H */
