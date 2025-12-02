@@ -6,6 +6,9 @@
  * @file kata.h
  *
  *------------------------------------------------------------------------------
+ * Copyright (c) 2025 - Pablo Joaquim
+ * MIT License: https://opensource.org/licenses/MIT
+ *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION: API for the Person module
  *

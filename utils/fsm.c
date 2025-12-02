@@ -3,6 +3,9 @@
  * @file fsm.c
  *
  *------------------------------------------------------------------------------
+ * Copyright (c) 2025 - Pablo Joaquim
+ * MIT License: https://opensource.org/licenses/MIT
+ *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
  * Finite state machine in C (FSM)

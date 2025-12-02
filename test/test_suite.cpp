@@ -3,6 +3,9 @@
  * @file test_suite.cpp
  *
  *------------------------------------------------------------------------------
+ * Copyright (c) 2025 - Pablo Joaquim
+ * MIT License: https://opensource.org/licenses/MIT
+ *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
  * Unit tests

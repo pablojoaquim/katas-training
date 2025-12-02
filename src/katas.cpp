@@ -3,6 +3,9 @@
  * @file katas.cpp
  *
  *------------------------------------------------------------------------------
+ * Copyright (c) 2025 - Pablo Joaquim
+ * MIT License: https://opensource.org/licenses/MIT
+ *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
  * Develop the code to solve the kata in this file

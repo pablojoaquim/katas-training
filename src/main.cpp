@@ -3,18 +3,12 @@
  * @file main.cpp
  *
  *------------------------------------------------------------------------------
+ * Copyright (c) 2025 - Pablo Joaquim
+ * MIT License: https://opensource.org/licenses/MIT
+ *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * You are given a string of space separated numbers, and have to return the highest and lowest number.
- * 
- * Examples
- * Input: "1 2 3 4 5"   =>  Output: "5 1"
- * Input: "1 2 -3 4 5"  =>  Output: "5 -3"
- * Input: "1 9 3 4 -5"  =>  Output: "9 -5"
- * Notes
- * All numbers are valid Int32, no need to validate them.
- * There will always be at least one number in the input string.
- * Output string must be two numbers separated by a single space, and highest number is first.
+ * Add a description here
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
@@ -75,7 +69,7 @@
  * Function Definitions
  *===========================================================================*/
 extern "C" {
-void fsm_example(void);
+int list_example (void);
 }
 
 
@@ -101,7 +95,7 @@ int main(int argc, char *argv[])
     // free(actual);
 
     std::cout << "=== Start ===" << std::endl;
-    fsm_example();
+    list_example();
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
