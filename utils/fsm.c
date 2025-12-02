@@ -181,32 +181,6 @@ bool fsm_post_event(fsm_ctx_t *ctx, fsm_event_id_t id, void *data)
 }
 
 /*****************************************************************************
- * Name         fsm_handle_event
- * Description  If the current state have a transition related to the received
- *              event, the guard is checked, the action related is taken, and
- *              then moved to the destination state
- *****************************************************************************/
-static void fsm_handle_event(fsm_ctx_t *ctx, fsm_event_t ev)
-{
-    if (!ctx->current)
-        return;
-
-    const fsm_transition_t *t = fsm_find_transition(ctx, ctx->current->id, ev.id);
-    if (!t)
-        return;
-
-    if (t->guard && !t->guard(ctx, ev.data))
-        return;
-
-    if (t->action)
-        t->action(ctx, ev.data);
-
-    const fsm_state_t *dst = fsm_find_state(ctx, t->dst);
-    if (dst)
-        fsm_change_state(ctx, dst);
-}
-
-/*****************************************************************************
  * Name         fsm_process_events
  * Description  Process the received events (till 'max' events)
  *****************************************************************************/
@@ -217,7 +191,27 @@ void fsm_process_events(fsm_ctx_t *ctx, int max)
 
     while (count < max && eq_pop(&ctx->evq, &ev))
     {
-        fsm_handle_event(ctx, ev);
+        if (ctx->current)
+        {
+            // If the current state have a transition related to the received
+            // event, the guard is checked, the action related is taken, and
+            // then moved to the destination state
+            const fsm_transition_t *t = fsm_find_transition(ctx, ctx->current->id, ev.id);
+            if (t)
+            {
+                bool guard_ok = true;
+                if (t->guard)
+                    guard_ok = t->guard(ctx, ev.data);
+                if (guard_ok)
+                {
+                    if (t->action)
+                        t->action(ctx, ev.data);
+                    const fsm_state_t *dst = fsm_find_state(ctx, t->dst);
+                    if (dst)
+                        fsm_change_state(ctx, dst);
+                }
+            }
+        }
         count++;
     }
 }

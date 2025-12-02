@@ -131,10 +131,7 @@ void fsm_process_events(fsm_ctx_t *ctx, int max);
 void fsm_run_do_action(fsm_ctx_t *ctx);
 
 /* FSM creation */
-void fsm_setup(
-    fsm_ctx_t *ctx,
-    const fsm_state_t *states, size_t state_count,
-    const fsm_transition_t *transitions, size_t transition_count);
+void fsm_setup(fsm_ctx_t *ctx, const fsm_state_t *states, size_t state_count, const fsm_transition_t *transitions, size_t transition_count);
 
 #ifdef __cplusplus
 } /* extern "C" */
