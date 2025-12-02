@@ -32,71 +32,20 @@
  *===========================================================================*/
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
+#include "fsm.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
-#define FSM_EVENT_QUEUE_SIZE 32
 
 /*===========================================================================*
  * Local Preprocessor #define MACROS
  *===========================================================================*/
-#define STATE(id, name, entry, exit, dofn) \
-{ id, name, entry, exit, dofn }
-
-#define TRANS(src, evt, guard, action, dst) \
-{ src, evt, guard, action, dst }
 
 /*===========================================================================*
  * Local Type Declarations
  *===========================================================================*/
-typedef int fsm_state_id_t;
-typedef int fsm_event_id_t;
-
-typedef struct fsm_ctx fsm_ctx_t; /* forward */
-
-/* Function prototypes for state/transitions */
-typedef void (*state_fn_t)(fsm_ctx_t *ctx);
-typedef bool (*guard_fn_t)(fsm_ctx_t *ctx, void *event_data);
-typedef void (*action_fn_t)(fsm_ctx_t *ctx, void *event_data);
-
-/* State management structure */
-typedef struct fsm_state
-{
-    fsm_state_id_t id; /* id */
-    const char *name;  /* name (mainly for debug) */
-
-    state_fn_t on_entry; /* on entry */
-    state_fn_t on_exit;  /* on exit */
-    state_fn_t on_do;    /* do it while keep in the state */
-} fsm_state_t;
-
-/* Transition management structure */
-typedef struct fsm_transition
-{
-    fsm_state_id_t src; /* source state */
-    fsm_event_id_t evt; /* event trigger */
-    guard_fn_t guard;   /* guard (NULL if NA) */
-    action_fn_t action; /* action to execute during transition (NULL if NA) */
-    fsm_state_id_t dst; /* destination state (same as src for loops) */
-} fsm_transition_t;
-
-/* Event queue (simple) - adaptable */
-typedef struct fsm_event
-{
-    fsm_event_id_t id;
-    void *data; /* data pointer (optional) */
-} fsm_event_t;
-
-typedef struct fsm_event_queue
-{
-    fsm_event_t buf[FSM_EVENT_QUEUE_SIZE];
-    int head;
-    int tail;
-    int count;
-} fsm_event_queue_t;
 
 /*===========================================================================*
  * Local Object Declarations
@@ -105,21 +54,6 @@ typedef struct fsm_event_queue
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
-/* FSM context */
-struct fsm_ctx
-{
-    const fsm_state_t *current;
-    const fsm_state_t *states; /* states array */
-    size_t state_count;
-
-    const fsm_transition_t *transitions; /* transitions array */
-    size_t transition_count;
-
-    fsm_event_queue_t evq; /* ev queue */
-
-    /* user data if necessary */
-    void *user_data;
-};
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -195,11 +129,6 @@ static const fsm_transition_t *fsm_find_transition(const fsm_ctx_t *ctx, fsm_sta
     return NULL;
 }
 
-/*****************************************************************************
- * Name         fsm_change_state
- * Description  Move to the destination state, executing on_exit from current 
- *              state and on_entry in the destination state.
- *****************************************************************************/
 static void fsm_change_state(fsm_ctx_t *ctx, const fsm_state_t *dst)
 {
     if (ctx->current == dst)
@@ -215,16 +144,40 @@ static void fsm_change_state(fsm_ctx_t *ctx, const fsm_state_t *dst)
 }
 
 /*****************************************************************************
+ * Name         fsm_change_state
+ * Description  Move to the destination state, executing on_exit from current
+ *              state and on_entry in the destination state.
+ *****************************************************************************/
+void fsm_setup(fsm_ctx_t *ctx, const fsm_state_t *states, size_t state_count, const fsm_transition_t *transitions, size_t transition_count)
+{
+    memset(ctx, 0, sizeof(*ctx));
+    ctx->states = states;
+    ctx->state_count = state_count;
+    ctx->transitions = transitions;
+    ctx->transition_count = transition_count;
+}
+
+/*****************************************************************************
  * Name         fsm_init
  * Description  Move the current state to the initial state and executes its
  *              on_entry function if any.
  *****************************************************************************/
-static void fsm_init(fsm_ctx_t *ctx, fsm_state_id_t initial_id)
+void fsm_init(fsm_ctx_t *ctx, fsm_state_id_t initial_id)
 {
     eq_init(&ctx->evq);
     ctx->current = fsm_find_state(ctx, initial_id);
     if (ctx->current && ctx->current->on_entry)
         ctx->current->on_entry(ctx);
+}
+
+/*****************************************************************************
+ * Name         fsm_post_event
+ * Description  Execute the on_do() of the current state (if any)
+ *****************************************************************************/
+bool fsm_post_event(fsm_ctx_t *ctx, fsm_event_id_t id, void *data)
+{
+    fsm_event_t ev = {.id = id, .data = data};
+    return eq_push(&ctx->evq, ev);
 }
 
 /*****************************************************************************
@@ -257,7 +210,7 @@ static void fsm_handle_event(fsm_ctx_t *ctx, fsm_event_t ev)
  * Name         fsm_process_events
  * Description  Process the received events (till 'max' events)
  *****************************************************************************/
-static void fsm_process_events(fsm_ctx_t *ctx, int max)
+void fsm_process_events(fsm_ctx_t *ctx, int max)
 {
     fsm_event_t ev;
     int count = 0;
@@ -270,100 +223,11 @@ static void fsm_process_events(fsm_ctx_t *ctx, int max)
 }
 
 /*****************************************************************************
- * Name         fsm_post_event
- * Description  Execute the on_do() of the current state (if any)
- *****************************************************************************/
-static bool fsm_post_event(fsm_ctx_t *ctx, fsm_event_id_t id, void *data)
-{
-    fsm_event_t ev = {.id = id, .data = data};
-    return eq_push(&ctx->evq, ev);
-}
-
-/*****************************************************************************
  * Name         fsm_run_do_action
  * Description  Execute the on_do() of the current state (if any)
  *****************************************************************************/
-static void fsm_run_do_action(fsm_ctx_t *ctx)
+void fsm_run_do_action(fsm_ctx_t *ctx)
 {
     if (ctx->current && ctx->current->on_do)
         ctx->current->on_do(ctx);
-}
-
-
-/*****************************************************************************
- * EXAMPLE
- *****************************************************************************/
-enum { S_IDLE = 1, S_WORKING = 2, S_ERROR = 3 };
-enum { EV_START = 1, EV_STOP = 2, EV_FAIL = 3, EV_RESET = 4 };
-
-static void idle_entry(fsm_ctx_t *ctx) { printf("ENTER IDLE\n"); }
-static void idle_exit (fsm_ctx_t *ctx) { printf("EXIT IDLE\n"); }
-static void idle_do (fsm_ctx_t *ctx) { printf("IDLE...\n"); }
-
-static void work_entry(fsm_ctx_t *ctx) { printf("ENTER WORKING\n"); }
-static void work_exit (fsm_ctx_t *ctx) { printf("EXIT WORKING\n"); }
-static void work_do (fsm_ctx_t *ctx) { printf("WORKING...\n"); }
-
-static void err_entry (fsm_ctx_t *ctx) { printf("ENTER ERROR\n"); }
-static void err_exit (fsm_ctx_t *ctx) { printf("EXIT ERROR\n"); }
-static void err_do (fsm_ctx_t *ctx) {}
-
-static bool guard_always(fsm_ctx_t *ctx, void *d) 
-{ 
-    return true; 
-}
-static bool guard_if_positive(fsm_ctx_t *ctx, void *d) 
-{
-    if (!d) 
-        return false;
-    return ((*(int*)d) > 0);
-}
-
-static void action_start(fsm_ctx_t *ctx, void *d) { printf("ACTION: start\n"); }
-static void action_stop (fsm_ctx_t *ctx, void *d) { printf("ACTION: stop\n"); }
-static void action_fail (fsm_ctx_t *ctx, void *d) { printf("ACTION: fail reported\n"); }
-
-
-static fsm_state_t states[] = 
-{
-    STATE(S_IDLE, "IDLE", idle_entry, idle_exit, idle_do),
-    STATE(S_WORKING, "WORKING", work_entry, work_exit, work_do),
-    STATE(S_ERROR, "ERROR", err_entry, err_exit, err_do)
-};
-
-static fsm_transition_t transitions[] = {
-    TRANS(S_IDLE, EV_START, guard_always, action_start, S_WORKING),
-    TRANS(S_WORKING, EV_STOP, guard_always, action_stop, S_IDLE),
-    TRANS(S_WORKING, EV_FAIL, guard_if_positive, action_fail, S_ERROR),
-    TRANS(S_ERROR, EV_RESET, guard_always, NULL, S_IDLE),
-};
-
-void fsm_example(void)
-{
-    fsm_ctx_t ctx;
-    memset(&ctx, 0, sizeof(ctx));
-
-    ctx.states = states;
-    ctx.state_count = sizeof(states)/sizeof(states[0]);
-    ctx.transitions = transitions;
-    ctx.transition_count = sizeof(transitions)/sizeof(transitions[0]);
-
-    fsm_init(&ctx, S_IDLE);
-
-    /* Post some events */
-    fsm_post_event(&ctx, EV_START, NULL);
-    fsm_post_event(&ctx, EV_FAIL, NULL); /* guard_if_positive -> require positive data, so no transitioning expected */
-
-    int positive = 5;
-    fsm_post_event(&ctx, EV_FAIL, &positive);
-
-    fsm_post_event(&ctx, EV_RESET, NULL);
-
-    /* Process up to 10 events */
-    fsm_process_events(&ctx, 10);
-
-    /* Execute the on_do() of the current state */
-    for (int i = 0; i < 3; ++i) {
-        fsm_run_do_action(&ctx);
-    }
 }
