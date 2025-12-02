@@ -40,6 +40,7 @@
 #include <string>
 #include <cstdint>
 #include "katas.h"
+#include "fsm.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -84,20 +85,21 @@
  *****************************************************************************/
 int main(int argc, char *argv[])
 {
-    const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
-    const int arr2[] = {1};
+    // const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
+    // const int arr2[] = {1};
 
-    size_t length;    
-    int *actual = array_diff(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
+    // size_t length;    
+    // int *actual = array_diff(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
 
-    printf("{ ");
-    for (size_t i = 0; i < length; i++)
-        printf("%d%s", actual[i], (i == length - 1) ? "" : ", ");
-    printf(" }");
+    // printf("{ ");
+    // for (size_t i = 0; i < length; i++)
+    //     printf("%d%s", actual[i], (i == length - 1) ? "" : ", ");
+    // printf(" }");
     
-    free(actual);
+    // free(actual);
 
-    // std::cout << "=== The result is: " << length << " ===" << std::endl;
-
+    std::cout << "=== Start ===" << std::endl;
+    fsm_example();
+    std::cout << "===  End  ===" << std::endl;
     return 0;
 }
