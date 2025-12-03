@@ -83,6 +83,12 @@ typedef bool (*dlist_match_fn)(const void *node_data, const void *criteria);
  ******************************************************************************/
 typedef void (*dlist_free_fn)(void *data);
 
+/*****************************************************************************
+ * @typedef    dlist_iter_fn
+ * @brief      Callback called by the foreach function to analyze each element
+ * @param[in]  data   Pointer to the data stored in the list node.
+ * @return     None
+ ******************************************************************************/
 typedef void (*dlist_iter_fn)(void *data);
 
 /*===========================================================================*
