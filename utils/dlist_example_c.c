@@ -27,6 +27,7 @@
  * Header Files
  *===========================================================================*/
 #include <stdio.h>
+#include <stdlib.h>
 #include "dlist.h"
 
 /*===========================================================================*
@@ -37,34 +38,92 @@ bool match_int(const void *node_data, const void *criteria)
     return *(const int *)node_data == *(const int *)criteria;
 }
 
+static void free_int(void *data)
+{
+    free(data);
+}
+
+static void print_int(void *data)
+{
+    printf("%d ", *(int *)data);
+}
+
 /*===========================================================================*
  * The usage example
  *===========================================================================*/
-int dlist_example (void)
+int dlist_example(void)
 {
-    DList dl;
-    dlist_init(&dl);
-    int a = 10, b = 20, c = 30;
+    DList list;
+    dlist_init(&list);
 
-    printf("push head: %d\n", a);
-    dlist_push_head(&dl, &a);
+    // Push initial elements
+    for (int i = 1; i <= 3; i++)
+    {
+        int *v = malloc(sizeof(int));
+        *v = i;
+        dlist_push_tail(&list, v);
+    }
 
-    printf("push tail: %d\n", b);
-    dlist_push_tail(&dl, &b);
+    printf("Initial list: ");
+    dlist_foreach(&list, print_int);
+    printf("\n");
 
-    printf("push tail: %d\n", c);
-    dlist_push_tail(&dl, &c);
+    printf("Size: %zu, empty: %s\n", dlist_size(&list), dlist_is_empty(&list)? "yes" : "no");
 
-    int key = 20;
-    printf("Contains 20? %s\n", dlist_contains(&dl, &key, match_int) ? "yes" : "no");
+    // Insert before head
+    int *val0 = malloc(sizeof(int));
+    *val0 = 0;
+    dlist_insert_before(&list, list.head, val0);
 
-    int *p = dlist_pop_head(&dl);
-    if (p)
-        printf("pop head: %d\n", *p);
+    // Insert after tail
+    int *val4 = malloc(sizeof(int));
+    *val4 = 4;
+    dlist_insert_after(&list, list.tail, val4);
 
-    p = dlist_pop_tail(&dl);
-    if (p)
-        printf("pop tail: %d\n", *p);
+    printf("After inserts: ");
+    dlist_foreach(&list, print_int);
+    printf("\n");
+
+    // Find
+    int criteria = 2;
+    void *found = dlist_find(&list, &criteria, match_int);
+    printf("Found 2? %s\n", found ? "yes" : "no");
+
+    // Remove
+    criteria = 3;
+    dlist_remove(&list, &criteria, match_int, free_int);
+
+    printf("After removing 3: ");
+    dlist_foreach(&list, print_int);
+    printf("\n");
+
+    // Clear entire list
+    dlist_clear(&list, free_int);
+    printf("Cleared. Size: %zu, empty: %s\n", dlist_size(&list), dlist_is_empty(&list)? "yes" : "no");
+
+    return 0;
+
+    // int a = 10, b = 20, c = 30;
+
+    // printf("push head: %d\n", a);
+    // dlist_push_head(&dl, &a);
+
+    // printf("push tail: %d\n", b);
+    // dlist_push_tail(&dl, &b);
+
+    // printf("push tail: %d\n", c);
+    // dlist_push_tail(&dl, &c);
+
+    // int key = 20;
+    // printf("Contains 20? %s\n", dlist_contains(&dl, &key, match_int) ? "yes" : "no");
+
+    // int *p = dlist_pop_head(&dl);
+    // if (p)
+    //     printf("pop head: %d\n", *p);
+
+    // p = dlist_pop_tail(&dl);
+    // if (p)
+    //     printf("pop tail: %d\n", *p);
 
     return 0;
 }
