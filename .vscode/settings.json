@@ -55,6 +55,7 @@
         "variant": "cpp",
         "sstream": "cpp",
         "stddef.h": "c",
-        "list.h": "c"
+        "list.h": "c",
+        "string.h": "c"
     }
 }

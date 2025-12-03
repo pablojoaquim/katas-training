@@ -1,0 +1,81 @@
+/*===========================================================================*/
+/**
+ * @file dlist_example.c
+ *
+ *------------------------------------------------------------------------------
+ *
+ * @section DESC DESCRIPTION:
+ * Example on how to use the Double Linked List module
+ *
+ * @section ABBR ABBREVIATIONS:
+ *   - @todo List any abbreviations, precede each with a dash ('-').
+ *
+ * @section TRACE TRACEABILITY INFO:
+ *   - Design Document(s):
+ *     - @todo Update list of design document(s).
+ *
+ *   - Requirements Document(s):
+ *     - @todo Update list of requirements document(s)
+ *
+ *   - Applicable Standards (in order of precedence: highest first):
+ *     - @todo Update list of other applicable standards
+ *
+ */
+/*==========================================================================*/
+
+/*===========================================================================*
+ * Header Files
+ *===========================================================================*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "dict.h"
+
+/*===========================================================================*
+ * The matching function
+ *===========================================================================*/
+void free_string(void *v)
+{
+    free(v);
+}
+
+void print_item(const char *key, void *value)
+{
+    printf("%s: %s\n", key, (char *)value);
+}
+
+/*===========================================================================*
+ * The usage example
+ *===========================================================================*/
+int dict_example(void)
+{
+    dict *d = dict_create(16, free_string);
+
+    // valores con malloc + memcpy
+    char *name = malloc(strlen("Victoria") + 1);
+    memcpy(name, "Victoria", strlen("Victoria"));
+    name[strlen("Victoria")] = '\0';
+
+    char *role = malloc(strlen("Paladin") + 1);
+    memcpy(role, "Paladin", strlen("Paladin"));
+    role[strlen("Paladin")] = '\0';
+
+    char *year = malloc(strlen("2025") + 1);
+    memcpy(year, "2025", strlen("2025"));
+    year[strlen("2025")] = '\0';
+
+    dict_set(d, "name", name);
+    dict_set(d, "role", role);
+    dict_set(d, "year", year);
+    dict_set(d, "Year", year);
+
+    printf("Iterando el dict:\n");
+    dict_foreach(d, print_item);
+
+    dict_remove(d, "role");
+    printf("\nDespués de eliminar 'role':\n");
+    dict_foreach(d, print_item);
+
+    dict_free(d);
+    return 0;
+}
