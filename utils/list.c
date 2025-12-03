@@ -70,8 +70,21 @@
  *****************************************************************************/
 void list_init(List *list)
 {
+    if (!list)
+        return;
     list->head = NULL;
     list->tail = NULL;
+    list->size = 0;
+}
+
+bool list_is_empty(const List *list)
+{
+    return list->size == 0;
+}
+
+size_t list_size(const List *list)
+{
+    return list->size;
 }
 
 /*****************************************************************************
@@ -83,10 +96,10 @@ void list_push_head(List *list, void *data)
     ListNode *node = malloc(sizeof(ListNode));
     node->data = data;
     node->next = list->head;
-
     list->head = node;
-    if (list->tail == NULL)
+    if (!list->tail)
         list->tail = node;
+    list->size++;
 }
 
 /*****************************************************************************
@@ -100,15 +113,12 @@ void list_push_tail(List *list, void *data)
     node->next = NULL;
 
     if (list->tail)
-    {
         list->tail->next = node;
-        list->tail = node;
-    }
     else
-    {
         list->head = node;
-        list->tail = node;
-    }
+
+    list->tail = node;
+    list->size++;
 }
 
 /*****************************************************************************
@@ -125,10 +135,11 @@ void *list_pop_head(List *list)
     void *data = node->data;
 
     list->head = node->next;
-    if (list->head == NULL)
+    if (!list->head)
         list->tail = NULL;
 
     free(node);
+    list->size--;
     return data;
 }
 
@@ -154,17 +165,14 @@ void *list_pop_tail(List *list)
     void *data = cur->data;
 
     if (prev)
-    {
         prev->next = NULL;
-        list->tail = prev;
-    }
     else
-    {
         list->head = NULL;
-        list->tail = NULL;
-    }
+
+    list->tail = prev;
 
     free(cur);
+    list->size--;
     return data;
 }
 
@@ -176,12 +184,109 @@ void *list_pop_tail(List *list)
  *****************************************************************************/
 bool list_contains(const List *list, const void *criteria, list_match_fn match)
 {
+    return list_find(list, criteria, match) != NULL;
+}
+
+/*****************************************************************************
+ * @fn         list_find
+ * @brief      Searches the list for the first node whose data matches the
+ *             provided criteria using the comparison callback.
+ * @param[in]  list      Pointer to the List instance.
+ * @param[in]  criteria  Pointer to the user-defined criteria to match.
+ * @param[in]  match     Function used to compare node data against criteria.
+ * @return     Pointer to the matching data if found, NULL otherwise.
+ ******************************************************************************/
+void *list_find(const List *list, const void *criteria, list_match_fn match)
+{
     ListNode *cur = list->head;
     while (cur)
     {
         if (match(cur->data, criteria))
+            return cur->data;
+        cur = cur->next;
+    }
+    return NULL;
+}
+
+/*****************************************************************************
+ * @fn         list_remove
+ * @brief      Removes the first node whose data matches the provided criteria
+ *             using the comparison callback. Optionally frees node data using
+ *             free_fn.
+ * @param[in]  list      Pointer to the List instance.
+ * @param[in]  criteria  Pointer to the user-defined criteria to match.
+ * @param[in]  match     Function used to determine if node data matches criteria.
+ * @param[in]  free_fn   Function used to free node data (may be NULL).
+ * @return     true if a node was removed, false otherwise.
+ ******************************************************************************/
+bool list_remove(List *list, const void *criteria, list_match_fn match, list_free_fn free_fn)
+{
+    ListNode *cur = list->head;
+    ListNode *prev = NULL;
+
+    while (cur)
+    {
+        if (match(cur->data, criteria))
+        {
+            if (prev)
+                prev->next = cur->next;
+            else
+                list->head = cur->next;
+
+            if (cur == list->tail)
+                list->tail = prev;
+
+            if (free_fn)
+                free_fn(cur->data);
+            free(cur);
+            list->size--;
             return true;
+        }
+        prev = cur;
         cur = cur->next;
     }
     return false;
+}
+
+/*****************************************************************************
+ * @fn         list_clear
+ * @brief      Removes all nodes from the list. If free_fn is provided, it is
+ *             called for each node's data. The list is reinitialized afterwards.
+ * @param[in]  list      Pointer to the List instance.
+ * @param[in]  free_fn   Function used to free node data (may be NULL).
+ * @return     None.
+ ******************************************************************************/
+void list_clear(List *list, list_free_fn free_fn)
+{
+    ListNode *cur = list->head;
+    while (cur)
+    {
+        ListNode *next = cur->next;
+        if (free_fn)
+            free_fn(cur->data);
+        free(cur);
+        cur = next;
+    }
+    list_init(list);
+}
+
+/*****************************************************************************
+ * @fn         list_foreach
+ * @brief      Iterates over all elements stored in the list and invokes the
+ *             supplied callback for each node's data.
+ * @param[in]  list      Pointer to the List instance.
+ * @param[in]  fn        Function to be executed for each node; receives node data.
+ * @return     None.
+ ******************************************************************************/
+void list_foreach(List *list, list_iter_fn fn)
+{
+    if (!list || !fn)
+        return;
+
+    ListNode *cur = list->head;
+    while (cur)
+    {
+        fn(cur->data);
+        cur = cur->next;
+    }
 }

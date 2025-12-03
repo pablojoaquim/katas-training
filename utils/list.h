@@ -61,6 +61,7 @@ typedef struct
 {
     ListNode *head;
     ListNode *tail;
+    size_t size;    
 } List;
 
 /*****************************************************************************
@@ -72,6 +73,22 @@ typedef struct
  * @return     true if node_data matches criteria, false otherwise.
  ******************************************************************************/
 typedef bool (*list_match_fn)(const void *node_data, const void *criteria);
+
+/*****************************************************************************
+ * @typedef    list_free_fn
+ * @brief      Callback used to free the used memory by data
+ * @param[in]  data   Pointer to the data stored in the list node.
+ * @return     None
+ ******************************************************************************/
+typedef void (*list_free_fn)(void *data);
+
+/*****************************************************************************
+ * @typedef    list_iter_fn
+ * @brief      Callback called by the foreach function to analyze each element
+ * @param[in]  data   Pointer to the data stored in the list node.
+ * @return     None
+ ******************************************************************************/
+typedef void (*list_iter_fn)(void *data);
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -95,6 +112,33 @@ extern "C"
  * @return     None
  ******************************************************************************/
 void list_init(List *list);
+
+/*****************************************************************************
+ * @fn         bool list_is_empty(const List *list);
+ * @brief      Checks whether the linked list contains no elements.
+ * @param[in]  list   Pointer to the List instance.
+ * @return     true if the list is empty, false otherwise.
+ ******************************************************************************/
+bool list_is_empty(const List *list);
+
+/*****************************************************************************
+ * @fn         list_size
+ * @brief      Retrieves the number of elements currently stored in the
+ *             linked list.
+ * @param[in]  list   Pointer to the List instance.
+ * @return     The number of elements in the list.
+ ******************************************************************************/
+size_t list_size(const List *list);
+
+/*****************************************************************************
+ * @fn         list_foreach
+ * @brief      Iterates over all elements stored in the linked list
+ *             and invokes the supplied callback for each node's data.
+ * @param[in]  list   Pointer to the List instance.
+ * @param[in]  fn     Function to be executed for each node; receives node data.
+ * @return     None.
+ ******************************************************************************/
+void list_foreach(List *list, list_iter_fn fn);
 
 /*****************************************************************************
  * @fn         list_push_head
@@ -142,6 +186,39 @@ void *list_pop_tail(List *list);
  * @return     true if a matching element is found, false otherwise.
  ******************************************************************************/
 bool list_contains(const List *list, const void *criteria, list_match_fn match);
+
+/*****************************************************************************
+ * @fn         list_find
+ * @brief      Searches the list for the first node whose data matches the
+ *             provided criteria using the given comparison callback.
+ * @param[in]  list      Pointer to the List instance.
+ * @param[in]  criteria  Pointer to the user-provided comparison data.
+ * @param[in]  match     Function used to compare node_data vs criteria.
+ * @return     Pointer to the matching data, or NULL if no match is found.
+ ******************************************************************************/
+void *list_find(const List *list, const void *criteria, list_match_fn match);
+
+/*****************************************************************************
+ * @fn         list_remove
+ * @brief      Removes the first node whose data matches the provided criteria
+ *             using the comparison callback.
+ * @param[in]  list      Pointer to the List instance.
+ * @param[in]  criteria  Pointer to the user-provided comparison data.
+ * @param[in]  match     Function used to determine if a node matches criteria.
+ * @param[in]  free_fn   Function used to free node data (may be NULL).
+ * @return     true if a node was removed, false otherwise.
+ ******************************************************************************/
+bool list_remove(List *list, const void *criteria, list_match_fn match, list_free_fn free_fn);
+
+/*****************************************************************************
+ * @fn         list_clear
+ * @brief      Removes all nodes from the list.
+ *             If free_fn is provided, it is called for each node’s data.
+ * @param[in]  list      Pointer to the List instance.
+ * @param[in]  free_fn   Function used to free node data (may be NULL).
+ * @return     None.
+ ******************************************************************************/
+void list_clear(List *list, list_free_fn free_fn);
 
 #ifdef __cplusplus
 } /* extern "C" */

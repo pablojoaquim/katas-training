@@ -69,7 +69,7 @@
  * Function Definitions
  *===========================================================================*/
 extern "C" {
-int dlist_example (void);
+int list_example (void);
 }
 
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     // free(actual);
 
     std::cout << "=== Start ===" << std::endl;
-    dlist_example();
+    list_example();
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
