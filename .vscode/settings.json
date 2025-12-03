@@ -56,6 +56,7 @@
         "sstream": "cpp",
         "stddef.h": "c",
         "list.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "dict_example_c": "cpp"
     }
 }

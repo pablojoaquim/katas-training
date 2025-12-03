@@ -1,11 +1,11 @@
 /*===========================================================================*/
 /**
- * @file dlist_example.c
+ * @file dict_example.c
  *
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * Example on how to use the Double Linked List module
+ * Example on how to use the Dictionary module
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
