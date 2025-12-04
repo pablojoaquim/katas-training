@@ -1,6 +1,9 @@
+#ifndef OBJECT_H
+#define OBJECT_H
+
 /*===========================================================================*/
 /**
- * @file main.cpp
+ * @file object.h
  *
  *------------------------------------------------------------------------------
  * Copyright (c) 2025 - Pablo Joaquim
@@ -8,7 +11,9 @@
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * Add a description here
+ * API for the Object design pattern
+ *
+ * @todo Add full description here
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
@@ -27,87 +32,78 @@
 /*==========================================================================*/
 
 /*===========================================================================*
- * Header Files
+ * Header Files (Common to C and C++)
  *===========================================================================*/
-#include <iostream>
-#include <memory>
-#include <string>
-#include <cstdint>
-#include "katas.h"
-#include "object.h"
+#include <stdint.h>
+
+#ifdef __cplusplus
+/*===========================================================================*
+ * Header Files (C++ only)
+ *===========================================================================*/
+#endif
 
 /*===========================================================================*
- * Local Preprocessor #define Constants
- *===========================================================================*/
-#define NDEBUG
-
-/*===========================================================================*
- * Local Preprocessor #define MACROS
- *===========================================================================*/
-// #define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
-
-/*===========================================================================*
- * Local Type Declarations
+ * Exported Preprocessor #define Constants
  *===========================================================================*/
 
 /*===========================================================================*
- * Local Object Declarations
+ * Exported Preprocessor #define MACROS
  *===========================================================================*/
 
 /*===========================================================================*
- * Local Variables Definitions
+ * Exported Type Declarations
  *===========================================================================*/
+// The key in object pattern is that the user is responsible for allocation of objects.
+// User must either allocate the object on stack of the main thread or as part of 
+// another object which will be using our object
+struct object
+{
+    uint32_t variable;
+    uint32_t flags;
+};
 
 /*===========================================================================*
- * Local Function Prototypes
+ * Exported Classes (C++ only)
  *===========================================================================*/
+#ifdef __cplusplus
+// @todo: Add C++ class declarations here.
+#endif
 
 /*===========================================================================*
- * Local Inline Function Definitions and Function-Like Macros
+ * Exported C Function Prototypes
  *===========================================================================*/
-
-/*===========================================================================*
- * Function Definitions
- *===========================================================================*/
+#ifdef __cplusplus
 extern "C"
 {
-    struct application
-    {
-        struct object obj;
-    };
-    int application_init(struct application *self)
-    {
-        object_init(&self->obj);
-        return 0;
-    }
-}
+#endif
+// @todo: Add pure C function prototypes here.
+
+int object_init(struct object *self);
+int object_deinit(struct object *self);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+/*===========================================================================*
+ * Exported C++ Function Prototypes
+ *===========================================================================*/
+#ifdef __cplusplus
+// @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         main
- * @brief      The main entry point
- * @param [in] void
- * @return     0 -success, -1 -Error
- *****************************************************************************/
-int main(int argc, char *argv[])
-{
-    // const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
-    // const int arr2[] = {1};
+ * @fn         array_diff
+ * @brief      Computes the difference between two lists.
+ *             Remove all occurrences of elements from the first list (arr1)
+ *             that are present in the second list (arr2).
+ *             The order of elements in the first list is preserved in the result.
+ * @param [in] arr1
+ * @param [in] arr2
+ * @return     The resulted array. This array shall be freed by the caller.
+ ******************************************************************************/
 
-    // size_t length;
-    // int *actual = array_diff(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
+#endif /* __cplusplus */
 
-    // printf("{ ");
-    // for (size_t i = 0; i < length; i++)
-    //     printf("%d%s", actual[i], (i == length - 1) ? "" : ", ");
-    // printf(" }");
-
-    // free(actual);
-
-    std::cout << "=== Start ===" << std::endl;
-    application app;
-    application_init(&app);
-    // queue_example();
-    // suma(1, 2);
-    std::cout << "===  End  ===" << std::endl;
-    return 0;
-}
+/*===========================================================================*/
+/*===========================================================================*/
+#endif /* OBJECT_H */

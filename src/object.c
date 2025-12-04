@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /**
- * @file main.cpp
+ * @file object.cpp
  *
  *------------------------------------------------------------------------------
  * Copyright (c) 2025 - Pablo Joaquim
@@ -8,7 +8,23 @@
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * Add a description here
+ * The most basic and also perhaps the most useful design pattern in C is the object pattern.
+ * The object pattern groups data into a hierarchy of data structures and directs functions to
+ * operate on these data structures.
+ * The key aspect of the object pattern is that it makes data flow along the code path instead of
+ * being referenced externally.
+ * This has a tremendous effect on cleanliness of the whole software architecture because it
+ * gives the programmer a clear view into what data a function will modify directly.
+ *  • Context is passed as parameter: we use self parameter to access all data that belongs
+ *    to the object upon which a function operates.
+ *  • Data is never accessed globally: any global or singleton data is never accessed directly
+ *    but instead is accessed through singleton methods (see singleton pattern for more
+ *    information on how this is implemented).
+ *  • Functions do not have static data: all data is part of the object being operated on. There
+ *    is no static data in object methods. Data is either part of the object.
+ *  • Data flows along call path: this is an important feature that ensures we have clear
+ *    boundaries between methods that use particular data. This is incredibly useful for multithreaded
+ *    environments because it makes data locking very straightforward when needed.
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
@@ -29,11 +45,9 @@
 /*===========================================================================*
  * Header Files
  *===========================================================================*/
-#include <iostream>
-#include <memory>
-#include <string>
-#include <cstdint>
-#include "katas.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "object.h"
 
 /*===========================================================================*
@@ -44,7 +58,6 @@
 /*===========================================================================*
  * Local Preprocessor #define MACROS
  *===========================================================================*/
-// #define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 /*===========================================================================*
  * Local Type Declarations
@@ -57,6 +70,7 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
+// int working_arr[100];
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -69,45 +83,25 @@
 /*===========================================================================*
  * Function Definitions
  *===========================================================================*/
-extern "C"
+
+/*****************************************************************************
+ * Name         object_init
+ * Description  Initalize everything in here. 
+ *              Is the same as the constructor of an object
+ *****************************************************************************/
+int object_init(struct object *self)
 {
-    struct application
-    {
-        struct object obj;
-    };
-    int application_init(struct application *self)
-    {
-        object_init(&self->obj);
-        return 0;
-    }
+    memset(self, 0, sizeof(*self));
+    return 0;
 }
 
 /*****************************************************************************
- * @fn         main
- * @brief      The main entry point
- * @param [in] void
- * @return     0 -success, -1 -Error
+ * Name         object_deinit
+ * Description  Clean everything in here. 
+ *              Is the same as the destructor of an object
  *****************************************************************************/
-int main(int argc, char *argv[])
+int object_deinit(struct object *self)
 {
-    // const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
-    // const int arr2[] = {1};
-
-    // size_t length;
-    // int *actual = array_diff(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
-
-    // printf("{ ");
-    // for (size_t i = 0; i < length; i++)
-    //     printf("%d%s", actual[i], (i == length - 1) ? "" : ", ");
-    // printf(" }");
-
-    // free(actual);
-
-    std::cout << "=== Start ===" << std::endl;
-    application app;
-    application_init(&app);
-    // queue_example();
-    // suma(1, 2);
-    std::cout << "===  End  ===" << std::endl;
+    // cleanup
     return 0;
 }
