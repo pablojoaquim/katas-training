@@ -90,7 +90,7 @@ bool list_init(List *list, ListNode *pool, size_t capacity)
 
 /*****************************************************************************
  * Name         list_is_empty
- * Description  Check for empty
+ * Description  Returns true if the list has no elements.
  *****************************************************************************/
 bool list_is_empty(const List *list)
 {
@@ -99,7 +99,7 @@ bool list_is_empty(const List *list)
 
 /*****************************************************************************
  * Name         list_size
- * Description  The size of the list
+ * Description  Returns the number of elements currently stored in the list.
  *****************************************************************************/
 size_t list_size(const List *list)
 {

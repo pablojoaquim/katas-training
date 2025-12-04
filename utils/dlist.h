@@ -63,6 +63,14 @@ typedef struct
     DListNode *head;
     DListNode *tail;
     size_t size;
+
+    /* Prealocated pool of nodes */
+    DListNode *pool;
+    size_t pool_capacity;
+
+    /* nodes available */
+    DListNode *free_list;
+
 } DList;
 
 /*****************************************************************************
@@ -110,9 +118,9 @@ extern "C"
  * @fn         dlist_init
  * @brief      Initializes a DList structure, setting it to an empty state.
  * @param [in] list   Pointer to the DList instance to initialize.
- * @return     None
+ * @return     True if the list is init ok, False otherwise.
  ******************************************************************************/
-void dlist_init(DList *list);
+bool dlist_init(DList *list, DListNode *pool, size_t capacity);
 
 /*****************************************************************************
  * @fn         dlist_is_empty
@@ -146,18 +154,18 @@ void dlist_foreach(DList *list, dlist_iter_fn fn);
  * @brief      Inserts a new element at the beginning of the list.
  * @param[in]  list   Pointer to the DList instance.
  * @param[in]  data   Pointer to the data to be stored in the new node.
- * @return     None.
+ * @return     true if the data is stored ok, false otherwise.
  ******************************************************************************/
-void dlist_push_head(DList *list, void *data);
+bool dlist_push_head(DList *list, void *data);
 
 /*****************************************************************************
  * @fn         dlist_push_tail
  * @brief      Inserts a new element at the end of the list.
  * @param[in]  list   Pointer to the DList instance.
  * @param[in]  data   Pointer to the data to be stored in the new node.
- * @return     None.
+ * @return     true if the data is stored ok, false otherwise.
  ******************************************************************************/
-void dlist_push_tail(DList *list, void *data);
+bool dlist_push_tail(DList *list, void *data);
 
 /*****************************************************************************
  * @fn         dlist_pop_head
@@ -227,9 +235,9 @@ void dlist_clear(DList *list, dlist_free_fn free_fn);
  * @param[in]  list   Pointer to the DList instance.
  * @param[in]  pos    Pointer to the node before which the new node is inserted.
  * @param[in]  data   Pointer to the data to store in the new node.
- * @return     None.
+ * @return     True if the node is inserted, False otherwise.
  ******************************************************************************/
-void dlist_insert_before(DList *list, DListNode *pos, void *data);
+bool dlist_insert_before(DList *list, DListNode *pos, void *data);
 
 /*****************************************************************************
  * @fn         dlist_insert_after
@@ -237,9 +245,9 @@ void dlist_insert_before(DList *list, DListNode *pos, void *data);
  * @param[in]  list   Pointer to the DList instance.
  * @param[in]  pos    Pointer to the node after which the new node is inserted.
  * @param[in]  data   Pointer to the data to store in the new node.
- * @return     None.
+ * @return     True if the node is inserted, False otherwise.
  ******************************************************************************/
-void dlist_insert_after(DList *list, DListNode *pos, void *data);
+bool dlist_insert_after(DList *list, DListNode *pos, void *data);
 
 #ifdef __cplusplus
 } /* extern "C" */

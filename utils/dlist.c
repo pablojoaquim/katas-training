@@ -68,11 +68,25 @@
  * Name         dlist_init
  * Description  Initialize the list structure, leaving it empty.
  *****************************************************************************/
-void dlist_init(DList *list)
+bool dlist_init(DList *list, DListNode *pool, size_t capacity)
 {
+    if (!list || !pool || capacity == 0)
+        return false;
+
     list->head = NULL;
     list->tail = NULL;
     list->size = 0; 
+
+    list->pool = pool;
+    list->pool_capacity = capacity;
+
+    /* Init the free list */
+    list->free_list = &pool[0];
+    for (size_t i = 0; i < capacity - 1; i++)
+        pool[i].next = &pool[i + 1];
+    pool[capacity - 1].next = NULL;
+
+    return true;
 }
 
 /*****************************************************************************
@@ -91,6 +105,31 @@ bool dlist_is_empty(const DList *list)
 size_t dlist_size(const DList *list)
 {
     return list->size;
+}
+
+/*****************************************************************************
+ * Name         alloc_node
+ * Description  Request a node from the pool
+ *****************************************************************************/
+static DListNode *alloc_node(DList *list)
+{
+    if (!list->free_list)
+        return NULL;
+
+    DListNode *node = list->free_list;
+    list->free_list = node->next;
+
+    return node;
+}
+
+/*****************************************************************************
+ * Name         free_node
+ * Description  Returns a node to the pool
+ *****************************************************************************/
+static void free_node(DList *list, DListNode *node)
+{
+    node->next = list->free_list;
+    list->free_list = node;
 }
 
 /*****************************************************************************
@@ -115,9 +154,12 @@ void dlist_foreach(DList *list, dlist_iter_fn fn)
  * Name         dlist_push_head
  * Description  Insert a new element at the beginning of the list.
  *****************************************************************************/
-void dlist_push_head(DList *list, void *data)
+bool dlist_push_head(DList *list, void *data)
 {
-    DListNode *node = malloc(sizeof(DListNode));
+    DListNode *node = alloc_node(list);
+    if (!node)
+        return false;
+
     node->data = data;
     node->prev = NULL;
     node->next = list->head;
@@ -129,15 +171,18 @@ void dlist_push_head(DList *list, void *data)
 
     list->head = node;
     list->size++;
+    return true;
 }
 
 /*****************************************************************************
  * Name         dlist_push_tail
  * Description  Insert a new element at the end of the list.
  *****************************************************************************/
-void dlist_push_tail(DList *list, void *data)
+bool dlist_push_tail(DList *list, void *data)
 {
-    DListNode *node = malloc(sizeof(DListNode));
+    DListNode *node = alloc_node(list);
+    if (!node)
+        return false;    
     node->data = data;
     node->next = NULL;
     node->prev = list->tail;
@@ -149,6 +194,7 @@ void dlist_push_tail(DList *list, void *data)
 
     list->tail = node;
     list->size++;
+    return true;
 }
 
 /*****************************************************************************
@@ -170,7 +216,7 @@ void *dlist_pop_head(DList *list)
     else
         list->tail = NULL;
 
-    free(node);
+    free_node(list, node);
     list->size--;
     return data;
 }
@@ -194,7 +240,7 @@ void *dlist_pop_tail(DList *list)
     else
         list->head = NULL;
 
-    free(node);
+    free_node(list, node);
     list->size--;
     return data;
 }
@@ -253,7 +299,7 @@ bool dlist_remove(DList *list, const void *criteria, dlist_match_fn match, dlist
 
             if (free_fn)
                 free_fn(cur->data);
-            free(cur);
+            free_node(list, cur);
             list->size--;
             return true;
         }
@@ -275,10 +321,11 @@ void dlist_clear(DList *list, dlist_free_fn free_fn)
         DListNode *next = cur->next;
         if (free_fn)
             free_fn(cur->data);
-        free(cur);
+        free_node(list, cur);
         cur = next;
     }
-    dlist_init(list);
+    list->head = list->tail = NULL;
+    list->size = 0;
 }
 
 /*****************************************************************************
@@ -286,16 +333,17 @@ void dlist_clear(DList *list, dlist_free_fn free_fn)
  * Description  Insert a new node before the given position node. If pos is NULL,
  *              the element is inserted at the head of the list.
  *****************************************************************************/
-void dlist_insert_before(DList *list, DListNode *pos, void *data)
+bool dlist_insert_before(DList *list, DListNode *pos, void *data)
 {
     if (!pos)
     {
-        dlist_push_head(list, data);
-        return;
+        return dlist_push_head(list, data);
     }
-    DListNode *node = malloc(sizeof(DListNode));
-    node->data = data;
+    DListNode *node = alloc_node(list);
+    if (!node)
+        return false;
 
+    node->data = data;
     node->prev = pos->prev;
     node->next = pos;
 
@@ -306,6 +354,7 @@ void dlist_insert_before(DList *list, DListNode *pos, void *data)
 
     pos->prev = node;
     list->size++;
+    return true;
 }
 
 /*****************************************************************************
@@ -313,16 +362,17 @@ void dlist_insert_before(DList *list, DListNode *pos, void *data)
  * Description  Insert a new node after the given position node. If pos is NULL,
  *              the element is inserted at the tail of the list.
  *****************************************************************************/
-void dlist_insert_after(DList *list, DListNode *pos, void *data)
+bool dlist_insert_after(DList *list, DListNode *pos, void *data)
 {
     if (!pos)
     {
-        dlist_push_tail(list, data);
-        return;
+        return dlist_push_tail(list, data);
     }
-    DListNode *node = malloc(sizeof(DListNode));
-    node->data = data;
+    DListNode *node = alloc_node(list);
+    if (!node)
+        return false;
 
+    node->data = data;
     node->next = pos->next;
     node->prev = pos;
 
@@ -333,4 +383,5 @@ void dlist_insert_after(DList *list, DListNode *pos, void *data)
 
     pos->next = node;
     list->size++;
+    return true;
 }

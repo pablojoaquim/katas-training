@@ -53,8 +53,11 @@ static void print_int(void *data)
  *===========================================================================*/
 int dlist_example(void)
 {
+    #define LIST_CAPACITY 64
+    DListNode pool[LIST_CAPACITY];
+
     DList list;
-    dlist_init(&list);
+    dlist_init(&list, pool, LIST_CAPACITY);
 
     // Push initial elements
     for (int i = 1; i <= 3; i++)
