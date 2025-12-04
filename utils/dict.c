@@ -29,9 +29,9 @@
 /*===========================================================================*
  * Header Files
  *===========================================================================*/
-#include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "dict.h"
 
 /*===========================================================================*
@@ -66,154 +66,239 @@
  * Function Definitions
  *===========================================================================*/
 /*****************************************************************************
- * Name         hash
+ * Name         hash_key
  * Description  hash function for strings based in djb2 algorithm, created by
  *              Daniel J. Bernstein.
  *****************************************************************************/
-static size_t hash(const char *key, size_t capacity)
+static uint32_t hash_key(const char *str)
 {
-    size_t h = 5381;
+    uint32_t hash = 5381;
     int c;
-    while ((c = *key++))
-        h = ((h << 5) + h) + c; // h * 33 + c
-    return h % capacity;
+    while ((c = *str++))
+    {
+        hash = ((hash << 5) + hash) + c;
+    }
+    return hash;
 }
 
 /*****************************************************************************
- * Name         dict_create
- * Description  Creates a new dictionary with a given capacity and optional value free function.
+ * Name         dict_init
+ * Description  Initializes a dictionary instance with provided storage and configuration.
  *****************************************************************************/
-dict *dict_create(size_t capacity, dict_free_fn free_fn)
+bool dict_init(dict_t *dict, void *storage, uint16_t max_entries,
+               uint16_t key_max_len, dict_free_fn free_fn)
 {
-    dict *d = malloc(sizeof(dict));
-    d->capacity = capacity;
-    d->buckets = calloc(capacity, sizeof(dict_item *));
-    d->free_fn = free_fn;
-    return d;
+    if (!dict || !storage || max_entries == 0)
+        return false;
+
+    dict->entries = (dict_entry_t *)storage;
+    dict->max_entries = max_entries;
+    dict->key_max_len = key_max_len;
+    dict->count = 0;
+    dict->free_fn = free_fn;
+
+    // Initialize all entries
+    char *ptr = (char *)storage;
+    char *key_storage = ptr + sizeof(dict_entry_t) * max_entries;
+
+    for (int i = 0; i < max_entries; i++)
+    {
+        dict->entries[i].occupied = false;
+        dict->entries[i].key = key_storage + (key_max_len * i);
+        dict->entries[i].value = NULL;
+        dict->entries[i].key[0] = '\0';
+    }
+
+    return true;
+}
+
+/*****************************************************************************
+ * Name         dict_calc_storage_size_req
+ * Description  Calculates the required storage size for a dictionary.
+ *****************************************************************************/
+size_t dict_calc_storage_size_req(uint16_t max_entries, uint16_t key_max_len)
+{
+    return sizeof(dict_entry_t) * max_entries + (key_max_len * max_entries);
 }
 
 /*****************************************************************************
  * Name         dict_set
  * Description  Sets or updates the value associated with a key.
  *****************************************************************************/
-int dict_set(dict *d, const char *key, void *value)
+bool dict_set(dict_t *dict, const char *key, void *value)
 {
-    size_t idx = hash(key, d->capacity);
-    dict_item *cur = d->buckets[idx];
+    if (!dict || !key)
+        return false;
+    if (strlen(key) >= dict->key_max_len)
+        return false;
 
-    // If the key already exist, overwrite the value
-    while (cur)
+    uint32_t hash = hash_key(key);
+    uint32_t idx = hash % dict->max_entries;
+    uint32_t start_idx = idx;
+
+    do
     {
-        if (strcmp(cur->key, key) == 0)
-        {
-            if (d->free_fn && cur->value)
-                d->free_fn(cur->value);
-            cur->value = value;
-            return 1;
+        if (!dict->entries[idx].occupied)
+        { 
+            /* If the entry is available copy the key and value */
+            strncpy(dict->entries[idx].key, key, dict->key_max_len - 1);
+            dict->entries[idx].key[dict->key_max_len - 1] = '\0';
+            dict->entries[idx].value = value;
+            dict->entries[idx].occupied = true;
+            dict->count++;
+            return true;
         }
-        cur = cur->next;
-    }
+        else if (strcmp(dict->entries[idx].key, key) == 0)
+        {   
+            /* If the key is the same, free the prev value and update the new one */
+            if (dict->free_fn && dict->entries[idx].value)
+            {
+                dict->free_fn(dict->entries[idx].value);
+            }
+            dict->entries[idx].value = value;
+            return true;
+        }
+        idx = (idx + 1) % dict->max_entries;
+    } while (idx != start_idx);
 
-    // New item
-    dict_item *new_item = malloc(sizeof(dict_item));
-    size_t key_len = strlen(key);
-    new_item->key = malloc(key_len + 1); // +1 for the null terminator
-    memcpy(new_item->key, key, key_len); // copy the key string
-    new_item->key[key_len] = '\0';       // add null terminator
-
-    new_item->value = value;
-    new_item->next = d->buckets[idx];
-    d->buckets[idx] = new_item;
-    return 1;
+    return false; // Dictionary full
 }
 
 /*****************************************************************************
  * Name         dict_get
- * Description  Retrieves the value associated with the specified key.
+ * Description  Retrieves the value associated with the given key.
  *****************************************************************************/
-void *dict_get(dict *d, const char *key)
+void *dict_get(dict_t *dict, const char *key)
 {
-    size_t idx = hash(key, d->capacity);
-    dict_item *cur = d->buckets[idx];
-    while (cur)
+    if (!dict || !key)
+        return NULL;
+
+    uint32_t hash = hash_key(key);
+    uint32_t idx = hash % dict->max_entries;
+    uint32_t start_idx = idx;
+
+    do
     {
-        if (strcmp(cur->key, key) == 0)
-            return cur->value;
-        cur = cur->next;
-    }
+        if (!dict->entries[idx].occupied)
+            return NULL;
+        if (strcmp(dict->entries[idx].key, key) == 0)
+            return dict->entries[idx].value;
+        idx = (idx + 1) % dict->max_entries;
+    } while (idx != start_idx);
+
     return NULL;
 }
 
 /*****************************************************************************
- * Name         dict_remove
- * Description  Removes the entry for the given key, calling free_fn if defined.
+ * Name         dict_contains
+ * Description  Checks if the dictionary contains the specified key.
  *****************************************************************************/
-int dict_remove(dict *d, const char *key)
+bool dict_contains(dict_t *dict, const char *key)
 {
-    size_t idx = hash(key, d->capacity);
-    dict_item *cur = d->buckets[idx];
-    dict_item *prev = NULL;
-
-    while (cur)
-    {
-        if (strcmp(cur->key, key) == 0)
-        {
-            if (prev)
-                prev->next = cur->next;
-            else
-                d->buckets[idx] = cur->next;
-            if (d->free_fn && cur->value)
-                d->free_fn(cur->value);
-            free(cur->key);
-            free(cur);
-            return 1;
-        }
-        prev = cur;
-        cur = cur->next;
-    }
-    return 0;
+    return dict_get(dict, key) != NULL;
 }
 
 /*****************************************************************************
- * Name         dict_free
- * Description  Frees the dictionary and all its contents.
+ * Name         dict_delete
+ * Description  Removes the entry for the specified key.
  *****************************************************************************/
-void dict_free(dict *d)
+bool dict_delete(dict_t *dict, const char *key)
 {
-    for (size_t i = 0; i < d->capacity; i++)
+    if (!dict || !key)
+        return false;
+
+    uint32_t hash = hash_key(key);
+    uint32_t idx = hash % dict->max_entries;
+    uint32_t start_idx = idx;
+
+    do
     {
-        dict_item *cur = d->buckets[i];
-        while (cur)
+        if (!dict->entries[idx].occupied)
+            return false;
+        if (strcmp(dict->entries[idx].key, key) == 0)
         {
-            dict_item *tmp = cur;
-            cur = cur->next;
-            if (d->free_fn && tmp->value)
-                d->free_fn(tmp->value);
-            free(tmp->key);
-            free(tmp);
+            if (dict->free_fn && dict->entries[idx].value)
+                dict->free_fn(dict->entries[idx].value);
+            dict->entries[idx].occupied = false;
+            dict->entries[idx].key[0] = '\0';
+            dict->entries[idx].value = NULL;
+            dict->count--;
+ 
+            /******************************************************************************
+            * Rehash subsequent entries to maintain correct probe sequence after deletion:
+            * In linear probing, keys that collided may be displaced from their "ideal" slot.
+            * If we simply mark a deleted slot as empty, a lookup for a displaced key could fail.
+            * This loop moves any following entries that should come before the deleted slot
+            * back into the empty slot, preserving the invariant that all keys are reachable
+            * by probing from their hashed index.
+            *******************************************************************************/
+            uint32_t next_idx = (idx + 1) % dict->max_entries;
+            while (dict->entries[next_idx].occupied)
+            {
+                uint32_t ideal_idx = hash_key(dict->entries[next_idx].key) % dict->max_entries;
+                if ((idx < next_idx && (ideal_idx <= idx || ideal_idx > next_idx)) ||
+                    (idx > next_idx && (ideal_idx <= idx && ideal_idx > next_idx)))
+                {
+                    strcpy(dict->entries[idx].key, dict->entries[next_idx].key);
+                    dict->entries[idx].value = dict->entries[next_idx].value;
+                    dict->entries[idx].occupied = true;
+                    dict->entries[next_idx].occupied = false;
+                    dict->entries[next_idx].key[0] = '\0';
+                    dict->entries[next_idx].value = NULL;
+                    idx = next_idx;
+                }
+                next_idx = (next_idx + 1) % dict->max_entries;
+            }
+            return true;
         }
-    }
-    free(d->buckets);
-    free(d);
+        idx = (idx + 1) % dict->max_entries;
+    } while (idx != start_idx);
+
+    return false;
 }
 
 /*****************************************************************************
  * Name         dict_foreach
- * Description  Iterate through all nodes in the dict and call the provided
- *              callback function for each element.
+ * Description  Iterates over all dictionary entries and calls a callback function.
  *****************************************************************************/
-void dict_foreach(dict *d, dict_iter_fn fn)
+void dict_foreach(dict_t *dict, dict_iter_fn fn)
 {
-    if (!d || !fn)
+    if (!dict || !fn)
         return;
-
-    for (size_t i = 0; i < d->capacity; i++)
+    for (int i = 0; i < dict->max_entries; i++)
     {
-        dict_item *cur = d->buckets[i];
-        while (cur)
+        if (dict->entries[i].occupied)
+            fn(dict->entries[i].key, dict->entries[i].value);
+    }
+}
+
+/*****************************************************************************
+ * Name         dict_size
+ * Description  Returns the number of entries currently stored in the dictionary.
+ *****************************************************************************/
+uint16_t dict_size(dict_t *dict)
+{
+    return dict ? dict->count : 0;
+}
+
+/*****************************************************************************
+ * Name         dict_clear
+ * Description  Removes all entries from the dictionary.
+ *****************************************************************************/
+void dict_clear(dict_t *dict)
+{
+    if (!dict)
+        return;
+    for (int i = 0; i < dict->max_entries; i++)
+    {
+        if (dict->entries[i].occupied)
         {
-            fn(cur->key, cur->value);
-            cur = cur->next;
+            if (dict->free_fn && dict->entries[i].value)
+                dict->free_fn(dict->entries[i].value);
+            dict->entries[i].occupied = false;
+            dict->entries[i].key[0] = '\0';
+            dict->entries[i].value = NULL;
         }
     }
+    dict->count = 0;
 }
