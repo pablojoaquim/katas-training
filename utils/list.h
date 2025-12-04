@@ -61,7 +61,15 @@ typedef struct
 {
     ListNode *head;
     ListNode *tail;
-    size_t size;    
+    size_t size;
+
+    /* pool of nodes preallocated by the user */
+    ListNode *pool;
+    size_t pool_capacity;
+
+    /* nodes available */
+    ListNode *free_list;
+
 } List;
 
 /*****************************************************************************
@@ -109,14 +117,16 @@ extern "C"
  * @fn         list_init
  * @brief      Initializes a list structure, setting it to an empty state.
  * @param [in] list   Pointer to the list instance to initialize.
- * @return     None
+ * @param[in]  pool     Pointer to the List of nodes preallocated by the user
+ * @param[in]  capacity Nodes available for the Linked list
+ * @return     True if the list is init ok, False otherwise.
  ******************************************************************************/
-void list_init(List *list);
+bool list_init(List *list, ListNode *pool, size_t capacity);
 
 /*****************************************************************************
  * @fn         bool list_is_empty(const List *list);
  * @brief      Checks whether the linked list contains no elements.
- * @param[in]  list   Pointer to the List instance.
+ * @param[in]  list     Pointer to the List instance.
  * @return     true if the list is empty, false otherwise.
  ******************************************************************************/
 bool list_is_empty(const List *list);
@@ -145,18 +155,18 @@ void list_foreach(List *list, list_iter_fn fn);
  * @brief      Inserts a new element at the beginning of the list.
  * @param[in]  list   Pointer to the list instance.
  * @param[in]  data   Pointer to the data to be stored in the new node.
- * @return     None.
+ * @return     true if the data is stored ok, false otherwise.
  ******************************************************************************/
-void list_push_head(List *list, void *data);
+bool list_push_head(List *list, void *data);
 
 /*****************************************************************************
  * @fn         list_push_tail
  * @brief      Inserts a new element at the end of the list.
  * @param[in]  list   Pointer to the list instance.
  * @param[in]  data   Pointer to the data to be stored in the new node.
- * @return     None.
+ * @return     true if the data is stored ok, false otherwise.
  ******************************************************************************/
-void list_push_tail(List *list, void *data);
+bool list_push_tail(List *list, void *data);
 
 /*****************************************************************************
  * @fn         list_pop_head

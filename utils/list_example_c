@@ -53,8 +53,11 @@ static void print_int(void *data)
  *===========================================================================*/
 int list_example(void)
 {
+    #define LIST_CAPACITY 64
+    ListNode pool[LIST_CAPACITY];
+
     List list;
-    list_init(&list);
+    list_init(&list, pool, LIST_CAPACITY);
 
     // Push elements
     for (int i = 1; i <= 3; i++)

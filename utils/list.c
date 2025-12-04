@@ -68,47 +68,95 @@
  * Name         list_init
  * Description  Initialize the list structure, leaving it empty.
  *****************************************************************************/
-void list_init(List *list)
+bool list_init(List *list, ListNode *pool, size_t capacity)
 {
-    if (!list)
-        return;
+    if (!list || !pool || capacity == 0)
+        return false;
     list->head = NULL;
     list->tail = NULL;
     list->size = 0;
+
+    list->pool = pool;
+    list->pool_capacity = capacity;
+
+    /* Init the free list */
+    list->free_list = &pool[0];
+    for (size_t i = 0; i < capacity - 1; i++)
+        pool[i].next = &pool[i + 1];
+    pool[capacity - 1].next = NULL;
+
+    return true;
 }
 
+/*****************************************************************************
+ * Name         list_is_empty
+ * Description  Check for empty
+ *****************************************************************************/
 bool list_is_empty(const List *list)
 {
     return list->size == 0;
 }
 
+/*****************************************************************************
+ * Name         list_size
+ * Description  The size of the list
+ *****************************************************************************/
 size_t list_size(const List *list)
 {
     return list->size;
 }
 
 /*****************************************************************************
+ * Name         alloc_node
+ * Description  Request a node from the pool
+ *****************************************************************************/
+static ListNode *alloc_node(List *list)
+{
+    if (!list->free_list)
+        return NULL;  // no more nodes free
+
+    ListNode *node = list->free_list;
+    list->free_list = node->next;
+    return node;
+}
+
+/*****************************************************************************
+ * Name         free_node
+ * Description  Returns a node to the pool
+ *****************************************************************************/
+static void free_node(List *list, ListNode *node)
+{
+    node->next = list->free_list;
+    list->free_list = node;
+}
+
+/*****************************************************************************
  * Name         list_push_head
  * Description  Insert a new element at the beginning of the list.
  *****************************************************************************/
-void list_push_head(List *list, void *data)
+bool list_push_head(List *list, void *data)
 {
-    ListNode *node = malloc(sizeof(ListNode));
+    ListNode *node = alloc_node(list);
+    if (!node)
+        return false;  // Pool is full
     node->data = data;
     node->next = list->head;
     list->head = node;
     if (!list->tail)
         list->tail = node;
     list->size++;
+    return true;
 }
 
 /*****************************************************************************
  * Name         list_push_tail
  * Description  Insert a new element at the end of the list.
  *****************************************************************************/
-void list_push_tail(List *list, void *data)
+bool list_push_tail(List *list, void *data)
 {
-    ListNode *node = malloc(sizeof(ListNode));
+    ListNode *node = alloc_node(list);
+    if (!node)
+        return false;   // Pool is full
     node->data = data;
     node->next = NULL;
 
@@ -119,6 +167,8 @@ void list_push_tail(List *list, void *data)
 
     list->tail = node;
     list->size++;
+
+    return true;
 }
 
 /*****************************************************************************
@@ -138,7 +188,7 @@ void *list_pop_head(List *list)
     if (!list->head)
         list->tail = NULL;
 
-    free(node);
+    free_node(list, node);
     list->size--;
     return data;
 }
@@ -171,7 +221,7 @@ void *list_pop_tail(List *list)
 
     list->tail = prev;
 
-    free(cur);
+    free_node(list, cur);
     list->size--;
     return data;
 }
@@ -238,7 +288,7 @@ bool list_remove(List *list, const void *criteria, list_match_fn match, list_fre
 
             if (free_fn)
                 free_fn(cur->data);
-            free(cur);
+            free_node(list, cur);
             list->size--;
             return true;
         }
@@ -264,10 +314,11 @@ void list_clear(List *list, list_free_fn free_fn)
         ListNode *next = cur->next;
         if (free_fn)
             free_fn(cur->data);
-        free(cur);
+        free_node(list, cur);
         cur = next;
     }
-    list_init(list);
+    list->head = list->tail = NULL;
+    list->size = 0;
 }
 
 /*****************************************************************************
