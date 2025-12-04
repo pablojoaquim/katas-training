@@ -78,10 +78,11 @@ extern "C"
  * @fn         cqueue_init
  * @brief      Initializes the circular queue.
  * @param[in]  q       Pointer to the Queue instance.
+ * @param[in]  buffer  Pointer to the memory the Queue shall use.
  * @param[in]  capacity Maximum number of elements.
  * @return     true if initialization succeeded, false otherwise.
  ******************************************************************************/
-bool queue_init(Queue *q, size_t capacity);
+bool queue_init(Queue *q, void **buffer, size_t capacity);
 
 /*****************************************************************************
  * @fn         cqueue_free

@@ -68,14 +68,11 @@
  * Name         queue_init
  * Description  Initializes the circular queue.
  *****************************************************************************/
-bool queue_init(Queue *q, size_t capacity)
+bool queue_init(Queue *q, void **buffer, size_t capacity)
 {
     if (!q || capacity == 0)
         return false;
-    q->buffer = malloc(sizeof(void *) * capacity);
-    if (!q->buffer)
-        return false;
-
+    q->buffer = buffer;
     q->capacity = capacity;
     q->head = 0;
     q->tail = 0;
@@ -91,7 +88,7 @@ void queue_free(Queue *q)
 {
     if (!q)
         return;
-    free(q->buffer);
+
     q->buffer = NULL;
     q->capacity = 0;
     q->head = 0;
