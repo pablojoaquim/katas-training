@@ -1,9 +1,9 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef SINGLETON_H
+#define SINGLETON_H
 
 /*===========================================================================*/
 /**
- * @file object.h
+ * @file singleton.h
  *
  *------------------------------------------------------------------------------
  * Copyright (c) 2025 - Pablo Joaquim
@@ -11,25 +11,20 @@
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * The Object pattern provides a way to structure code in C using principles
- * similar to object-oriented programming. An object is represented by a struct
- * whose layout is visible to the user, and the API operates on the object via a
- * "self" pointer. This pattern enables encapsulation, clear ownership rules, and
- * a well-defined lifecycle, while maintaining full transparency of the data
- * structure.
- * The Object pattern is appropriate when:
- *   - Users must allocate the object directly on the stack.
- *   - The internal fields are intentionally part of the public contract.
- *   - ABI stability is not a strict requirement.
+ * Simple Singleton pattern implementation in C.
  *
- * The typical usage pattern resembles a constructor/destructor model:
- *      struct object obj;         // allocated by the user
- *      object_init(&obj);         // constructor-like initialization
- *      object_set_value(&obj, 10);
- *      int v = object_get_value(&obj);
- *      object_deinit(&obj);       // destructor-like cleanup
+ * This pattern guarantees that only one instance of an object exists and provides
+ * a global point of access to it. In C, this is typically implemented by storing
+ * a static instance inside the implementation (.c file), hiding the data from the
+ * user and exposing a stateless API.
  *
- * @todo Add full description here
+ * Unlike the object or opaque patterns, the user never allocates memory or creates
+ * an instance. The instance is created automatically the first time it is accessed.
+ *
+ * Usage example:
+ *      singleton_set_value(42);
+ *      int v = singleton_get_value();
+ *      printf("Value = %d\n", v);
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
@@ -43,9 +38,8 @@
  *
  *   - Applicable Standards (in order of precedence: highest first):
  *     - @todo Update list of other applicable standards
- *
  */
-/*==========================================================================*/
+/*===========================================================================*/
 
 /*===========================================================================*
  * Header Files (Common to C and C++)
@@ -69,14 +63,6 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
-// The key in object pattern is that the user is responsible for allocation of objects.
-// User must either allocate the object on stack of the main thread or as part of 
-// another object which will be using our object
-struct object
-{
-    uint32_t variable;
-    uint32_t flags;
-};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -93,9 +79,16 @@ extern "C"
 {
 #endif
 // @todo: Add pure C function prototypes here.
+/**
+ * @brief Sets a value inside the singleton instance.
+ */
+void singleton_set_value(uint32_t value);
 
-int object_init(struct object *self);
-int object_deinit(struct object *self);
+/**
+ * @brief Retrieves the internal value stored in the singleton instance.
+ */
+uint32_t singleton_get_value(void);
+
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -107,19 +100,9 @@ int object_deinit(struct object *self);
 #ifdef __cplusplus
 // @todo: Add pure C++ function prototypes here.
 
-/*****************************************************************************
- * @fn         array_diff
- * @brief      Computes the difference between two lists.
- *             Remove all occurrences of elements from the first list (arr1)
- *             that are present in the second list (arr2).
- *             The order of elements in the first list is preserved in the result.
- * @param [in] arr1
- * @param [in] arr2
- * @return     The resulted array. This array shall be freed by the caller.
- ******************************************************************************/
-
 #endif /* __cplusplus */
 
 /*===========================================================================*/
 /*===========================================================================*/
-#endif /* OBJECT_H */
+#endif /* SINGLETON_H */
+

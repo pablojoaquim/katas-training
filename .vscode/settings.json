@@ -57,6 +57,9 @@
         "stddef.h": "c",
         "list.h": "c",
         "string.h": "c",
-        "dict_example_c": "cpp"
+        "dict_example_c": "cpp",
+        "queue_example_c": "c",
+        "list_example_c": "cpp",
+        "stdbool.h": "c"
     }
 }

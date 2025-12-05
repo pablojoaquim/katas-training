@@ -35,6 +35,7 @@
 #include <cstdint>
 #include "katas.h"
 #include "object.h"
+#include "singleton.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -80,6 +81,8 @@ extern "C"
         object_init(&self->obj);
         return 0;
     }
+
+    int dict_example(void);
 }
 
 /*****************************************************************************
@@ -104,8 +107,16 @@ int main(int argc, char *argv[])
     // free(actual);
 
     std::cout << "=== Start ===" << std::endl;
+    // dict_example();
+
     application app;
     application_init(&app);
+
+    singleton_set_value(123);
+    printf("Singleton value = %u\n", singleton_get_value());
+    singleton_set_value(999);
+    printf("Singleton value = %u\n", singleton_get_value());
+
     // queue_example();
     // suma(1, 2);
     std::cout << "===  End  ===" << std::endl;

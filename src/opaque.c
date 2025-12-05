@@ -8,17 +8,23 @@
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * Opaque pattern is an extension of the object pattern where we make the object
- * data structure fully private and not visible outside of the implementation.
- * As the user don't know anything about the Opaque object to reserve the necessary
- * memory a function is necessary to return that size.
- * The usage is as follows:
- * Create an opaque type on the stack
+ * This file contains the private definition of the opaque object. The structure 
+ * is fully defined here and remains hidden from users of the API, who only see 
+ * an incomplete forward declaration in the header. This ensures that:
+ *   - The internal representation of the object is completely encapsulated.
+ *   - The ABI remains stable even if the internal layout changes.
+ *   - Users can only interact with the object through the provided functions.
+ * Memory for the opaque object must be allocated by the user. The API enforces
+ * a construction/destruction lifecycle similar to object-oriented programming:
  *      struct opaque *obj = malloc(opaque_size());
- *      opaque_init(obj);
- *      opaque_set_data(obj, 123);
- *      opaque_deinit(obj);
- *      free(obj); 
+ *      opaque_init(obj);          // constructor
+ *      ... use object ...
+ *      opaque_deinit(obj);        // destructor
+ *      free(obj);
+ * This pattern is often used when it is necessary to provide a clean public 
+ * interface while keeping implementation details private. It is ideal for 
+ * firmware modules, libraries, and abstractions where hiding internal data 
+ * improves maintainability, modularity and reduces coupling.
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').

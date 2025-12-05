@@ -11,9 +11,28 @@
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * API for the Opaque design pattern
+ * The Opaque pattern is a variation of the Object pattern in which the internal
+ * data structure of the object is completely hidden from the user. Only a
+ * forward declaration of the type is exposed in this header, preventing any
+ * external code from accessing or depending on the internal layout of the
+ * object.
+ * Memory ownership remains with the user: the user is responsible for allocating
+ * enough memory for the opaque object (typically using opaque_size() to obtain
+ * the required size), and is also responsible for calling opaque_init() and
+ * opaque_deinit() to properly construct and destruct the object.
+ * The main advantages of this pattern are:
+ *   - Encapsulation: the internal fields of the object are fully private.
+ *   - ABI stability: changes to the internal structure do not affect users.
+ *   - Controlled initialization: only the exposed functions can manipulate the
+ *     internal state.
  *
- * @todo Add full description here
+ * Typical usage:
+ *      struct opaque *obj = malloc(opaque_size());
+ *      opaque_init(obj);
+ *      opaque_set_data(obj, 123);
+ *      uint32_t v = opaque_get_data(obj);
+ *      opaque_deinit(obj);
+ *      free(obj);
  *
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
@@ -91,17 +110,6 @@ uint32_t opaque_get_data(struct opaque *self);
  *===========================================================================*/
 #ifdef __cplusplus
 // @todo: Add pure C++ function prototypes here.
-
-/*****************************************************************************
- * @fn         array_diff
- * @brief      Computes the difference between two lists.
- *             Remove all occurrences of elements from the first list (arr1)
- *             that are present in the second list (arr2).
- *             The order of elements in the first list is preserved in the result.
- * @param [in] arr1
- * @param [in] arr2
- * @return     The resulted array. This array shall be freed by the caller.
- ******************************************************************************/
 
 #endif /* __cplusplus */
 
