@@ -1,6 +1,6 @@
 /*===========================================================================*/
 /**
- * @file main.cpp
+ * @file observer.cpp
  *
  *------------------------------------------------------------------------------
  * Copyright (c) 2025 - Pablo Joaquim
@@ -8,8 +8,30 @@
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * Add a description here
+ * Implementation of a small Observer pattern framework for C.
+ * This file contains the internal logic for managing observers in a Subject:
+ * - Initializing a subject with a user-provided buffer
+ * - Registering observer callbacks
+ * - Unregistering callbacks (O(1) using swap-delete)
+ * - Notifying all subscribed observers
+ * The implementation avoids dynamic memory and relies solely on arrays
+ * provided by the caller. This makes it appropriate for real-time or
+ * embedded environments.
  *
+ * ### How It Works
+ * - A `Subject` holds an array of `Observer` items.
+ * - Each `Observer` stores:
+ *      - A callback function
+ *      - A user argument passed back during notifications
+ * - When `subject_notify()` is called, each callback is invoked in the order
+ *   they are stored.
+ * 
+ * @warning The API does not check for duplicate registrations. If the same
+ *          callback is registered more than once, it will be called multiple
+ *          times.
+ * 
+ * @see observer.h for public API and example usage.
+ * 
  * @section ABBR ABBREVIATIONS:
  *   - @todo List any abbreviations, precede each with a dash ('-').
  *
@@ -29,13 +51,6 @@
 /*===========================================================================*
  * Header Files
  *===========================================================================*/
-#include <iostream>
-#include <memory>
-#include <string>
-#include <cstdint>
-#include "katas.h"
-#include "object.h"
-#include "singleton.h"
 #include "observer.h"
 
 /*===========================================================================*
@@ -46,7 +61,6 @@
 /*===========================================================================*
  * Local Preprocessor #define MACROS
  *===========================================================================*/
-// #define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 /*===========================================================================*
  * Local Type Declarations
@@ -59,6 +73,7 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
+// int working_arr[100];
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -71,81 +86,53 @@
 /*===========================================================================*
  * Function Definitions
  *===========================================================================*/
-extern "C"
-{
-    struct application
-    {
-        struct object obj;
-    };
-    int application_init(struct application *self)
-    {
-        object_init(&self->obj);
-        return 0;
-    }
 
-    void observer_A(struct Subject *s, void *arg)
-    {
-        printf("Observer A notified. Message: %s\n", (char *)arg);
-    }
-
-    void observer_B(struct Subject *s, void *arg)
-    {
-        printf("Observer B notified. Message: %s\n", (char *)arg);
-    }
-
-    int dict_example(void);
+/*****************************************************************************
+ * Name         subject_init
+ * Description  Initialize the observers for the subject
+ *****************************************************************************/
+void subject_init(Subject *s, Observer *buffer, size_t capacity) {
+    s->observers = buffer;
+    s->capacity = capacity;
+    s->count = 0;
 }
 
 /*****************************************************************************
- * @fn         main
- * @brief      The main entry point
- * @param [in] void
- * @return     0 -success, -1 -Error
+ * Name         subject_register
+ * Description  Register an observer for the subject
  *****************************************************************************/
-int main(int argc, char *argv[])
-{
-    // const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
-    // const int arr2[] = {1};
+int subject_register(Subject *s, ObserverCallback cb, void *user_arg) {
+    if (s->count >= s->capacity) return -1;
 
-    // size_t length;
-    // int *actual = array_diff(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
+    s->observers[s->count].callback = cb;
+    s->observers[s->count].user_arg = user_arg;
+    s->count++;
 
-    // printf("{ ");
-    // for (size_t i = 0; i < length; i++)
-    //     printf("%d%s", actual[i], (i == length - 1) ? "" : ", ");
-    // printf(" }");
-
-    // free(actual);
-
-    std::cout << "=== Start ===" << std::endl;
-    // dict_example();
-
-    application app;
-    application_init(&app);
-
-    singleton_set_value(123);
-    printf("Singleton value = %u\n", singleton_get_value());
-    singleton_set_value(999);
-    printf("Singleton value = %u\n", singleton_get_value());
-
-    Observer buffer[5];
-    Subject subject;
-
-    subject_init(&subject, buffer, 5);
-
-    subject_register(&subject, observer_A, (void*)"hello from A");
-    subject_register(&subject, observer_B, (void*)"hello from B");
-
-    printf("== Notifying observers ==\n");
-    subject_notify(&subject);
-
-    subject_unregister(&subject, observer_A);
-
-    printf("== After removing A ==\n");
-    subject_notify(&subject);
-
-    // queue_example();
-    // suma(1, 2);
-    std::cout << "===  End  ===" << std::endl;
     return 0;
+}
+
+/*****************************************************************************
+ * Name         subject_unregister
+ * Description  Unregister an observer for the subject
+ *****************************************************************************/
+int subject_unregister(Subject *s, ObserverCallback cb) {
+    for (size_t i = 0; i < s->count; i++) {
+        if (s->observers[i].callback == cb) {
+            /* Replace removed with last element */
+            s->observers[i] = s->observers[s->count - 1];
+            s->count--;
+            return 0;
+        }
+    }
+    return -1;
+}
+
+/*****************************************************************************
+ * Name         subject_notify
+ * Description  Notify to all the observers about an event in the subject
+ *****************************************************************************/
+void subject_notify(Subject *s) {
+    for (size_t i = 0; i < s->count; i++) {
+        s->observers[i].callback(s, s->observers[i].user_arg);
+    }
 }
