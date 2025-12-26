@@ -73,27 +73,7 @@
  *===========================================================================*/
 extern "C"
 {
-    struct application
-    {
-        struct object obj;
-    };
-    int application_init(struct application *self)
-    {
-        object_init(&self->obj);
-        return 0;
-    }
-
-    void observer_A(struct Subject *s, void *arg)
-    {
-        printf("Observer A notified. Message: %s\n", (char *)arg);
-    }
-
-    void observer_B(struct Subject *s, void *arg)
-    {
-        printf("Observer B notified. Message: %s\n", (char *)arg);
-    }
-
-    int dict_example(void);
+    
 }
 
 /*****************************************************************************
@@ -108,7 +88,7 @@ int main(int argc, char *argv[])
     // const int arr2[] = {1};
 
     // size_t length;
-    // int *actual = array_diff(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
+    // int *actual = camelCaseBreaker(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
 
     // printf("{ ");
     // for (size_t i = 0; i < length; i++)
@@ -118,34 +98,7 @@ int main(int argc, char *argv[])
     // free(actual);
 
     std::cout << "=== Start ===" << std::endl;
-    // dict_example();
-
-    application app;
-    application_init(&app);
-
-    singleton_set_value(123);
-    printf("Singleton value = %u\n", singleton_get_value());
-    singleton_set_value(999);
-    printf("Singleton value = %u\n", singleton_get_value());
-
-    Observer buffer[5];
-    Subject subject;
-
-    subject_init(&subject, buffer, 5);
-
-    subject_register(&subject, observer_A, (void*)"hello from A");
-    subject_register(&subject, observer_B, (void*)"hello from B");
-
-    printf("== Notifying observers ==\n");
-    subject_notify(&subject);
-
-    subject_unregister(&subject, observer_A);
-
-    printf("== After removing A ==\n");
-    subject_notify(&subject);
-
-    // queue_example();
-    // suma(1, 2);
+    std::cout << camelCaseBreaker("camelCaseString") << std::endl;
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }

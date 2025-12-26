@@ -81,16 +81,14 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         array_diff
- * @brief      Computes the difference between two lists. 
- *             Remove all occurrences of elements from the first list (arr1) 
- *             that are present in the second list (arr2). 
- *             The order of elements in the first list is preserved in the result.
- * @param [in] arr1
- * @param [in] arr2
+ * @fn         camelCaseBreaker
+ * @brief      Break up camel casing strings, using a space between words.
+ *             The returned buffer should be dynamically allocated and 
+ *             will be freed by a callerr
+ * @param [in] camelCase - The string to break
  * @return     The resulted array. This array shall be freed by the caller.
  ******************************************************************************/
-int *array_diff(const int *arr1, size_t n1, const int *arr2, size_t n2, size_t *z);
+char* camelCaseBreaker(const char *camelCase);
 
 #endif /* __cplusplus */
 

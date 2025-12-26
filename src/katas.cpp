@@ -32,6 +32,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -69,45 +70,39 @@
 
 
 /*****************************************************************************
- * Name         array_diff
- * Description  Computes the difference between two lists.
- *              The length of the returned array goes to *z, and the returned 
- *              array shall be freed by the caller
+ * Name         camelCaseBreaker
+ * Description  Break up camel casing strings, using a space between words.
+ *              The returned buffer should be dynamically allocated and 
+ *              will be freed by a callerr
  *****************************************************************************/
-int *array_diff(const int *arr1, size_t n1, const int *arr2, size_t n2, size_t *z)
+char* camelCaseBreaker(const char *camelCase) 
 {
-    int index;
-    int working_index = 0;
-    int* working_arr = (int*) malloc(n1 * sizeof(int));
-    // Check for lack of available memory
-    if(NULL == (working_arr))
+    int len = strlen(camelCase);
+
+    // Goes through the input string and count the number of upper case letters
+    int upperCaseCnt = 0;
+    for(int i=0; i<len; i++)
     {
-        *z = 0;
-        return NULL;
+        if(camelCase[i]>='A' && camelCase[i]<='Z' && i!=0)
+        upperCaseCnt++;
     }
 
-    // Move thorugh the arr1
-    for (index=0; index<n1; index++)
-    {
-        bool found = false;
-        // Check if the current element is present in arr2 
-        for (int j=0; j<n2; j++)
-        {
-            if(arr1[index] == arr2[j])
-            {
-                found=true;
-                break;
-            }
-        }
-        if(found==false)
-        {
-            working_arr[working_index] = arr1[index];
-            working_index++;
-        }
-    }
+    // Prepare the output string
+    char* str = (char*)malloc(len+upperCaseCnt+1);
     
-    // Resize the array before returning
-    working_arr = (int*)realloc(working_arr, sizeof(int) * working_index);
-    *z = working_index;
-    return working_arr;
+    // Simple solution but needs a big buffer which probably we're not going to use
+    // char* str = (char*)malloc(200);
+    int pos = 0;
+    for(int i=0; i<len;i++)
+    {
+        if(camelCase[i]>='A' && camelCase[i]<='Z' && i!=0)
+        {
+            str[pos] = ' ';
+            pos++;
+        }
+        str[pos] = camelCase[i];
+        pos++;    
+    }
+    str[pos]='\0';
+    return (str);
 }
