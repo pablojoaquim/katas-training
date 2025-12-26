@@ -33,6 +33,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -68,41 +69,44 @@
  * Function Definitions
  *===========================================================================*/
 
+ void printArr (int curr, size_t len, int *arr)
+ {
+    printf("-- %d ---", curr);
+    for (size_t i = 0; i < len; ++i)
+    {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+ }
 
 /*****************************************************************************
- * Name         camelCaseBreaker
- * Description  Break up camel casing strings, using a space between words.
- *              The returned buffer should be dynamically allocated and 
- *              will be freed by a callerr
+ * Name         move_zeros
+ * Description  Takes an array and moves all of the zeros to the end,
+ *              preserving the order of the other elements.
  *****************************************************************************/
-char* camelCaseBreaker(const char *camelCase) 
+void move_zeros(size_t len, int *arr)
 {
-    int len = strlen(camelCase);
-
-    // Goes through the input string and count the number of upper case letters
-    int upperCaseCnt = 0;
-    for(int i=0; i<len; i++)
+    // mutate arr in place
+    int zerosCnt = 0;
+    int i=0;
+    while(i < (len-zerosCnt))
     {
-        if(camelCase[i]>='A' && camelCase[i]<='Z' && i!=0)
-        upperCaseCnt++;
-    }
-
-    // Prepare the output string
-    char* str = (char*)malloc(len+upperCaseCnt+1);
-    
-    // Simple solution but needs a big buffer which probably we're not going to use
-    // char* str = (char*)malloc(200);
-    int pos = 0;
-    for(int i=0; i<len;i++)
-    {
-        if(camelCase[i]>='A' && camelCase[i]<='Z' && i!=0)
+        printArr(arr[i], len, arr);
+        if (arr[i] == 0)
         {
-            str[pos] = ' ';
-            pos++;
+            /* Move all the string one place */
+            for (int j = i; j < len; j++)
+            {
+                arr[j] = arr[j + 1];
+            }
+            /* Move the '0' at the end of the array */
+            arr[len-1]=0;
+            /* To avoid reordening the leading 0s already moved */
+            zerosCnt++ ;
         }
-        str[pos] = camelCase[i];
-        pos++;    
+        else
+        {
+            i++;
+        }
     }
-    str[pos]='\0';
-    return (str);
 }

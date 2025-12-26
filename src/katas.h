@@ -81,14 +81,15 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         camelCaseBreaker
- * @brief      Break up camel casing strings, using a space between words.
- *             The returned buffer should be dynamically allocated and 
- *             will be freed by a callerr
- * @param [in] camelCase - The string to break
- * @return     The resulted array. This array shall be freed by the caller.
+ * @fn         move_zeros
+ * @brief      Takes an array and moves all of the zeros to the end, 
+ *             preserving the order of the other elements.
+ *             int [] {1, 2, 0, 1, 0, 1, 0, 3, 0, 1}) -> int [] {1, 2, 1, 1, 3, 1, 0, 0, 0, 0}
+ * @param [in] len - The length of the received array
+ * @param [in] arr - The input array
+ * @return     None
  ******************************************************************************/
-char* camelCaseBreaker(const char *camelCase);
+void move_zeros(size_t len, int* arr);
 
 #endif /* __cplusplus */
 

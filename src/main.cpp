@@ -34,9 +34,6 @@
 #include <string>
 #include <cstdint>
 #include "katas.h"
-#include "object.h"
-#include "singleton.h"
-#include "observer.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -46,7 +43,7 @@
 /*===========================================================================*
  * Local Preprocessor #define MACROS
  *===========================================================================*/
-// #define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
+#define NumElems(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 /*===========================================================================*
  * Local Type Declarations
@@ -73,7 +70,6 @@
  *===========================================================================*/
 extern "C"
 {
-    
 }
 
 /*****************************************************************************
@@ -98,7 +94,15 @@ int main(int argc, char *argv[])
     // free(actual);
 
     std::cout << "=== Start ===" << std::endl;
-    std::cout << camelCaseBreaker("camelCaseString") << std::endl;
+    // int array[] = {9, 0, 0, 9, 1, 2, 0, 1, 0, 1, 0, 3, 0, 1, 9, 0, 0, 0, 0, 9};
+    int array[] = {0, 1, 0, 2, 0, 3, 4, 5};
+    int len = NumElems(array);
+    move_zeros(len, array);
+    for (int i = 0; i < len; ++i)
+    {
+        std::cout << array[i] << " ";
+    }
+    std::cout << std::endl;
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
