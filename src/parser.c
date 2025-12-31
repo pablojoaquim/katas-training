@@ -8,21 +8,7 @@
  *------------------------------------------------------------------------------
  *
  * @section DESC DESCRIPTION:
- * Parser for an Input frame. It's developed based in a FSM.
- *
- * @section ABBR ABBREVIATIONS:
- *   - @todo List any abbreviations, precede each with a dash ('-').
- *
- * @section TRACE TRACEABILITY INFO:
- *   - Design Document(s):
- *     - @todo Update list of design document(s).
- *
- *   - Requirements Document(s):
- *     - @todo Update list of requirements document(s)
- *
- *   - Applicable Standards (in order of precedence: highest first):
- *     - @todo Update list of other applicable standards
- *
+ * Parser for an Input frame. Refactored for better maintainability.
  */
 /*==========================================================================*/
 
@@ -39,234 +25,360 @@
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
-#define NDEBUG
-
-/*===========================================================================*
- * Local Preprocessor #define MACROS
- *===========================================================================*/
 #define MAX_FRAME_LENGTH 500
-#define MAX_FIELD_TYPE_LENGTH 1
-#define MAX_FIELD_LEN_LENGTH 2
-#define MAX_FIELD_PAYLOAD_LENGTH 100
-#define MAX_FIELD_CHK_LENGTH 2
+#define MAX_FIELD_PAYLOAD_LENGTH 99
+#define CHECKSUM_FIELD_LENGTH 2
 
 /*===========================================================================*
  * Local Type Declarations
  *===========================================================================*/
-typedef enum cs_parser_Tag
+typedef enum
 {
-    CS_PARSER_WAIT_SOF,
-    CS_PARSER_PROCESS_TYPE,
-    CS_PARSER_PROCESS_LEN,
-    CS_PARSER_PROCESS_PAYLOAD,
-    CS_PARSER_PROCESS_CHK,
-    CS_PARSER_WAIT_EOF
-} cs_parser_t;
+    STATE_WAIT_SOF,
+    STATE_PROCESS_TYPE,
+    STATE_PROCESS_LEN,
+    STATE_PROCESS_PAYLOAD,
+    STATE_PROCESS_CHK,
+    STATE_COMPLETE
+} parser_state_t;
 
-/*===========================================================================*
- * Local Object Declarations
- *===========================================================================*/
-
-/*===========================================================================*
- * Local Variables Definitions
- *===========================================================================*/
-cs_parser_t cs_parser;
-char frame_type[MAX_FIELD_TYPE_LENGTH];
-char frame_length[MAX_FIELD_LEN_LENGTH];
-char frame_payload[MAX_FIELD_PAYLOAD_LENGTH];
-char frame_chk[MAX_FIELD_CHK_LENGTH];
+typedef struct
+{
+    parser_state_t state;
+    size_t field_index;
+    char type;
+    int payload_length;
+    char payload[MAX_FIELD_PAYLOAD_LENGTH + 1];
+    int computed_checksum;
+    char checksum_chars[CHECKSUM_FIELD_LENGTH];
+} parser_context_t;
 
 /*===========================================================================*
  * Local Function Prototypes
  *===========================================================================*/
+static void init_parser_context(parser_context_t *ctx);
+static int hex_char_to_int(char c);
+static int hex_string_to_int(const char *hex_str, size_t len);
+static bool is_valid_frame_type(char type);
+static int parse_length_field(const char *len_str, size_t len);
+
+static int process_sof(parser_context_t *ctx, char c);
+static int process_type(parser_context_t *ctx, char c);
+static int process_length(parser_context_t *ctx, char c);
+static int process_payload(parser_context_t *ctx, char c);
+static int process_checksum(parser_context_t *ctx, char c);
 
 /*===========================================================================*
- * Local Inline Function Definitions and Function-Like Macros
+ * Helper Function Definitions
  *===========================================================================*/
 
-/*===========================================================================*
- * Function Definitions
- *===========================================================================*/
-
-void printArr(int code, size_t len, char *arr)
+/*****************************************************************************
+ * Name         init_parser_context
+ * Description  Initialization function
+ *****************************************************************************/
+static void init_parser_context(parser_context_t *ctx)
 {
-    printf("-- %d --- ", code);
-    for (size_t i = 0; i < len; ++i)
-    {
-        printf("%c ", arr[i]);
-    }
-    printf("\n");
+    ctx->state = STATE_WAIT_SOF;
+    ctx->field_index = 0;
+    ctx->type = '\0';
+    ctx->payload_length = 0;
+    ctx->computed_checksum = 0;
+    memset(ctx->payload, 0, sizeof(ctx->payload));
+    memset(ctx->checksum_chars, 0, sizeof(ctx->checksum_chars));
 }
 
 /*****************************************************************************
- * Name         parse_frame
- * Description  Parse a frame of this type <STX><TYPE>|<LEN>|<PAYLOAD>|<CHK><ETX>
- *              <SOF>	 Start of frame, character #
- *              <TYPE>	 Message type ('D' data, 'C' command, 'A' Ack)
- *              <LEN>	 Payload length in bytes (decimal ASCII)
- *              <PAYLOAD> Data (ASCII)
- *              <CHK>	 Payload Checksum in hex (2 chars), i.e. 0x41 ^ 0x42 ^ 0x43 = 0x40 -> "40"
- *              <EOF>	 End of frame, character '\n'
- * Return       0 → Valid frame, -1 → Format Error, -2 → Invalid Checksum, -3 → Invalid Length
+ * Name         hex_char_to_int
+ * Description  Helper function
  *****************************************************************************/
-int parse_frame(const char *frame)
+static int hex_char_to_int(char c)
 {
-    /* Control variables initialization */
-    int idx = 0;
-    cs_parser = CS_PARSER_WAIT_SOF;
-    int inputCnt = 0;
-    int payloadLength = 0;
-    int checksum = 0;
-    int frame_chk_value = 0;
-    // char frame_type[1];
-    // char frame_length[2];
-    // char frame_payload[100];
-    // char frame_chk[2];
-
-    /* The parser state machine */
-    while ((*(frame+idx)!='\n') && (idx < MAX_FRAME_LENGTH))
+    if (c >= '0' && c <= '9')
     {
-        switch (cs_parser)
-        {
-        case CS_PARSER_WAIT_SOF:
-            printf("CS_PARSER_WAIT_SOF\n");
-            if ('#' == *(frame + idx))
-            {
-                cs_parser = CS_PARSER_PROCESS_TYPE;
-                inputCnt = 0;
-            }
-            break;
+        return c - '0';
+    }
+    if (c >= 'A' && c <= 'F')
+    {
+        return (c - 'A') + 10;
+    }
+    if (c >= 'a' && c <= 'f')
+    {
+        return (c - 'a') + 10;
+    }
+    return -1;
+}
 
-        case CS_PARSER_PROCESS_TYPE:
-            printf("CS_PARSER_PROCESS_TYPE\n");
-            if (inputCnt < MAX_FIELD_TYPE_LENGTH)
-            {
-                frame_type[inputCnt++] = *(frame + idx);
-            }
-            else if ('|' == *(frame + idx))
-            {
-                if (('D' == frame_type[0]) || ('C' == frame_type[0]) || ('A' == frame_type[0]))
-                {
-                    cs_parser = CS_PARSER_PROCESS_LEN;
-                    inputCnt = 0;
-                }
-                else
-                {
-                    return RET_FORMAT_ERROR;
-                }
-            }
-            else
+/*****************************************************************************
+ * Name         hex_string_to_int
+ * Description  Helper function
+ *****************************************************************************/
+static int hex_string_to_int(const char *hex_str, size_t len)
+{
+    if (len != 2)
+    {
+        return -1;
+    }
+
+    int high = hex_char_to_int(hex_str[0]);
+    int low = hex_char_to_int(hex_str[1]);
+
+    if (high < 0 || low < 0)
+    {
+        return -1;
+    }
+
+    return (high << 4) | low;
+}
+
+/*****************************************************************************
+ * Name         is_valid_frame_type
+ * Description  Frame type verification
+ *****************************************************************************/
+static bool is_valid_frame_type(char type)
+{
+    return (type == 'D' || type == 'C' || type == 'A');
+}
+
+/*****************************************************************************
+ * Name         parse_length_field
+ * Description  Length from Str to int
+ *****************************************************************************/
+static int parse_length_field(const char *len_str, size_t len)
+{
+    if (len == 0 || len > 2)
+    {
+        return -1;
+    }
+
+    int result = 0;
+    for (size_t i = 0; i < len; i++)
+    {
+        if (len_str[i] < '0' || len_str[i] > '9')
+        {
+            return -1;
+        }
+        result = result * 10 + (len_str[i] - '0');
+    }
+
+    if (result > MAX_FIELD_PAYLOAD_LENGTH)
+    {
+        return -1;
+    }
+
+    return result;
+}
+
+/*===========================================================================*
+ * State Processing Functions
+ *===========================================================================*/
+
+static int process_sof(parser_context_t *ctx, char c)
+{
+    if (c == '#')
+    {
+        ctx->state = STATE_PROCESS_TYPE;
+        ctx->field_index = 0;
+        return RET_VALID_FRAME; // Continue processing
+    }
+    return RET_FORMAT_ERROR;
+}
+
+static int process_type(parser_context_t *ctx, char c)
+{
+    if (ctx->field_index == 0)
+    {
+        ctx->type = c;
+        ctx->field_index++;
+        return RET_VALID_FRAME; // Continue
+    }
+
+    if (c == '|')
+    {
+        if (!is_valid_frame_type(ctx->type))
+        {
+            return RET_FORMAT_ERROR;
+        }
+        ctx->state = STATE_PROCESS_LEN;
+        ctx->field_index = 0;
+        return RET_VALID_FRAME; // Continue
+    }
+
+    return RET_FORMAT_ERROR;
+}
+
+static int process_length(parser_context_t *ctx, char c)
+{
+    if (c == '|')
+    {
+        char len_buffer[3];
+        memcpy(len_buffer, ctx->checksum_chars, ctx->field_index);
+
+        ctx->payload_length = parse_length_field(len_buffer, ctx->field_index);
+        if (ctx->payload_length < 0)
+        {
+            return RET_INVALID_LENGTH;
+        }
+
+        ctx->state = STATE_PROCESS_PAYLOAD;
+        ctx->field_index = 0;
+        return RET_VALID_FRAME; // Continue
+    }
+
+    if (ctx->field_index >= 2)
+    {
+        return RET_FORMAT_ERROR;
+    }
+
+    if (c < '0' || c > '9')
+    {
+        return RET_FORMAT_ERROR;
+    }
+
+    ctx->checksum_chars[ctx->field_index++] = c;
+    return RET_VALID_FRAME; // Continue
+}
+
+static int process_payload(parser_context_t *ctx, char c)
+{
+    if (c == '|')
+    {
+        if ((int)ctx->field_index != ctx->payload_length)
+        {
+            return RET_INVALID_LENGTH;
+        }
+
+        ctx->payload[ctx->field_index] = '\0';
+        ctx->state = STATE_PROCESS_CHK;
+        ctx->field_index = 0;
+        return RET_VALID_FRAME; // Continue
+    }
+
+    if (ctx->field_index >= MAX_FIELD_PAYLOAD_LENGTH)
+    {
+        return RET_INVALID_LENGTH;
+    }
+
+    ctx->payload[ctx->field_index++] = c;
+    ctx->computed_checksum ^= c;
+    return RET_VALID_FRAME; // Continue
+}
+
+static int process_checksum(parser_context_t *ctx, char c)
+{
+    if (ctx->field_index < CHECKSUM_FIELD_LENGTH)
+    {
+        ctx->checksum_chars[ctx->field_index++] = c;
+
+        if (ctx->field_index == CHECKSUM_FIELD_LENGTH)
+        {
+            int received_checksum = hex_string_to_int(ctx->checksum_chars, CHECKSUM_FIELD_LENGTH);
+            if (received_checksum < 0)
             {
                 return RET_FORMAT_ERROR;
             }
-            break;
 
-        case CS_PARSER_PROCESS_LEN:
-            printf("CS_PARSER_PROCESS_LEN\n");
-            if ('|' == *(frame + idx))
+            if (received_checksum != ctx->computed_checksum)
             {
-                if (inputCnt == 2)
-                    payloadLength = (frame_length[0] - '0') * 10 + (frame_length[1] - '0');
-                else if (inputCnt == 1)
-                    payloadLength = (frame_length[0] - '0');
-                else
-                    return RET_INVALID_LENGTH;
+                return RET_INVALID_CHK;
+            }
 
-                if (payloadLength < MAX_FIELD_PAYLOAD_LENGTH)
-                {
-                    cs_parser = CS_PARSER_PROCESS_PAYLOAD;
-                    inputCnt = 0;
-                }
-                else
-                {
-                    return RET_INVALID_LENGTH;
-                }
-            }
-            else if (inputCnt < MAX_FIELD_LEN_LENGTH)
-            {
-                frame_length[inputCnt++] = *(frame + idx);
-            }
-            break;
-
-        case CS_PARSER_PROCESS_PAYLOAD:
-            printf("CS_PARSER_PROCESS_PAYLOAD\n");
-            if (inputCnt < MAX_FIELD_PAYLOAD_LENGTH)
-            {
-                if ('|' == *(frame + idx))
-                {
-                    if (inputCnt != payloadLength)
-                    {
-                        return RET_INVALID_LENGTH;
-                    }
-                    else
-                    {
-                        frame_payload[inputCnt] = '\0';
-                        cs_parser = CS_PARSER_PROCESS_CHK;
-                        inputCnt = 0;
-                    }
-                }
-                else
-                {
-                    frame_payload[inputCnt++] = *(frame + idx);
-                    checksum ^= *(frame + idx);
-                }
-            }
-            else if ('|' == *(frame + idx))
-            {
-                frame_payload[inputCnt] = '\0';
-                cs_parser = CS_PARSER_PROCESS_CHK;
-                inputCnt = 0;
-            }
-            else
-            {
-                return RET_INVALID_LENGTH;
-            }
-            break;
-
-        case CS_PARSER_PROCESS_CHK:
-            printf("CS_PARSER_PROCESS_CHK\n");
-            
-            if (inputCnt < MAX_FIELD_CHK_LENGTH)
-            {
-                frame_chk[inputCnt++] = *(frame + idx);
-            }
-            if(inputCnt >= MAX_FIELD_CHK_LENGTH)
-            {
-                if (frame_chk[0] >= 0 && frame_chk[0] <= '9')
-                {
-                    frame_chk_value = (frame_chk[0] - '0') * 16;
-                }
-                else if (frame_chk[0] >= 'A' && frame_chk[0] <= 'F')
-                {
-                    frame_chk_value = ((frame_chk[0] - 'A') + 10) * 16;
-                }
-                if (frame_chk[1] >= 0 && frame_chk[1] <= '9')
-                {
-                    frame_chk_value += (frame_chk[1] - '0');
-                }
-                else if (frame_chk[1] >= 'A' && frame_chk[1] <= 'F')
-                {
-                    frame_chk_value += (frame_chk[1] - 'A') + 10;
-                }
-                if (frame_chk_value != checksum)
-                {
-                    return RET_INVALID_CHK;
-                }
-            }
-            break;
-
-        case CS_PARSER_WAIT_EOF:
-            break;
+            ctx->state = STATE_COMPLETE;
         }
+        return RET_VALID_FRAME; // Continue
+    }
+
+    return RET_FORMAT_ERROR;
+}
+
+/*===========================================================================*
+ * Main Parser Function
+ *===========================================================================*/
+
+/*****************************************************************************
+ * Name         parse_frame
+ * Description  Parse a frame of this type: #<TYPE>|<LEN>|<PAYLOAD>|<CHK>\n
+ *              <SOF>     Start of frame, character '#'
+ *              <TYPE>    Message type ('D' data, 'C' command, 'A' Ack)
+ *              <LEN>     Payload length in bytes (decimal ASCII, 1-2 digits)
+ *              <PAYLOAD> Data (ASCII)
+ *              <CHK>     Payload Checksum in hex (2 chars), XOR of payload bytes
+ *              <EOF>     End of frame, character '\n'
+ * Parameters   frame - null-terminated string containing the frame
+ * Return       0  → Valid frame
+ *             -1  → Format Error
+ *             -2  → Invalid Checksum
+ *             -3  → Invalid Length
+ *****************************************************************************/
+int parse_frame(const char *frame)
+{
+    if (frame == NULL)
+    {
+        return RET_FORMAT_ERROR;
+    }
+
+    parser_context_t ctx;
+    init_parser_context(&ctx);
+
+    size_t idx = 0;
+    int result = RET_VALID_FRAME;
+
+    while (frame[idx] != '\n' && frame[idx] != '\0' && idx < MAX_FRAME_LENGTH)
+    {
+        char current_char = frame[idx];
+
+        switch (ctx.state)
+        {
+        case STATE_WAIT_SOF:
+            result = process_sof(&ctx, current_char);
+            break;
+
+        case STATE_PROCESS_TYPE:
+            result = process_type(&ctx, current_char);
+            break;
+
+        case STATE_PROCESS_LEN:
+            result = process_length(&ctx, current_char);
+            break;
+
+        case STATE_PROCESS_PAYLOAD:
+            result = process_payload(&ctx, current_char);
+            break;
+
+        case STATE_PROCESS_CHK:
+            result = process_checksum(&ctx, current_char);
+            break;
+
+        case STATE_COMPLETE:
+            // Frame already complete, unexpected character
+            return RET_FORMAT_ERROR;
+        }
+
+        if (result != RET_VALID_FRAME)
+        {
+            return result;
+        }
+
         idx++;
     }
 
-    printf("Type: %c\n", frame_type[0]);
-    printf("Length: %d\n", payloadLength);
-    printf("Payload: %s\n", frame_payload);
-    printf("Checksum: %d\n", frame_chk_value);
+    // Verify we reached the end properly
+    if (frame[idx] != '\n')
+    {
+        return RET_FORMAT_ERROR;
+    }
+
+    if (ctx.state != STATE_COMPLETE)
+    {
+        return RET_FORMAT_ERROR;
+    }
+
+#ifndef NDEBUG
+    printf("Type: %c\n", ctx.type);
+    printf("Length: %d\n", ctx.payload_length);
+    printf("Payload: %s\n", ctx.payload);
+    printf("Checksum: %02X\n", ctx.computed_checksum);
     printf("\n");
+#endif
+
     return RET_VALID_FRAME;
-    // printArr(0, 5, (char *)frame);
-    return RET_FORMAT_ERROR;
 }
