@@ -34,6 +34,7 @@
 #include <string>
 #include <cstdint>
 #include "katas.h"
+#include "parser.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -94,14 +95,9 @@ int main(int argc, char *argv[])
     // free(actual);
 
     std::cout << "=== Start ===" << std::endl;
-    // int array[] = {9, 0, 0, 9, 1, 2, 0, 1, 0, 1, 0, 3, 0, 1, 9, 0, 0, 0, 0, 9};
-    int array[] = {0, 1, 0, 2, 0, 3, 4, 5};
-    int len = NumElems(array);
-    move_zeros(len, array);
-    for (int i = 0; i < len; ++i)
-    {
-        std::cout << array[i] << " ";
-    }
+
+    const char* frame1 = "#D|5|HELLO|42\n";
+    std::cout << parse_frame(frame1);
     std::cout << std::endl;
     std::cout << "===  End  ===" << std::endl;
     return 0;
