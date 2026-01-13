@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
             }
         }
         mq_close(mqdes);
+        mq_unlink("/mq_test");
     }
     else
     {
@@ -150,6 +151,7 @@ int main(int argc, char *argv[])
                 break;
         }
         mq_close(mqdes);
+        mq_unlink("/mq_test");
     }
 
     std::cout << "===  End  ===" << std::endl;
