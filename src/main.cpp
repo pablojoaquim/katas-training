@@ -32,14 +32,27 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <cstring>
 #include <cstdint>
 #include "katas.h"
 #include "parser.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <mqueue.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
 #define NDEBUG
+
+#define SOCK_PATH "/tmp/echo_socket"
 
 /*===========================================================================*
  * Local Preprocessor #define MACROS
@@ -81,22 +94,88 @@ extern "C"
  *****************************************************************************/
 int main(int argc, char *argv[])
 {
-    // const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
-    // const int arr2[] = {1};
-
-    // size_t length;
-    // int *actual = camelCaseBreaker(arr1, ARRAY_LENGTH(arr1), arr2, ARRAY_LENGTH(arr2), &length);
-
-    // printf("{ ");
-    // for (size_t i = 0; i < length; i++)
-    //     printf("%d%s", actual[i], (i == length - 1) ? "" : ", ");
-    // printf(" }");
-
-    // free(actual);
-
     std::cout << "=== Start ===" << std::endl;
-    char* time_string = (char*)malloc(100);
-    std::cout << human_readable_time (359999, time_string) << std::endl;
+
+    if (!strcmp(argv[1], "server"))
+    {
+        int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (server_fd < 0)
+        {
+            perror("socket");
+            return 1;
+        }
+
+        sockaddr_un addr{};
+        addr.sun_family = AF_UNIX;
+        std::strcpy(addr.sun_path, SOCK_PATH);
+
+        unlink(SOCK_PATH);
+
+        if (bind(server_fd, (sockaddr *)&addr, sizeof(addr)) < 0)
+        {
+            perror("bind");
+            return 1;
+        }
+
+        if (listen(server_fd, 1) < 0)
+        {
+            perror("listen");
+            return 1;
+        }
+
+        printf("Server listening on %s\n", SOCK_PATH);
+
+        int client_fd = accept(server_fd, nullptr, nullptr);
+        if (client_fd < 0)
+        {
+            perror("accept");
+            return 1;
+        }
+
+        char buf[128];
+        int n = read(client_fd, buf, sizeof(buf));
+        if (n > 0)
+        {
+            write(client_fd, buf, n); // echo
+        }
+
+        close(client_fd);
+        close(server_fd);
+        unlink(SOCK_PATH);
+    }
+    else
+    {
+        int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (fd < 0)
+        {
+            perror("socket");
+            return 1;
+        }
+
+        sockaddr_un addr{};
+        addr.sun_family = AF_UNIX;
+        std::strcpy(addr.sun_path, SOCK_PATH);
+
+        if (connect(fd, (sockaddr *)&addr, sizeof(addr)) < 0)
+        {
+            perror("connect");
+            return 1;
+        }
+
+        const char *msg = "hola WSL\n";
+        write(fd, msg, strlen(msg));
+
+        char buf[128];
+        int n = read(fd, buf, sizeof(buf) - 1);
+        if (n > 0)
+        {
+            buf[n] = '\0';
+            printf("echo: %s", buf);
+        }
+
+        close(fd);
+    }
+
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
