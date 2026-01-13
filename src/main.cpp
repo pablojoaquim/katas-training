@@ -44,13 +44,15 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
 #define NDEBUG
 
-#define SHM_SIZE 1024 /* make it a 1K shared memory segment */
+#define SOCK_PATH "/tmp/echo_socket"
 
 /*===========================================================================*
  * Local Preprocessor #define MACROS
@@ -94,50 +96,84 @@ int main(int argc, char *argv[])
 {
     std::cout << "=== Start ===" << std::endl;
 
-    key_t key;
-    int shmid;
-    char *data;
-    int mode;
-    if (argc > 2)
+    if (!strcmp(argv[1], "server"))
     {
-        fprintf(stderr, "usage: main [data_to_write]\n");
-        exit(1);
-    }
-    /* make the key: */
-    if ((key = 123) == -1)
-    {
-        perror("ftok");
-        exit(1);
-    }
-    /* connect to (and possibly create) the segment: */
-    if ((shmid = shmget(key, SHM_SIZE, 0644 | IPC_CREAT)) == -1)
-    {
-        perror("shmget");
-        exit(1);
-    }
-    /* attach to the segment to get a pointer to it: */
-    data = (char*)shmat(shmid, (void *)0, 0);
-    /* we _could_ use MAP_FAILED, but technically that's not */
-    /* the defined return value. System V failed on this one! */
-    if (data == (void *)(-1))
-    {
-        perror("shmat");
-        exit(1);
-    }
-    /* read or modify the segment, based on the command line: */
-    if (argc == 2)
-    {
-        printf("writing to segment: \"%s\"\n", argv[1]);
-        strncpy(data, argv[1], SHM_SIZE);
-        data[SHM_SIZE - 1] = '\0';
+        int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (server_fd < 0)
+        {
+            perror("socket");
+            return 1;
+        }
+
+        sockaddr_un addr{};
+        addr.sun_family = AF_UNIX;
+        std::strcpy(addr.sun_path, SOCK_PATH);
+
+        unlink(SOCK_PATH);
+
+        if (bind(server_fd, (sockaddr *)&addr, sizeof(addr)) < 0)
+        {
+            perror("bind");
+            return 1;
+        }
+
+        if (listen(server_fd, 1) < 0)
+        {
+            perror("listen");
+            return 1;
+        }
+
+        printf("Server listening on %s\n", SOCK_PATH);
+
+        int client_fd = accept(server_fd, nullptr, nullptr);
+        if (client_fd < 0)
+        {
+            perror("accept");
+            return 1;
+        }
+
+        char buf[128];
+        int n = read(client_fd, buf, sizeof(buf));
+        if (n > 0)
+        {
+            write(client_fd, buf, n); // echo
+        }
+
+        close(client_fd);
+        close(server_fd);
+        unlink(SOCK_PATH);
     }
     else
-        printf("segment contains: \"%s\"\n", data);
-    /* detach from the segment: */
-    if (shmdt(data) == -1)
     {
-        perror("shmdt");
-        exit(1);
+        int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        if (fd < 0)
+        {
+            perror("socket");
+            return 1;
+        }
+
+        sockaddr_un addr{};
+        addr.sun_family = AF_UNIX;
+        std::strcpy(addr.sun_path, SOCK_PATH);
+
+        if (connect(fd, (sockaddr *)&addr, sizeof(addr)) < 0)
+        {
+            perror("connect");
+            return 1;
+        }
+
+        const char *msg = "hola WSL\n";
+        write(fd, msg, strlen(msg));
+
+        char buf[128];
+        int n = read(fd, buf, sizeof(buf) - 1);
+        if (n > 0)
+        {
+            buf[n] = '\0';
+            printf("echo: %s", buf);
+        }
+
+        close(fd);
     }
 
     std::cout << "===  End  ===" << std::endl;
