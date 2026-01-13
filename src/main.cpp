@@ -102,69 +102,40 @@ void sigint_handler(int sig)
  *****************************************************************************/
 int main(int argc, char *argv[])
 {
+    int pfds[2];
+    char buf[30];
+
     std::cout << "=== Start ===" << std::endl;
 
-    got_int = 0;
-    got_usr1 = 0;
-    char s[200];
-
-    struct sigaction sa_int = {sigint_handler, 0, 0};   // Use ^C from the command line to call this signal
-    struct sigaction sa_usr1 = {sigusr1_handler, 0, 0}; // Use kill -USR1 <PID> from the command line to call this signal
-
-    if (sigaction(SIGINT, &sa_int, NULL) == -1)
+    if (pipe(pfds) == -1)
     {
-        perror("sigaction");
+        perror("pipe");
         exit(1);
     }
 
-    if (sigaction(SIGUSR1, &sa_usr1, NULL) == -1)
+    pid_t pid;
+    switch (pid = fork())
     {
-        perror("sigaction");
-        exit(1);
+    case -1:
+        perror("fork"); /* something went wrong */
+        exit(1);        /* parent exits */
+    case 0:
+        printf(" CHILD: This is the child process!\n");
+        printf(" CHILD: My PID is %d\n", getpid());
+        printf(" CHILD: My parent's PID is %d\n", getppid());
+        printf(" CHILD: writing to the pipe\n");
+        write(pfds[1], "test", 5);
+        printf(" CHILD: Terminating!\n");
+        exit(0);
+    default:
+        printf("PARENT: This is the parent process!\n");
+        printf("PARENT: My PID is %d\n", getpid());
+        printf("PARENT: My child's PID is %d\n", pid);
+        read(pfds[0], buf, 5);
+        printf("PARENT: read \"%s\"\n", buf);
+        wait(NULL);
+        printf("PARENT: Terminating!\n");
     }
-
-    printf("My PID: %d\n", getpid());
-
-    while (!got_usr1 && !got_int)
-    {
-        sleep(1);
-    }
-
-    if (got_usr1)
-        printf("Finished by SIGUSR1!\n");
-    if (got_int)
-        printf("Finished by SIGINT!\n");
-
-    // printf("Enter a string:\n");
-    // if (fgets(s, sizeof s, stdin) == NULL)
-    //     perror("fgets");
-    // else
-    //     printf("You entered: %s\n", s);
-
-    // pid_t pid;
-    // int rv;
-    // switch (pid = fork())
-    // {
-    // case -1:
-    //     perror("fork"); /* something went wrong */
-    //     exit(1);        /* parent exits */
-    // case 0:
-    //     printf(" CHILD: This is the child process!\n");
-    //     printf(" CHILD: My PID is %d\n", getpid());
-    //     printf(" CHILD: My parent's PID is %d\n", getppid());
-    //     printf(" CHILD: Enter my exit status (make it small): ");
-    //     scanf(" %d", &rv);
-    //     printf(" CHILD: I'm outta here!\n");
-    //     exit(rv);
-    // default:
-    //     printf("PARENT: This is the parent process!\n");
-    //     printf("PARENT: My PID is %d\n", getpid());
-    //     printf("PARENT: My child's PID is %d\n", pid);
-    //     printf("PARENT: I'm now waiting for my child to exit()...\n");
-    //     wait(&rv);
-    //     printf("PARENT: My child's exit status is: %d\n", WEXITSTATUS(rv));
-    //     printf("PARENT: I'm outta here!\n");
-    // }
 
     // const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
     // const int arr2[] = {1};
