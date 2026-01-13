@@ -35,6 +35,8 @@
 #include <cstdint>
 #include "katas.h"
 #include "parser.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -81,6 +83,33 @@ extern "C"
  *****************************************************************************/
 int main(int argc, char *argv[])
 {
+    std::cout << "=== Start ===" << std::endl;
+
+    pid_t pid;
+    int rv;
+    switch (pid = fork())
+    {
+    case -1:
+        perror("fork"); /* something went wrong */
+        exit(1);        /* parent exits */
+    case 0:
+        printf(" CHILD: This is the child process!\n");
+        printf(" CHILD: My PID is %d\n", getpid());
+        printf(" CHILD: My parent's PID is %d\n", getppid());
+        printf(" CHILD: Enter my exit status (make it small): ");
+        scanf(" %d", &rv);
+        printf(" CHILD: I'm outta here!\n");
+        exit(rv);
+    default:
+        printf("PARENT: This is the parent process!\n");
+        printf("PARENT: My PID is %d\n", getpid());
+        printf("PARENT: My child's PID is %d\n", pid);
+        printf("PARENT: I'm now waiting for my child to exit()...\n");
+        wait(&rv);
+        printf("PARENT: My child's exit status is: %d\n", WEXITSTATUS(rv));
+        printf("PARENT: I'm outta here!\n");
+    }
+
     // const int arr1[] = {1, 2,3,4,5,6,6,7,8,9};
     // const int arr2[] = {1};
 
@@ -94,9 +123,6 @@ int main(int argc, char *argv[])
 
     // free(actual);
 
-    std::cout << "=== Start ===" << std::endl;
-    char* time_string = (char*)malloc(100);
-    std::cout << human_readable_time (359999, time_string) << std::endl;
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
