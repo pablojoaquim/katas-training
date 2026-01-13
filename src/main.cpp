@@ -95,10 +95,8 @@ int main(int argc, char *argv[])
     // free(actual);
 
     std::cout << "=== Start ===" << std::endl;
-
-    const char* frame1 = "#D|5|HELLO|42\n";
-    std::cout << parse_frame(frame1);
-    std::cout << std::endl;
+    char* time_string = (char*)malloc(100);
+    std::cout << human_readable_time (359999, time_string) << std::endl;
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }

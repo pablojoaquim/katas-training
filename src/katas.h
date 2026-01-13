@@ -82,14 +82,17 @@ extern "C" {
 
 /*****************************************************************************
  * @fn         move_zeros
- * @brief      Takes an array and moves all of the zeros to the end, 
- *             preserving the order of the other elements.
- *             int [] {1, 2, 0, 1, 0, 1, 0, 3, 0, 1}) -> int [] {1, 2, 1, 1, 3, 1, 0, 0, 0, 0}
- * @param [in] len - The length of the received array
- * @param [in] arr - The input array
- * @return     None
+ * @brief      Takes a non-negative integer (seconds) as input and returns 
+ *             the time in a human-readable format (HH:MM:SS)
+ *                  HH = hours, padded to 2 digits, range: 00 - 99
+ *                  MM = minutes, padded to 2 digits, range: 00 - 59
+ *                  SS = seconds, padded to 2 digits, range: 00 - 59
+ *                  The maximum time never exceeds 359999 (99:59:59)
+ * @param [in] seconds - The input to conver
+ * @param [in] time_string - The output array
+ * @return     Return the time_string
  ******************************************************************************/
-void move_zeros(size_t len, int* arr);
+char *human_readable_time (unsigned seconds, char *time_string);
 
 #endif /* __cplusplus */
 

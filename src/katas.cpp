@@ -80,33 +80,23 @@
  }
 
 /*****************************************************************************
- * Name         move_zeros
- * Description  Takes an array and moves all of the zeros to the end,
- *              preserving the order of the other elements.
+ * Name         human_readable_time
+ * Description  Takes a non-negative integer (seconds) as input and returns 
+ *              the time in a human-readable format (HH:MM:SS)
  *****************************************************************************/
-void move_zeros(size_t len, int *arr)
+char *human_readable_time (unsigned seconds, char *time_string)
 {
-    // mutate arr in place
-    int zerosCnt = 0;
-    int i=0;
-    while(i < (len-zerosCnt))
-    {
-        printArr(arr[i], len, arr);
-        if (arr[i] == 0)
-        {
-            /* Move all the string one place */
-            for (int j = i; j < len; j++)
-            {
-                arr[j] = arr[j + 1];
-            }
-            /* Move the '0' at the end of the array */
-            arr[len-1]=0;
-            /* To avoid reordening the leading 0s already moved */
-            zerosCnt++ ;
-        }
-        else
-        {
-            i++;
-        }
-    }
+    int hh = seconds/3600;
+    int mm = (seconds%3600)/60;
+    int ss = (seconds%3600)%60;
+    time_string[0] = hh/10 + '0';
+    time_string[1] = hh%10 + '0';
+    time_string[2] = ':';
+    time_string[3] = mm/10 + '0';
+    time_string[4] = mm%10 + '0';
+    time_string[5] = ':';    
+    time_string[6] = ss/10 + '0';
+    time_string[7] = ss%10 + '0';
+    time_string[8] = '\0';
+	return time_string;
 }
