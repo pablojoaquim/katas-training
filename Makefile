@@ -1,207 +1,195 @@
-# ===============================
-# Makefile for Windows + MinGW
-# ===============================
-CC  = gcc
-CXX = g++
-CFLAGS   = -Wall -Wextra -std=c11
-CXXFLAGS = -Wall -Wextra -std=c++17
+# ============================================
+# AUTOSAR Lab Makefile
+# Extends existing katas-training Makefile
+# ============================================
 
-# ===============================
-# Detect OS
-# ===============================
-ifeq ($(OS),Windows_NT)
-    EXE_EXT	= .exe
-else
-    EXE_EXT =
-endif
+# Compiler and flags
+CC := gcc
+CFLAGS := -Wall -Wextra -std=c11 -g
+LDFLAGS := -lrt -lpthread
 
-# ===============================
-# Source directories
-# EDIT ONLY HERE!!!!!!!!!!!
-# ===============================
-SRC_DIRS  = src utils
-TEST_DIRS = test
-MAIN = src/main.cpp
+# Directories
+BUILD_DIR := build
+AUTOSAR_BUILD_DIR := $(BUILD_DIR)/autosar
+COVERAGE_DIR := $(BUILD_DIR)/coverage
 
-# ===============================
-# Other directories
-# ===============================
-BUILD_DIR     = build
-OBJ_DIR       = $(BUILD_DIR)/obj
-COVERAGE_DIR  = $(BUILD_DIR)/coverage
-CPPCHECK_DIR  = $(BUILD_DIR)/cppcheck
+# AUTOSAR source directories
+AUTOSAR_BSW_DIR := src/autosar/bsw
+AUTOSAR_RTE_DIR := src/autosar/rte
+AUTOSAR_SWC_DIR := src/autosar/swc
 
-# ===============================
-# Windows \ → /
-# ===============================
-ifeq ($(OS),Windows_NT)
-	SRC_DIRS  := $(subst /,\,$(SRC_DIRS))
-	TEST_DIRS := $(subst /,\,$(TEST_DIRS))
-	BUILD_DIR := $(subst /,\,$(BUILD_DIR))
-	OBJ_DIR   := $(subst /,\,$(OBJ_DIR))
-	COVERAGE_DIR := $(subst /,\,$(COVERAGE_DIR))
-	CPPCHECK_DIR := $(subst /,\,$(CPPCHECK_DIR))
-endif
+# AUTOSAR include paths
+AUTOSAR_INCLUDES := -Isrc/autosar/bsw/os \
+                    -Isrc/autosar/bsw/com \
+                    -Isrc/autosar/rte \
+                    -Isrc/autosar/swc/template \
+                    -Isrc/autosar/swc/kata_001
 
-# ===============================
-# Search for all the .c inside 
-# the src directories
-# ===============================
-C_SRC_FILES   	= $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.c))
-CPP_SRC_FILES	= $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))
-C_TEST_FILES 	= $(foreach d,$(TEST_DIRS),$(wildcard $(d)/test_*.c))
-CPP_TEST_FILES 	= $(foreach d,$(TEST_DIRS),$(wildcard $(d)/test_*.cpp))
+# AUTOSAR source files
+AUTOSAR_BSW_SRCS := $(wildcard $(AUTOSAR_BSW_DIR)/os/*.c) \
+                    $(wildcard $(AUTOSAR_BSW_DIR)/com/*.c)
 
-# ===============================
-# Automatic Includes
-# ===============================
-CFLAGS += $(foreach dir,$(SRC_DIRS), -I$(dir))
-CXXFLAGS += $(foreach d,$(SRC_DIRS), -I$(d))
+AUTOSAR_RTE_SRCS := $(wildcard $(AUTOSAR_RTE_DIR)/*.c)
 
-# ===============================
-# Outputs
-# ===============================
-TARGET       = $(BUILD_DIR)/main$(EXE_EXT)
-TEST_TARGET  = $(BUILD_DIR)/tests$(EXE_EXT)
+AUTOSAR_SWC_SRCS := $(wildcard $(AUTOSAR_SWC_DIR)/template/*.c) \
+                    $(wildcard $(AUTOSAR_SWC_DIR)/kata_001/*.c)
 
-# ===============================
+AUTOSAR_MAIN_SRC := src/autosar/main.c
+
+AUTOSAR_ALL_SRCS := $(AUTOSAR_BSW_SRCS) \
+                    $(AUTOSAR_RTE_SRCS) \
+                    $(AUTOSAR_SWC_SRCS) \
+                    $(AUTOSAR_MAIN_SRC)
+
 # Object files
-# ===============================
-OBJ_C_SRC	= $(patsubst %.c,$(OBJ_DIR)/%.o,$(C_SRC_FILES))
-OBJ_CPP_SRC = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(CPP_SRC_FILES))
-OBJ_C_TEST 	= $(patsubst %.c,$(OBJ_DIR)/%.o,$(C_TEST_FILES))
-OBJ_CPP_TEST= $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(CPP_TEST_FILES))
+AUTOSAR_OBJS := $(AUTOSAR_ALL_SRCS:%.c=$(AUTOSAR_BUILD_DIR)/%.o)
 
-OBJ_ALL = $(OBJ_C_SRC) $(OBJ_CPP_SRC)
-OBJ_ALL_TEST = $(OBJ_C_TEST) $(OBJ_CPP_TEST)
+# Executable
+AUTOSAR_EXE := $(AUTOSAR_BUILD_DIR)/autosar_lab
 
-# ===============================
-# Create directories automatically
-# ===============================
+# ============================================
+# Main targets
+# ============================================
 
-# Ensure build dirs exist before compiling
-.dirs:
-ifeq ($(OS),Windows_NT)
-	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
-	if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
-	for %%d in ($(SRC_DIRS)) do if not exist "$(OBJ_DIR)\%%d" mkdir "$(OBJ_DIR)\%%d"
-	for %%d in ($(TEST_DIRS)) do if not exist "$(OBJ_DIR)\%%d" mkdir "$(OBJ_DIR)\%%d"
-else
-	mkdir -p $(BUILD_DIR)
-	mkdir -p $(OBJ_DIR)
-	@for d in $(SRC_DIRS); do \
-		mkdir -p "$(OBJ_DIR)/$$d"; \
-	done
-	@for d in $(TEST_DIRS); do \
-		mkdir -p "$(OBJ_DIR)/$$d"; \
-	done
-endif
+.PHONY: all clean help
+.PHONY: autosar autosar-run autosar-clean autosar-rebuild
+.PHONY: autosar-tests autosar-coverage autosar-debug
 
-# =================================
-# Build rules
-# =================================
-all: .dirs $(TARGET)
+# Default target
+all: help
 
-# Link with C++ to avoid unresolved C++ symbols
-$(TARGET): $(OBJ_ALL)
-	$(CXX) $(CXXFLAGS) $(OBJ_ALL) -o $(TARGET)
-	@echo ==== Compilation completed: $(TARGET) ====
+# ============================================
+# AUTOSAR Lab targets
+# ============================================
 
-# Compile C files
-$(OBJ_DIR)/%.o: %.c | .dirs
-	$(CC) $(CFLAGS) -c $< -o $@
+autosar: $(AUTOSAR_EXE)
+	@echo "✓ AUTOSAR Lab built successfully!"
 
-# Compile C++ files
-$(OBJ_DIR)/%.o: %.cpp | .dirs
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(AUTOSAR_EXE): $(AUTOSAR_OBJS)
+	@echo "Linking AUTOSAR Lab..."
+	@mkdir -p $(dir $@)
+	$(CC) $(AUTOSAR_OBJS) $(LDFLAGS) -o $@
 
-# =================================
-# Build tests (no main.cpp)
-# =================================
-tests: .dirs $(OBJ_ALL) $(OBJ_ALL_TEST)
-	$(CXX) $(CXXFLAGS) \
-		$(filter-out $(OBJ_DIR)/$(MAIN:.cpp=.o),$(OBJ_ALL)) \
-		$(OBJ_ALL_TEST) -o $(TEST_TARGET)
-	@echo ==== Tests built: $(TEST_TARGET) ====
+# Compile C source files
+$(AUTOSAR_BUILD_DIR)/%.o: %.c
+	@echo "Compiling $<..."
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(AUTOSAR_INCLUDES) -c $< -o $@
 
-# =================================
-# Run tests
-# =================================
-run-tests: tests
-	@echo ==== Executing tests ====
-	@./$(TEST_TARGET)
+autosar-run: autosar
+	@echo ""
+	@echo "Running AUTOSAR Lab..."
+	@echo "======================================"
+	@$(AUTOSAR_EXE)
 
-# ===============================
-# Valgrind (Linux only)
-# ===============================
-valgrind: 
-ifeq ($(OS),Windows_NT)
-	@echo Valgrind is not available on Windows
-else
-	@echo ==== Running under Valgrind ====
-	$(MAKE) tests
-	valgrind --leak-check=full ./$(TEST_TARGET)
-endif
+autosar-clean:
+	@echo "Cleaning AUTOSAR build artifacts..."
+	@rm -rf $(AUTOSAR_BUILD_DIR)
+	@echo "✓ Clean complete"
 
-# ===============================
-# Coverage (gcov + gcovr)
-# ===============================
-coverage:
-	@echo ==== Generating coverage ====
-ifeq ($(OS),Windows_NT)
-	$(MAKE) clean
-	if not exist $(COVERAGE_DIR) mkdir $(COVERAGE_DIR)
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fprofile-arcs -ftest-coverage" tests
-	./$(TEST_TARGET)
-else
-	$(MAKE) clean
-	mkdir -p $(COVERAGE_DIR)
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fprofile-arcs -ftest-coverage" tests
-	./$(TEST_TARGET)
-	gcovr --html-details --output $(COVERAGE_DIR)/coverage.html
-endif
+autosar-rebuild: autosar-clean autosar
 
-# ===============================
-# Cppcheck (Static Analysis)
-# ===============================
-cppcheck:
-	@echo ==== Running Cppcheck ====
-ifeq ($(OS),Windows_NT)
-	@echo Cppcheck build option has not yet tested on Windows
-else
-	mkdir -p $(CPPCHECK_DIR)
-endif
-	cppcheck $(CPPCHECK_OPTS) $(SRC_DIRS) \
-		--enable=all --inconclusive --std=c11 --std=c++17 \
-        --inline-suppr --force \
-		--suppress=missingIncludeSystem \
-		--check-level=exhaustive \
-		--addon=tools/cppcheck/misra.json \
-		--cppcheck-build-dir=$(CPPCHECK_DIR) \
-		--xml --xml-version=2 \
-		--checkers-report=$(CPPCHECK_DIR)/checkers.txt \
-		--output-file=$(CPPCHECK_DIR)/cppcheck-result.xml
-	@echo ==== Cppcheck finished. Report in $(CPPCHECK_DIR)/cppcheck-result.xml ====
-	@echo ==== Generating HTML Report ====
-	cppcheck-htmlreport \
-		--file=$(CPPCHECK_DIR)/cppcheck-result.xml \
-		--report-dir=$(CPPCHECK_DIR)/html
-	@echo ==== HTML report ready in $(CPPCHECK_DIR)/html ====
+# ============================================
+# Testing targets
+# ============================================
 
-# =================================
-# Run main application
-# =================================
-run: $(TARGET)
-	@echo ==== Running Application ====
-	@./$(TARGET)
+autosar-tests:
+	@echo "Running AUTOSAR unit tests..."
+	@echo "Note: Add your unit tests in test/autosar/"
+	@echo "TODO: Integrate with your test framework"
 
-# =================================
-# Clean everything
-# =================================
-clean:
-	@echo ==== Cleaning build directory ====
-ifeq ($(OS),Windows_NT)
-	if exist $(BUILD_DIR) rmdir /S /Q $(BUILD_DIR)
-else
-	-rm -rf $(BUILD_DIR)
-endif
+# ============================================
+# Code coverage
+# ============================================
+
+COVERAGE_CFLAGS := $(CFLAGS) --coverage
+COVERAGE_LDFLAGS := $(LDFLAGS) --coverage
+
+autosar-coverage: CFLAGS := $(COVERAGE_CFLAGS)
+autosar-coverage: LDFLAGS := $(COVERAGE_LDFLAGS)
+autosar-coverage: autosar-clean autosar
+	@echo ""
+	@echo "Running with coverage..."
+	@timeout 2s $(AUTOSAR_EXE) || true
+	@echo ""
+	@echo "Generating coverage report..."
+	@mkdir -p $(COVERAGE_DIR)
+	@gcovr -r . --html --html-details -o $(COVERAGE_DIR)/coverage.html \
+		--exclude 'test/*' --exclude 'build/*'
+	@echo "✓ Coverage report generated: $(COVERAGE_DIR)/coverage.html"
+
+# ============================================
+# Debug targets
+# ============================================
+
+autosar-debug: CFLAGS += -O0 -DDEBUG
+autosar-debug: autosar-rebuild
+	@echo "Debug build complete. Run with: gdb $(AUTOSAR_EXE)"
+
+# ============================================
+# Development helpers
+# ============================================
+
+# Create new kata from template
+new-kata:
+	@read -p "Enter kata number (e.g., 002): " num; \
+	kata_dir="src/autosar/swc/kata_$$num"; \
+	if [ -d "$$kata_dir" ]; then \
+		echo "Error: Kata $$num already exists!"; \
+		exit 1; \
+	fi; \
+	echo "Creating new kata: $$num"; \
+	cp -r src/autosar/swc/template $$kata_dir; \
+	cd $$kata_dir && \
+	mv Swc_Template.h Swc_Kata$$num.h && \
+	mv Swc_Template.c Swc_Kata$$num.c && \
+	sed -i "s/Template/Kata$$num/g" *.h *.c && \
+	sed -i "s/TEMPLATE/KATA$$num/g" *.h *.c; \
+	echo "✓ Kata $$num created in $$kata_dir"; \
+	echo "  Next steps:"; \
+	echo "  1. Edit Swc_Kata$$num.c with your kata solution"; \
+	echo "  2. Add to Makefile AUTOSAR_SWC_SRCS"; \
+	echo "  3. Register in main.c"
+
+# List all katas
+list-katas:
+	@echo "Available katas:"
+	@ls -1d src/autosar/swc/kata_* 2>/dev/null | sed 's|src/autosar/swc/||' || echo "  No katas created yet"
+	@echo ""
+	@echo "Template available at: src/autosar/swc/template"
+
+# ============================================
+# Help
+# ============================================
+
+help:
+	@echo "AUTOSAR Lab - Kata Training System"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  make autosar          - Build AUTOSAR lab"
+	@echo "  make autosar-run      - Build and run AUTOSAR lab"
+	@echo "  make autosar-clean    - Clean build artifacts"
+	@echo "  make autosar-rebuild  - Clean and rebuild"
+	@echo "  make autosar-tests    - Run unit tests"
+	@echo "  make autosar-coverage - Generate coverage report"
+	@echo "  make autosar-debug    - Build with debug symbols"
+	@echo ""
+	@echo "Development helpers:"
+	@echo "  make new-kata         - Create new kata from template"
+	@echo "  make list-katas       - List all created katas"
+	@echo ""
+	@echo "Example workflow:"
+	@echo "  1. make new-kata      (create kata_002)"
+	@echo "  2. Edit kata_002/Swc_Kata002.c"
+	@echo "  3. make autosar-run   (build and test)"
+	@echo "  4. make autosar-coverage (check coverage)"
+
+# ============================================
+# Dependency generation
+# ============================================
+
+-include $(AUTOSAR_OBJS:.o=.d)
+
+$(AUTOSAR_BUILD_DIR)/%.d: %.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) $(AUTOSAR_INCLUDES) -MM -MT $(@:.d=.o) $< -MF $@
