@@ -81,15 +81,18 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         find_outlier
- * @brief      Find The Parity Outlier. The array is either entirely comprised 
- *             of odd integers or entirely comprised of even integers except 
- *             for a single integer N
- * @param [in] values - The input array
- * @param [in] count - The size of the array
- * @return     The outlier
+ * @fn         move_zeros
+ * @brief      Takes a non-negative integer (seconds) as input and returns 
+ *             the time in a human-readable format (HH:MM:SS)
+ *                  HH = hours, padded to 2 digits, range: 00 - 99
+ *                  MM = minutes, padded to 2 digits, range: 00 - 59
+ *                  SS = seconds, padded to 2 digits, range: 00 - 59
+ *                  The maximum time never exceeds 359999 (99:59:59)
+ * @param [in] seconds - The input to conver
+ * @param [in] time_string - The output array
+ * @return     Return the time_string
  ******************************************************************************/
-int find_outlier(const int* values, size_t count);
+char *human_readable_time (unsigned seconds, char *time_string);
 
 #endif /* __cplusplus */
 

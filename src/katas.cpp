@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <iostream>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -70,54 +69,34 @@
  * Function Definitions
  *===========================================================================*/
 
-void printArr(int curr, size_t len, int *arr)
-{
-    printf("-- %d --- ", curr);
+ void printArr (int curr, size_t len, int *arr)
+ {
+    printf("-- %d ---", curr);
     for (size_t i = 0; i < len; ++i)
     {
         printf("%d ", arr[i]);
     }
     printf("\n");
-}
+ }
 
 /*****************************************************************************
- * Name         find_outlier
- * Description  Find The Parity Outlier. The array is either entirely comprised
- *              of odd integers or entirely comprised of even integers except
- *              for a single integer N
+ * Name         human_readable_time
+ * Description  Takes a non-negative integer (seconds) as input and returns 
+ *              the time in a human-readable format (HH:MM:SS)
  *****************************************************************************/
-int find_outlier(const int *values, size_t count)
+char *human_readable_time (unsigned seconds, char *time_string)
 {
-    int even_counter = 0;
-    int odd_counter = 0;
-    int possible_even_outlier = 0;
-    int possible_odd_outlier = 0;
-    int outlier = 0;
-
-    // Check if the input array is even or odd
-    for (int i=0; i<count; i++)
-    {
-        if(0 == (values[i] % 2))
-        {   
-            possible_even_outlier = values[i];  // Store the last even number detected
-            even_counter++;
-        }
-        else
-        {
-            possible_odd_outlier = values[i];   // Store the last odd number detected
-            odd_counter++;
-        }
-    }
-
-    if(even_counter == 1)
-    {
-        outlier = possible_even_outlier;
-    }
-    else
-    {
-        outlier = possible_odd_outlier;
-    }
-    
-    printArr(outlier, count, (int *)values);
-    return outlier;
+    int hh = seconds/3600;
+    int mm = (seconds%3600)/60;
+    int ss = (seconds%3600)%60;
+    time_string[0] = hh/10 + '0';
+    time_string[1] = hh%10 + '0';
+    time_string[2] = ':';
+    time_string[3] = mm/10 + '0';
+    time_string[4] = mm%10 + '0';
+    time_string[5] = ':';    
+    time_string[6] = ss/10 + '0';
+    time_string[7] = ss%10 + '0';
+    time_string[8] = '\0';
+	return time_string;
 }
