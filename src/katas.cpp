@@ -80,44 +80,147 @@ void printArr(int curr, size_t len, int *arr)
     printf("\n");
 }
 
-/*****************************************************************************
- * Name         find_outlier
- * Description  Find The Parity Outlier. The array is either entirely comprised
- *              of odd integers or entirely comprised of even integers except
- *              for a single integer N
- *****************************************************************************/
-int find_outlier(const int *values, size_t count)
+unsigned int from_roman_conversion(unsigned char c)
 {
-    int even_counter = 0;
-    int odd_counter = 0;
-    int possible_even_outlier = 0;
-    int possible_odd_outlier = 0;
-    int outlier = 0;
-
-    // Check if the input array is even or odd
-    for (int i=0; i<count; i++)
+    unsigned int ret = 0;
+    switch (c)
     {
-        if(0 == (values[i] % 2))
-        {   
-            possible_even_outlier = values[i];  // Store the last even number detected
-            even_counter++;
+    case 'I':
+        ret = 1;
+        break;
+    case 'V':
+        ret = 5;
+        break;
+    case 'X':
+        ret = 10;
+        break;
+    case 'L':
+        ret = 50;
+        break;
+    case 'C':
+        ret = 100;
+        break;
+    case 'D':
+        ret = 500;
+        break;
+    case 'M':
+        ret = 1000;
+        break;
+    default:
+        break;
+    }
+    return ret;
+}
+
+/*****************************************************************************
+ * Name         from_roman
+ * Description  Convert a roman number in the string to an integer
+ *****************************************************************************/
+unsigned from_roman(const char *roman)
+{
+    int len = strlen(roman);
+    int i = 0;
+    int curr_number = 0;
+    int next_number = 0;
+    int number = 0;
+    for (i = 0; i < len; i++)
+    {
+        curr_number = from_roman_conversion(roman[i]);
+        // printf("curr_number: -- %d --- \n", curr_number);
+        if ((i + 1) < len)
+        {
+            next_number = from_roman_conversion(roman[i + 1]);
+            // printf("next_number: -- %d --- \n", next_number);
+            if (curr_number >= next_number)
+                number += curr_number;
+            else
+            {
+                number += next_number - curr_number;
+                i++;
+            }
         }
         else
         {
-            possible_odd_outlier = values[i];   // Store the last odd number detected
-            odd_counter++;
+            number += curr_number;
         }
     }
+    return number;
+}
 
-    if(even_counter == 1)
+unsigned int to_roman_conversion(char digitx1, char digitx5, char digitx10, unsigned int number, char *roman)
+{
+    unsigned int pos = 0;
+    switch (number)
     {
-        outlier = possible_even_outlier;
+    case 1:
+        roman[pos++] = digitx1;
+        break;
+    case 2:
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx1;
+        break;
+    case 3:
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx1;
+        break;
+    case 4:
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx5;
+        break;
+    case 5:
+        roman[pos++] = digitx5;
+        break;
+    case 6:
+        roman[pos++] = digitx5;
+        roman[pos++] = digitx1;
+        break;
+    case 7:
+        roman[pos++] = digitx5;
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx1;
+        break;
+    case 8:
+        roman[pos++] = digitx5;
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx1;
+        break;
+    case 9:
+        roman[pos++] = digitx1;
+        roman[pos++] = digitx10;
+        break;
+    default:
+        break;
     }
-    else
-    {
-        outlier = possible_odd_outlier;
-    }
-    
-    printArr(outlier, count, (int *)values);
-    return outlier;
+    return pos;
+}
+
+/*****************************************************************************
+ * Name         to_roman
+ * Description  Convert a roman number as integer to a string
+ *****************************************************************************/
+void to_roman(unsigned number, char *roman)
+{
+    unsigned int m = 0;
+    unsigned int c = 0;
+    unsigned int d = 0;
+    unsigned int u = 0;
+
+    m = number / 1000;
+    c = (number % 1000) / 100;
+    d = (number % 100) / 10;
+    u = number % 10;
+    // printf("m: -- %d --- \n", m);
+    // printf("c: -- %d --- \n", c);
+    // printf("d: -- %d --- \n", d);
+    // printf("u: -- %d --- \n", u);
+
+    unsigned int pos = 0;
+    pos += to_roman_conversion('M', 'M', 'M', m, roman + pos);
+    pos += to_roman_conversion('C', 'D', 'M', c, roman + pos);
+    pos += to_roman_conversion('X', 'L', 'C', d, roman + pos);
+    pos += to_roman_conversion('I', 'V', 'X', u, roman + pos);
+
+    roman[pos] = '\0';
 }

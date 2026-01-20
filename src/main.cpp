@@ -84,10 +84,16 @@ extern "C"
  *****************************************************************************/
 int main(int argc, char *argv[])
 {
+    char actual[32] = "@@@@@@@@@@@@@@@@@@@@@@@@@@@";
+
     std::cout << "=== Start ===" << std::endl;
 
-    const int array[] = {160, 3, 1719, 19, 11, 13, -21};
-    find_outlier(array, NumElems(array));
+    
+// void to_roman(unsigned number, char *roman);
+    to_roman (356, actual);
+    std::cout << actual << std::endl;
+    int number = from_roman (actual);
+    std::cout << number << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

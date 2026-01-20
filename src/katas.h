@@ -81,15 +81,21 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         find_outlier
- * @brief      Find The Parity Outlier. The array is either entirely comprised 
- *             of odd integers or entirely comprised of even integers except 
- *             for a single integer N
- * @param [in] values - The input array
- * @param [in] count - The size of the array
- * @return     The outlier
+ * @fn         from_roman
+ * @brief      Convert a roman number in the string to an integer 
+ * @param [in] roman - The input number
+ * @return     The roman number as integer
  ******************************************************************************/
-int find_outlier(const int* values, size_t count);
+unsigned from_roman (const char *roman);
+
+/*****************************************************************************
+ * @fn         to_roman
+ * @brief      Convert a roman number as integer to a string
+ * @param [in] number - The input number as integer
+ * @param [in] roman - The output roman number as string
+ * @return     The roman number as integer
+ ******************************************************************************/
+void to_roman(unsigned number, char *roman);
 
 #endif /* __cplusplus */
 
