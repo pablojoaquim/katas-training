@@ -84,16 +84,34 @@ extern "C"
  *****************************************************************************/
 int main(int argc, char *argv[])
 {
-    char actual[32] = "@@@@@@@@@@@@@@@@@@@@@@@@@@@";
+    // interval v[] = {{1, 5}, {10, 20}, {1, 6}, {16, 19}, {5, 11}};
+    // interval v[] = {{1,5},{-1,2},{2,10}};
+
+    interval v[] = {
+    {-44, 402},
+    {222, 349},
+    {453, 480},
+    {-176, -63},
+    {377, 386},
+    {-469, -360},
+    {-360, -1},
+    {-397, 278},
+    {-441, 282},
+    {433, 447},
+    {-196, 486},
+    {-55, -47},
+    {287, 484},
+    {-282, -69},
+    {-102, 154},
+    {165, 177},
+    {-249, 385},
+    {-448, -387},
+    {-155, 415},
+    {-224, 127}};
 
     std::cout << "=== Start ===" << std::endl;
 
-    
-// void to_roman(unsigned number, char *roman);
-    to_roman (356, actual);
-    std::cout << actual << std::endl;
-    int number = from_roman (actual);
-    std::cout << number << std::endl;
+    std::cout << sum_intervals(v, NumElems(v)) << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

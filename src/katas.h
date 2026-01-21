@@ -54,6 +54,10 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
+struct interval {
+    int first;
+    int second;
+};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -81,21 +85,15 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         from_roman
- * @brief      Convert a roman number in the string to an integer 
- * @param [in] roman - The input number
- * @return     The roman number as integer
+ * @fn         sum_intervals
+ * @brief      Accepts an array of intervals, and returns the sum of all the 
+ *             interval lengths. Overlapping intervals should only be counted once.
+ * @param [in] v - The input interval expressed as a vector of intervals like
+ *             {{1, 5}, {10, 20}, {1, 6}, {16, 19}, {5, 11}}
+ * @param [in] n - The number of intervals in the input
+ * @return     The sum of all interval lengths
  ******************************************************************************/
-unsigned from_roman (const char *roman);
-
-/*****************************************************************************
- * @fn         to_roman
- * @brief      Convert a roman number as integer to a string
- * @param [in] number - The input number as integer
- * @param [in] roman - The output roman number as string
- * @return     The roman number as integer
- ******************************************************************************/
-void to_roman(unsigned number, char *roman);
+int sum_intervals(const struct interval *v, size_t n);
 
 #endif /* __cplusplus */
 
