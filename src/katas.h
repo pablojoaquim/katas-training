@@ -54,10 +54,6 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
-struct interval {
-    int first;
-    int second;
-};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -85,16 +81,16 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         sum_intervals
- * @brief      Accepts an array of intervals, and returns the sum of all the 
- *             interval lengths. Overlapping intervals should only be counted once.
- * @param [in] v - The input interval expressed as a vector of intervals like
- *             {{1, 5}, {10, 20}, {1, 6}, {16, 19}, {5, 11}}
- * @param [in] n - The number of intervals in the input
- * @return     The sum of all interval lengths
+ * @fn         narcissistic
+ * @brief      A Narcissistic Number (or Armstrong Number) is a positive number 
+ *             which is the sum of its own digits, each raised to the power of 
+ *             the number of digits in a given base.
+ *             For example, take 153 (3 digits), which is narcissistic:
+ *             1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153
+ * @param [in] value - The value to check if is narcissist or not
+ * @return     True - The value is narcissist, False - Other
  ******************************************************************************/
-int sum_intervals(const struct interval *v, size_t n);
-
+bool narcissistic( int value );
 #endif /* __cplusplus */
 
 /*===========================================================================*/

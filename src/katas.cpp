@@ -35,6 +35,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <iostream>
+#include <math.h>
 #include "katas.h"
 
 /*===========================================================================*
@@ -50,7 +51,7 @@
 /*===========================================================================*
  * Local Type Declarations
  *===========================================================================*/
-typedef interval q_elem;
+typedef int q_elem;
 
 typedef struct queue
 {
@@ -126,43 +127,39 @@ bool q_pop(queue_t *q, q_elem *out)
     return true;
 }
 
-int cmp(const void *a, const void *b)
-{
-    const struct interval *x = a;
-    const struct interval *y = b;
-    return x->first - y->first;
-}
-
 /*****************************************************************************
- * Name         sum_intervals
- * Description  Accepts an array of intervals, and returns the sum of all the
- *              interval lengths. Overlapping intervals should only be counted once.
+ * Name         narcissistic
+ * Description  A Narcissistic Number (or Armstrong Number) is a positive number
+ *              which is the sum of its own digits, each raised to the power of
+ *              the number of digits in a given base.
+ *              For example, take 153 (3 digits), which is narcissistic:
+ *              1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153
  *****************************************************************************/
-int sum_intervals(struct interval *v, size_t n)
+bool narcissistic(int value)
 {
-    if (n == 0) return 0;
-
-    qsort(v, n, sizeof(struct interval), cmp);
-
-    int sum = 0;
-    int start = v[0].first;
-    int end   = v[0].second;
-
-    for (size_t i = 1; i < n; i++)
+    int digits[10] = {};
+    int digitCnt = 0;
+    int powering = 0;
+    int number = value;
+    while (number > 0)
     {
-        if (v[i].first <= end)
-        {
-            if (v[i].second > end)
-                end = v[i].second;
-        }
-        else
-        {
-            sum += end - start;
-            start = v[i].first;
-            end   = v[i].second;
-        }
+        int digit = number % 10;
+        number /= 10;
+        // Store or process digit
+        digits[digitCnt++] = digit;
     }
 
-    sum += end - start;
-    return sum;
+    for (int i=0; i<digitCnt; i++)
+    {
+        powering += pow(digits[i],digitCnt);
+    }
+
+    if(powering == value)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }    
 }

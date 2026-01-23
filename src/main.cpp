@@ -87,31 +87,10 @@ int main(int argc, char *argv[])
     // interval v[] = {{1, 5}, {10, 20}, {1, 6}, {16, 19}, {5, 11}};
     // interval v[] = {{1,5},{-1,2},{2,10}};
 
-    interval v[] = {
-    {-44, 402},
-    {222, 349},
-    {453, 480},
-    {-176, -63},
-    {377, 386},
-    {-469, -360},
-    {-360, -1},
-    {-397, 278},
-    {-441, 282},
-    {433, 447},
-    {-196, 486},
-    {-55, -47},
-    {287, 484},
-    {-282, -69},
-    {-102, 154},
-    {165, 177},
-    {-249, 385},
-    {-448, -387},
-    {-155, 415},
-    {-224, 127}};
-
     std::cout << "=== Start ===" << std::endl;
 
-    std::cout << sum_intervals(v, NumElems(v)) << std::endl;
+    int value = 153;
+    std::cout << "Value: " << value << (narcissistic(153)? " is narcissistic":" is not narcissistic") << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
