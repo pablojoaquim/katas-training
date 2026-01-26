@@ -81,16 +81,13 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         narcissistic
- * @brief      A Narcissistic Number (or Armstrong Number) is a positive number 
- *             which is the sum of its own digits, each raised to the power of 
- *             the number of digits in a given base.
- *             For example, take 153 (3 digits), which is narcissistic:
- *             1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153
- * @param [in] value - The value to check if is narcissist or not
- * @return     True - The value is narcissist, False - Other
+ * @fn         rot13
+ * @brief      Rot13 cryptgraphic algorithm
+ * @param [in] str - The input string to encode
+ * @return     The encoded string
  ******************************************************************************/
-bool narcissistic( int value );
+std::string rot13(const std::string& str);
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

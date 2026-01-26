@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    int value = 153;
-    std::cout << "Value: " << value << (narcissistic(153)? " is narcissistic":" is not narcissistic") << std::endl;
+    std::string str = "ROT13 example.";
+    std::cout << "Value: " << rot13(str) << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

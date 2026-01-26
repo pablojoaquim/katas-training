@@ -128,38 +128,42 @@ bool q_pop(queue_t *q, q_elem *out)
 }
 
 /*****************************************************************************
- * Name         narcissistic
- * Description  A Narcissistic Number (or Armstrong Number) is a positive number
- *              which is the sum of its own digits, each raised to the power of
- *              the number of digits in a given base.
- *              For example, take 153 (3 digits), which is narcissistic:
- *              1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153
+ * Name         rot13
+ * Description  Rot13 cryptgraphic algorithm
  *****************************************************************************/
-bool narcissistic(int value)
+std::string rot13(const std::string &str)
 {
-    int digits[10] = {};
-    int digitCnt = 0;
-    int powering = 0;
-    int number = value;
-    while (number > 0)
+    std::string str_aux;
+    std::string table[2] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+                            "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm"};
+    for (auto &ch : str)
     {
-        int digit = number % 10;
-        number /= 10;
-        // Store or process digit
-        digits[digitCnt++] = digit;
-    }
+        if((ch>='A' && ch<='Z') || (ch>='a' && ch<='z'))
+        {
+            int pos = table[0].find(ch);
+            str_aux.push_back(table[1].at(pos));
 
-    for (int i=0; i<digitCnt; i++)
-    {
-        powering += pow(digits[i],digitCnt);
+            // char ch_new;
+            // if (ch >= 'a' && ch <= 'z')
+            // {
+            //     if (ch > ('z' - 13))
+            //         ch_new = ch - ('z' + 1) + 'a' + 13;
+            //     else
+            //         ch_new = ch + 13;
+            // }
+            // else if (ch >= 'A' && ch <= 'Z')
+            // {
+            //     if (ch > ('Z' - 13))
+            //         ch_new = ch - ('Z' + 1) + 'A' + 13;
+            //     else
+            //         ch_new = ch + 13;
+            // }
+            // str_aux.push_back(ch_new);
+        }
+        else
+        {
+            str_aux.push_back(ch);
+        }
     }
-
-    if(powering == value)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }    
+    return str_aux;
 }
