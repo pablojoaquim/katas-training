@@ -90,14 +90,12 @@ extern "C" {
 double power_optimized(double base, int exp);
 
 /*****************************************************************************
- * @fn         hamber
- * @brief      Calc the minimum hamming n number. 
- *             A hamming number is a positive integer of the form 2^i*3^j*5^k, 
- *             for some non-negative integers i, j, and k.
- * @param [in] n - The n-order hamming number
- * @return     The Hamming number
+ * @fn         format_duration
+ * @brief      Formats a duration, given as a number of seconds, in a human-friendly way..
+ * @param [in] seconds - The input to process
+ * @return     The duration in a human frienly formatted string
  ******************************************************************************/
-uint64_t hamber(int n);
+std::string format_duration(int seconds);
 
 #endif /* __cplusplus */
 

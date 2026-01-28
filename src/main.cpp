@@ -88,10 +88,8 @@ int main(int argc, char *argv[])
     // interval v[] = {{1,5},{-1,2},{2,10}};
 
     std::cout << "=== Start ===" << std::endl;
-    for (int i=1; i<=62; i++)
-    {
-        std::cout << "Hamming (" << i << "): " << hamber(i) << std::endl;
-    }
+    std::cout << format_duration(1111111162) << std::endl;
+    
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

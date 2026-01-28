@@ -160,99 +160,96 @@ double power_optimized(double base, int exp)
 }
 
 /*****************************************************************************
- * Name         hamber
- * Description  Calc the minimum hamming n number.
- *              A hamming number is a positive integer of the form 2^i*3^j*5^k,
- *              for some non-negative integers i, j, and k.
- *                     Assert::That(hamber(1), Equals(1));
- *                     Assert::That(hamber(2), Equals(2));
- *                     Assert::That(hamber(3), Equals(3));
- *                     Assert::That(hamber(4), Equals(4));
- *                     Assert::That(hamber(5), Equals(5));
- *                     Assert::That(hamber(8), Equals(9));
- *                     Assert::That(hamber(11), Equals(15));
- *                     Assert::That(hamber(14), Equals(20));
- *                     Assert::That(hamber(17), Equals(27));
- *                     Assert::That(hamber(20), Equals(36));
- *                     Assert::That(hamber(23), Equals(48));
- *                     Assert::That(hamber(26), Equals(60));
- *                     Assert::That(hamber(29), Equals(75));
- *                     Assert::That(hamber(32), Equals(90));
- *                     Assert::That(hamber(35), Equals(108));
- *                     Assert::That(hamber(38), Equals(128));
- *                     Assert::That(hamber(41), Equals(150));
- *                     Assert::That(hamber(44), Equals(180));
- *                     Assert::That(hamber(47), Equals(216));
- *                     Assert::That(hamber(50), Equals(243));
- *                     Assert::That(hamber(53), Equals(270));
- *                     Assert::That(hamber(56), Equals(320));
- *                     Assert::That(hamber(59), Equals(375));
- *                     Assert::That(hamber(62), Equals(405));
+ * Name         format_duration
+ * Description  Formats a duration, given as a number of seconds, in a human-friendly way.
  *****************************************************************************/
-uint64_t hamber(int n)
+std::string format_duration(int seconds)
 {
-    std::vector<uint64_t> H(n+1);
-    H[0] = 1;
+    uint32_t years;
+    uint32_t days;
+    uint32_t hours;
+    uint32_t minutes;
+    uint32_t sec;
+    uint32_t input = (uint32_t)seconds;
+    std::vector<std::string> components;
 
-    int i2 = 0, i3 = 0, i5 = 0;
-
-    for (int k = 1; k <= n; ++k)
+    if (seconds == 0)
     {
-        uint64_t next2 = 2 * H[i2];
-        uint64_t next3 = 3 * H[i3];
-        uint64_t next5 = 5 * H[i5];
-
-        uint64_t next = next2;
-        if (next3 < next)
-            next = next3;
-        if (next5 < next)
-            next = next5;
-        H[k] = next;
-
-        if (next == next2)
-            ++i2;
-        if (next == next3)
-            ++i3;
-        if (next == next5)
-            ++i5;
+        return ("now");
     }
 
-    return H[n-1];
+    years = input / 31536000;
+    input %= 31536000;
 
-    // int i, j, k;
-    // uint64_t hamming_number = 1;
-    // uint64_t hamming[3] = {1};
-    // i = 0;
-    // j = 0;
-    // k = 0;
-    // while (n-- > 1)
-    // {
-    //     // uint64_t possible1 = power_optimized(2, i+1) * power_optimized(3, j) * power_optimized(5, k);
-    //     // uint64_t possible2 = power_optimized(2, i) * power_optimized(3, j+1) * power_optimized(5, k);
-    //     // uint64_t possible3 = power_optimized(2, i) * power_optimized(3, j) * power_optimized(5, k+1);
-    //     uint64_t possible1 = hamming[0] * 2;
-    //     uint64_t possible2 = hamming[1] * 3;
-    //     uint64_t possible3 = hamming[3] * 5;
-    //     std::cout << "possible1: " << possible1 << std::endl;
-    //     std::cout << "possible2: " << possible2 << std::endl;
-    //     std::cout << "possible3: " << possible3 << std::endl;
+    days = input / 86400;
+    input %= 86400;
 
-    //     if( (possible1<possible2) && (possible1<possible3))
-    //     {
-    //         hamming[0] = possible1;
-    //         hamming_number = possible1;
-    //     }
-    //     if( (possible2<possible1) && (possible2<possible3))
-    //     {
-    //         hamming[1] = possible2;
-    //         hamming_number = possible2;
-    //     }
-    //     if( (possible3<possible1) && (possible3<possible2))
-    //     {
-    //         hamming[2] = possible3;
-    //         hamming_number = possible3;
-    //     }
-    // }
+    hours = input / 3600;
+    input %= 3600;
 
-    // return hamming_number;
+    minutes = input / 60;
+    sec = input % 60;
+
+    if (years > 0)
+    {
+        std::string str = "";
+        str.append(std::to_string(years));
+        (years > 1) ? str.append(" years") : str.append(" year");
+
+        components.push_back(str);
+    }
+
+    if (days > 0)
+    {
+        std::string str = "";
+        str.append(std::to_string(days));
+        (days > 1) ? str.append(" days") : str.append(" day");
+
+        components.push_back(str);
+    }
+
+    if (hours > 0)
+    {
+        std::string str = "";
+        str.append(std::to_string(hours));
+        (hours > 1) ? str.append(" hours") : str.append(" hour");
+
+        components.push_back(str);
+    }
+
+    if (minutes > 0)
+    {
+        std::string str = "";
+        str.append(std::to_string(minutes));
+        (minutes > 1) ? str.append(" minutes") : str.append(" minute");
+
+        components.push_back(str);
+    }
+
+    if (sec > 0)
+    {
+        std::string str = "";
+        str.append(std::to_string(sec));
+        (sec > 1) ? str.append(" seconds") : str.append(" second");
+
+        components.push_back(str);
+    }
+
+    if (components.size() == 1)
+        return components[0];
+
+    std::string result = "";
+    for (int i = 0; i < (components.size()); i++)
+    {
+        if (i > 0)
+        {
+            if (i == components.size() - 1)
+                result += " and ";
+            else
+                result += ", ";
+        }
+        result += components[i];
+    }
+
+    return result;
 }
