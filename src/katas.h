@@ -81,12 +81,13 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         rot13
- * @brief      Rot13 cryptgraphic algorithm
- * @param [in] str - The input string to encode
- * @return     The encoded string
+ * @fn         power_optimized
+ * @brief      Optimized Divide and Conquer Approach (Exponentiation by Squaring)
+ * @param [in] base
+ * @param [in] exp
+ * @return     base^exp
  ******************************************************************************/
-std::string rot13(const std::string& str);
+double power_optimized(double base, int exp);
 
 #endif /* __cplusplus */
 

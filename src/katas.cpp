@@ -128,42 +128,26 @@ bool q_pop(queue_t *q, q_elem *out)
 }
 
 /*****************************************************************************
- * Name         rot13
- * Description  Rot13 cryptgraphic algorithm
+ * Name         power_optimized
+ * Description  Optimized Divide and Conquer Approach (Exponentiation by Squaring)
  *****************************************************************************/
-std::string rot13(const std::string &str)
+double power_optimized(double base, int exp) 
 {
-    std::string str_aux;
-    std::string table[2] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-                            "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm"};
-    for (auto &ch : str)
-    {
-        if((ch>='A' && ch<='Z') || (ch>='a' && ch<='z'))
-        {
-            int pos = table[0].find(ch);
-            str_aux.push_back(table[1].at(pos));
-
-            // char ch_new;
-            // if (ch >= 'a' && ch <= 'z')
-            // {
-            //     if (ch > ('z' - 13))
-            //         ch_new = ch - ('z' + 1) + 'a' + 13;
-            //     else
-            //         ch_new = ch + 13;
-            // }
-            // else if (ch >= 'A' && ch <= 'Z')
-            // {
-            //     if (ch > ('Z' - 13))
-            //         ch_new = ch - ('Z' + 1) + 'A' + 13;
-            //     else
-            //         ch_new = ch + 13;
-            // }
-            // str_aux.push_back(ch_new);
-        }
-        else
-        {
-            str_aux.push_back(ch);
-        }
+    if (exp == 0) return 1;
+    // Handle negative exponents by taking the reciprocal
+    if (exp < 0) {
+        base = 1.0 / base;
+        exp = -exp;
     }
-    return str_aux;
+    double result = 1.0;
+    while (exp > 0) {
+        std::cout << "result: " << result << " - base: " << base << " - exp: " << exp << std::endl;
+        // If exponent is odd, multiply result by base
+        if (exp % 2 == 1) {
+            result *= base;
+        }
+        base *= base; // Square the base
+        exp /= 2;    // Halve the exponent
+    }
+    return result;
 }

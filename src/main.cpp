@@ -89,8 +89,7 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::string str = "ROT13 example.";
-    std::cout << "Value: " << rot13(str) << std::endl;
+    std::cout << "Value: " << power_optimized(4,4) << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
