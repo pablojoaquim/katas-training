@@ -90,12 +90,28 @@ extern "C" {
 double power_optimized(double base, int exp);
 
 /*****************************************************************************
- * @fn         format_duration
- * @brief      Formats a duration, given as a number of seconds, in a human-friendly way..
- * @param [in] seconds - The input to process
- * @return     The duration in a human frienly formatted string
+ * @fn         who_is_winner
+ * @brief      This is a gameplay for Connect Four. It receives the list of
+ *             movements from each player, and determines the winner.
+ * @param [in] pieces_position_list - The list of movements of the game in the form:
+ *              std::vector<std::string> pieces_position_list
+ *              {
+ *                "A_Red",
+ *                "B_Yellow",
+ *                "A_Red",
+ *                "B_Yellow",
+ *                "A_Red",
+ *                "B_Yellow",
+ *                "G_Red",
+ *                "B_Yellow"
+ *              }
+ * @return     "Yellow", "Red" or "Draw" accordingly
  ******************************************************************************/
-std::string format_duration(int seconds);
+/*****************************************************************************
+ * Name         who_is_winner
+ * Description  
+ *****************************************************************************/
+std::string who_is_winner(std::vector<std::string> pieces_position_list);
 
 #endif /* __cplusplus */
 

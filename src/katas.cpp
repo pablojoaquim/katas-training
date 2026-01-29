@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 #include <math.h>
 #include "katas.h"
 #include <vector>
@@ -43,7 +44,7 @@
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
-#define NDEBUG
+// #define NDEBUG
 
 /*===========================================================================*
  * Local Preprocessor #define MACROS
@@ -160,96 +161,187 @@ double power_optimized(double base, int exp)
 }
 
 /*****************************************************************************
- * Name         format_duration
- * Description  Formats a duration, given as a number of seconds, in a human-friendly way.
+ * Name         who_is_winner
+ * Description  This is a gameplay for Connect Four. It receives the list of
+ *              movements from each player, and determines the winner.
  *****************************************************************************/
-std::string format_duration(int seconds)
+std::string who_is_winner(std::vector<std::string> pieces_position_list)
 {
-    uint32_t years;
-    uint32_t days;
-    uint32_t hours;
-    uint32_t minutes;
-    uint32_t sec;
-    uint32_t input = (uint32_t)seconds;
-    std::vector<std::string> components;
+    constexpr int ROWS = 6;
+    constexpr int COLUMNS = 7;
+    constexpr int CONNECT = 4;
+    char positions[ROWS][COLUMNS] = {};
+    int row_position[COLUMNS] = {0};
 
-    if (seconds == 0)
+    // Iterate thorugh the input
+    for (std::string elem : pieces_position_list)
     {
-        return ("now");
+        int column = elem[0] - 'A'; // Get the column played
+        row_position[column]++;     // Increment the number of pieces in the column (which is the row!)
+        char player = elem[2];      // Could be 'Y' or 'R'
+        positions[row_position[column] - 1][column] = player;
     }
 
-    years = input / 31536000;
-    input %= 31536000;
-
-    days = input / 86400;
-    input %= 86400;
-
-    hours = input / 3600;
-    input %= 3600;
-
-    minutes = input / 60;
-    sec = input % 60;
-
-    if (years > 0)
+#ifndef NDEBUG
+    // Printout the game
+    // (this is not necessary, is just for debugging)
+    for (int row = 0; row < ROWS; row++)
     {
-        std::string str = "";
-        str.append(std::to_string(years));
-        (years > 1) ? str.append(" years") : str.append(" year");
-
-        components.push_back(str);
-    }
-
-    if (days > 0)
-    {
-        std::string str = "";
-        str.append(std::to_string(days));
-        (days > 1) ? str.append(" days") : str.append(" day");
-
-        components.push_back(str);
-    }
-
-    if (hours > 0)
-    {
-        std::string str = "";
-        str.append(std::to_string(hours));
-        (hours > 1) ? str.append(" hours") : str.append(" hour");
-
-        components.push_back(str);
-    }
-
-    if (minutes > 0)
-    {
-        std::string str = "";
-        str.append(std::to_string(minutes));
-        (minutes > 1) ? str.append(" minutes") : str.append(" minute");
-
-        components.push_back(str);
-    }
-
-    if (sec > 0)
-    {
-        std::string str = "";
-        str.append(std::to_string(sec));
-        (sec > 1) ? str.append(" seconds") : str.append(" second");
-
-        components.push_back(str);
-    }
-
-    if (components.size() == 1)
-        return components[0];
-
-    std::string result = "";
-    for (int i = 0; i < (components.size()); i++)
-    {
-        if (i > 0)
+        for (int col = 0; col < COLUMNS; col++)
         {
-            if (i == components.size() - 1)
-                result += " and ";
-            else
-                result += ", ";
+            switch (positions[row][col])
+            {
+            case 'Y':
+                printf("Y ");
+                break;
+            case 'R':
+                printf("R ");
+                break;
+            case 0:
+                printf("* ");
+                break;
+            default:
+                printf("E "); // Error, undefined value
+                break;
+            }
         }
-        result += components[i];
+        printf("\n");
+    }
+    printf("\n");
+#endif
+
+    // Iterate through the columns to look for a continous group of pieces of one color in a row
+    for (int row = 0; row < ROWS; row++)
+    {
+        // The column winner could be (at least) 0123 or 1234 or 2345 or 3456
+        for (int col = 0; col <= COLUMNS - CONNECT; col++)
+        {
+            if ((positions[row][col + 0] != 0) &&
+                (positions[row][col + 0] == positions[row][col + 1]) &&
+                (positions[row][col + 0] == positions[row][col + 2]) &&
+                (positions[row][col + 0] == positions[row][col + 3]))
+            {
+                printf("row\n");
+                return (positions[row][col + 0] == 'Y') ? "Yellow" : "Red";
+            }
+        }
     }
 
-    return result;
+    // Iterate through the columns to look for a continous group of pieces of one color in a column
+    for (int col = 0; col < COLUMNS; col++)
+    {
+        // The row winner could be (at least) 0123 or 1234 or 2345
+        for (int row = 0; row <= ROWS - CONNECT; row++)
+        {
+            if ((positions[row + 0][col] != 0) &&
+                (positions[row + 0][col] == positions[row + 1][col]) &&
+                (positions[row + 0][col] == positions[row + 2][col]) &&
+                (positions[row + 0][col] == positions[row + 3][col]))
+            {
+                printf("column\n");
+                return (positions[row + 0][col] == 'Y') ? "Yellow" : "Red";
+            }
+        }
+    }
+
+    // Iterate through the descendant diagonal
+    for (int row = CONNECT - 1; row < ROWS; row++)
+    {
+        for (int col = 0; col <= COLUMNS - CONNECT; col++)
+        {
+            if (positions[row][col] != 0 &&
+                positions[row][col] == positions[row - 1][col + 1] &&
+                positions[row][col] == positions[row - 2][col + 2] &&
+                positions[row][col] == positions[row - 3][col + 3])
+            {
+                printf("descendant\n");
+                return (positions[row][col] == 'Y') ? "Yellow" : "Red";
+            }
+        }
+    }
+
+    // Iterate through the ascendant diagonal
+    for (int row = 0; row <= ROWS - CONNECT; row++)
+    {
+        for (int col = 0; col <= COLUMNS - CONNECT; col++)
+        {
+            if (positions[row][col] != 0 &&
+                positions[row][col] == positions[row + 1][col + 1] &&
+                positions[row][col] == positions[row + 2][col + 2] &&
+                positions[row][col] == positions[row + 3][col + 3])
+            {
+                printf("ascendant\n");
+                return (positions[row][col] == 'Y') ? "Yellow" : "Red";
+            }
+        }
+    }
+
+    return "Draw";
+}
+
+/*****************************************************************************
+ * Name         who_is_winner_play_by_play
+ * Description  Same as who_is_winner but the evaluation is play by play, instead
+ *              of evaluate the final winner with the whole final view of the board.
+ *              The issue could happen if someone adds new pieces after the game has finished.
+ *****************************************************************************/
+std::string who_is_winner_play_by_play(std::vector<std::string> pieces_position_list)
+{
+    constexpr int ROWS = 6;
+    constexpr int COLUMNS = 7;
+    constexpr int CONNECT = 4;
+
+    char board[ROWS][COLUMNS] = {};
+    int height[COLUMNS] = {};
+
+    auto inside = [&](int r, int c) {
+        return r >= 0 && r < ROWS && c >= 0 && c < COLUMNS;
+    };
+
+    for (const std::string& move : pieces_position_list)
+    {
+        int col = move[0] - 'A';
+        char player = (move.find("Red") != std::string::npos) ? 'R' : 'Y';
+
+        int row = height[col]++;
+        board[row][col] = player;
+
+        // Directions: horizontal, vertical, two diagonals
+        const int directions[4][2] = {
+            {0, 1},
+            {1, 0},
+            {1, 1},
+            {1, -1}
+        };
+
+        for (auto& d : directions)
+        {
+            int count = 1;
+
+            // Forward
+            for (int k = 1; k < CONNECT; k++)
+            {
+                int r = row + d[0] * k;
+                int c = col + d[1] * k;
+                if (!inside(r, c) || board[r][c] != player)
+                    break;
+                count++;
+            }
+
+            // Backward
+            for (int k = 1; k < CONNECT; k++)
+            {
+                int r = row - d[0] * k;
+                int c = col - d[1] * k;
+                if (!inside(r, c) || board[r][c] != player)
+                    break;
+                count++;
+            }
+
+            if (count >= CONNECT)
+                return (player == 'R') ? "Red" : "Yellow";
+        }
+    }
+
+    return "Draw";
 }

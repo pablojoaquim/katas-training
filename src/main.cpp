@@ -34,6 +34,7 @@
 #include <string>
 #include <cstring>
 #include <cstdint>
+#include <vector>
 #include "katas.h"
 #include "parser.h"
 
@@ -87,9 +88,53 @@ int main(int argc, char *argv[])
     // interval v[] = {{1, 5}, {10, 20}, {1, 6}, {16, 19}, {5, 11}};
     // interval v[] = {{1,5},{-1,2},{2,10}};
 
+    std::vector<std::string> pieces_position_list{
+                "F_Yellow",
+                "G_Red",
+                "D_Yellow",
+                "C_Red",
+                "A_Yellow",
+                "A_Red",
+                "E_Yellow",
+                "D_Red",
+                "D_Yellow",
+                "F_Red",
+                "B_Yellow",
+                "E_Red",
+                "C_Yellow",
+                "D_Red",
+                "F_Yellow",
+                "D_Red",
+                "D_Yellow",
+                "F_Red",
+                "G_Yellow",
+                "C_Red",
+                "F_Yellow",
+                "E_Red",
+                "A_Yellow",
+                "A_Red",
+                "C_Yellow",
+                "B_Red",
+                "E_Yellow",
+                "C_Red",
+                "E_Yellow",
+                "G_Red",
+                "A_Yellow",
+                "A_Red",
+                "G_Yellow",
+                "C_Red",
+                "B_Yellow",
+                "E_Red",
+                "F_Yellow",
+                "G_Red",
+                "G_Yellow",
+                "B_Red",
+                "B_Yellow",
+                "B_Red"
+    };
+
     std::cout << "=== Start ===" << std::endl;
-    std::cout << format_duration(1111111162) << std::endl;
-    
+    std::cout << who_is_winner(pieces_position_list) << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
