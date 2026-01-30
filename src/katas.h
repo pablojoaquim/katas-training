@@ -62,39 +62,6 @@
 #ifdef __cplusplus
 // @todo: Add C++ class declarations here.
 
-/*****************************************************************************
- * Name         Class SnakesLadders
- * Description  Snakes and Ladders is an ancient Indian board game regarded
- *              today as a worldwide classic. It is played by two or more
- *              players on a game board with numbered, gridded squares.
- *              A number of "ladders" and "snakes" are pictured on the board,
- *              each connecting two specific squares.
- *****************************************************************************/
-class SnakesLadders
-{
-private:
-    int player;
-    int pos[2];
-    bool gameover;
-    static const std::unordered_map<int, int> jumps;
-
-public:
-    SnakesLadders();
-
-    /*****************************************************************************
-     * @fn         play
-     * @brief      Call this method with the value of dice1 and dice2, evaluate the 
-     *             current player move and return the result in the board.
-     * @param [in] dice1 - Value of the dice
-     * @param [in] dice2 - Value of the dice
-     * @return     Return "Player n Wins!" where n is the winning player who has 
-     *             landed on square 100 without any remaining moves left.
-     *             Return "Game over!" if a move is attempted after any player has won.
-     *             Otherwise, return "Player n is on square x", where n is the current 
-     *             player and x is the square they are currently on.
-     ******************************************************************************/
-    std::string play(int dice1, int dice2);
-};
 #endif
 
 /*===========================================================================*
@@ -117,13 +84,26 @@ extern "C"
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         power_optimized
- * @brief      Optimized Divide and Conquer Approach (Exponentiation by Squaring)
- * @param [in] base
- * @param [in] exp
- * @return     base^exp
+ * @fn         partsSum
+ * @brief      The function parts_sums will take as parameter a list 
+ *             and return a list of the sums of its parts
+ * @param [in] ls - The input list
+ * @return     The list with the sum of the parts of the input.
+ *             
+ * Let us consider this example (array written in general format):
+ *             ls = [0, 1, 3, 6, 10]
+ *             
+ *             Its following parts:
+ *             
+ *             ls = [0, 1, 3, 6, 10]
+ *             ls = [1, 3, 6, 10]
+ *             ls = [3, 6, 10]
+ *             ls = [6, 10]
+ *             ls = [10]
+ *             ls = []
+ * The corresponding sums are (put together in a list): [20, 20, 19, 16, 10, 0]
  ******************************************************************************/
-double power_optimized(double base, int exp);
+std::vector<unsigned long long> partsSum(const std::vector<unsigned long long>& ls);
 
 #endif /* __cplusplus */
 

@@ -90,14 +90,15 @@ int main(int argc, char *argv[])
     // interval v[] = {{1, 5}, {10, 20}, {1, 6}, {16, 19}, {5, 11}};
     // interval v[] = {{1,5},{-1,2},{2,10}};
 
-    SnakesLadders game = SnakesLadders();
-
     std::cout << "=== Start ===" << std::endl;
-    
-    std::cout << game.play(1,1) << std::endl;
-    std::cout << game.play(1,5) << std::endl;
-    std::cout << game.play(6,2) << std::endl;
-    std::cout << game.play(1,1) << std::endl;
+
+    std::vector<unsigned long long> ls = {0, 1, 3, 6, 10};
+
+    auto v = partsSum(ls);
+    for (int x : v)
+    {
+        std::cout << x << " ";
+    }
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

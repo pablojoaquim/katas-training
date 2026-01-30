@@ -161,166 +161,29 @@ double power_optimized(double base, int exp)
 }
 
 /*****************************************************************************
- * Name         Class SnakesLadders
- * Description  Snakes and Ladders is an ancient Indian board game regarded
- *              today as a worldwide classic. It is played by two or more
- *              players on a game board with numbered, gridded squares.
- *              A number of "ladders" and "snakes" are pictured on the board,
- *              each connecting two specific squares.
+ * Name         partsSum
+ * Description  The function parts_sums will take as parameter a list
+ *              and return a list of the sums of its parts
  *****************************************************************************/
-SnakesLadders::SnakesLadders()
+std::vector<unsigned long long> partsSum(const std::vector<unsigned long long> &ls)
 {
-    this->player = 0; // Player 1 starts and alternates with player 2.
-    this->pos[0] = 0; // Player 1 starts at square 0
-    this->pos[1] = 0; // Player 2 starts at square 0
-    this->gameover = false;
-};
+    unsigned long long sum = 0;
+    std::vector<unsigned long long> result = {};
 
-const std::unordered_map<int, int> SnakesLadders::jumps =
+    // Sum of all the elements in the list
+    for (int elem : ls)
     {
-        // ladders
-        {2, 38},
-        {7, 14},
-        {8, 31},
-        {15, 26},
-        {21, 42},
-        {28, 84},
-        {36, 44},
-        {51, 67},
-        {71, 91},
-        {78, 98},
-        {87, 94},
-        // snakes
-        {16, 6},
-        {49, 11},
-        {46, 25},
-        {64, 60},
-        {62, 19},
-        {74, 53},
-        {89, 68},
-        {95, 75},
-        {99, 80},
-        {92, 88}};
+        sum += elem;
+    }
+    // Add the sum of all the elements to the result list
+    result.push_back(sum);
 
-/*****************************************************************************
- * Name         play
- * Description  Call this method with the value of dice1 and dice2, evaluate the
- *              current player move and return the result in the board.
- *****************************************************************************/
-std::string SnakesLadders::play(int dice1, int dice2)
-{
-    std::string ret;
-
-    if (true == this->gameover)
+    // Add new elements to the result list where each one should be equal to the last one minus the next element in the list
+    for (int elem : ls)
     {
-        ret = "Game over!";
-        return ret;
+        sum -= elem;
+        result.push_back(sum);
     }
 
-    // Evaluate the new player position
-    this->pos[this->player] += dice1 + dice2;
-
-    // If the player roll too high, "bounces" off the last square and moves back
-    if (this->pos[this->player] > 100)
-    {
-        this->pos[this->player] = 100 - (this->pos[this->player] - 100);
-    }
-
-    // Evaluate the move through snakes and ladders
-    auto move = jumps.find(this->pos[this->player]);
-    if (move != jumps.end())
-    {
-        this->pos[this->player] = move->second;
-    }
-    // Instead of the map a switch-case could be use
-    // switch (this->pos[this->player])
-    // {
-    // case 2: // ladder
-    //     this->pos[this->player] = 38;
-    //     break;
-    // case 7: // ladder
-    //     this->pos[this->player] = 14;
-    //     break;
-    // case 8: // ladder
-    //     this->pos[this->player] = 31;
-    //     break;
-    // case 15: // ladder
-    //     this->pos[this->player] = 26;
-    //     break;
-    // case 21: // ladder
-    //     this->pos[this->player] = 42;
-    //     break;
-    // case 28: // ladder
-    //     this->pos[this->player] = 84;
-    //     break;
-    // case 36: // ladder
-    //     this->pos[this->player] = 44;
-    //     break;
-    // case 51: // ladder
-    //     this->pos[this->player] = 67;
-    //     break;
-    // case 78: // ladder
-    //     this->pos[this->player] = 98;
-    //     break;
-    // case 71: // ladder
-    //     this->pos[this->player] = 91;
-    //     break;
-    // case 87: // ladder
-    //     this->pos[this->player] = 94;
-    //     break;
-    // case 16: // snake
-    //     this->pos[this->player] = 6;
-    //     break;
-    // case 49: // snake
-    //     this->pos[this->player] = 11;
-    //     break;
-    // case 46: // snake
-    //     this->pos[this->player] = 25;
-    //     break;
-    // case 64: // snake
-    //     this->pos[this->player] = 60;
-    //     break;
-    // case 62: // snake
-    //     this->pos[this->player] = 19;
-    //     break;
-    // case 74: // snake
-    //     this->pos[this->player] = 53;
-    //     break;
-    // case 89: // snake
-    //     this->pos[this->player] = 68;
-    //     break;
-    // case 99: // snake
-    //     this->pos[this->player] = 80;
-    //     break;
-    // case 95: // snake
-    //     this->pos[this->player] = 75;
-    //     break;
-    // case 92: // snake
-    //     this->pos[this->player] = 88;
-    //     break;
-    // default:
-    //     break;
-    // }
-
-    // Evaluate winning the game (only if there's no more moves from that player)
-    if (this->pos[this->player] == 100)
-    {
-        ret = "Player " + std::to_string(this->player + 1) + " Wins!";
-        this->gameover = true;
-    }
-    else
-    {
-        ret = "Player " + std::to_string(this->player + 1) + " is on square " + std::to_string(this->pos[this->player]);
-    }
-    // If the dices are equals the player should play again,
-    // if not move the turn to the other player
-    if (dice1 != dice2)
-    {
-
-        // Move to the next player
-        (this->player == 0) ? this->player = 1 : this->player = 0;
-        // this->player = (this->player+1)%2;  // Another way, a little more complicated
-    }
-
-    return ret;
-};
+    return result;
+}
