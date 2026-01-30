@@ -161,187 +161,166 @@ double power_optimized(double base, int exp)
 }
 
 /*****************************************************************************
- * Name         who_is_winner
- * Description  This is a gameplay for Connect Four. It receives the list of
- *              movements from each player, and determines the winner.
+ * Name         Class SnakesLadders
+ * Description  Snakes and Ladders is an ancient Indian board game regarded
+ *              today as a worldwide classic. It is played by two or more
+ *              players on a game board with numbered, gridded squares.
+ *              A number of "ladders" and "snakes" are pictured on the board,
+ *              each connecting two specific squares.
  *****************************************************************************/
-std::string who_is_winner(std::vector<std::string> pieces_position_list)
+SnakesLadders::SnakesLadders()
 {
-    constexpr int ROWS = 6;
-    constexpr int COLUMNS = 7;
-    constexpr int CONNECT = 4;
-    char positions[ROWS][COLUMNS] = {};
-    int row_position[COLUMNS] = {0};
+    this->player = 0; // Player 1 starts and alternates with player 2.
+    this->pos[0] = 0; // Player 1 starts at square 0
+    this->pos[1] = 0; // Player 2 starts at square 0
+    this->gameover = false;
+};
 
-    // Iterate thorugh the input
-    for (std::string elem : pieces_position_list)
+const std::unordered_map<int, int> SnakesLadders::jumps =
     {
-        int column = elem[0] - 'A'; // Get the column played
-        row_position[column]++;     // Increment the number of pieces in the column (which is the row!)
-        char player = elem[2];      // Could be 'Y' or 'R'
-        positions[row_position[column] - 1][column] = player;
-    }
-
-#ifndef NDEBUG
-    // Printout the game
-    // (this is not necessary, is just for debugging)
-    for (int row = 0; row < ROWS; row++)
-    {
-        for (int col = 0; col < COLUMNS; col++)
-        {
-            switch (positions[row][col])
-            {
-            case 'Y':
-                printf("Y ");
-                break;
-            case 'R':
-                printf("R ");
-                break;
-            case 0:
-                printf("* ");
-                break;
-            default:
-                printf("E "); // Error, undefined value
-                break;
-            }
-        }
-        printf("\n");
-    }
-    printf("\n");
-#endif
-
-    // Iterate through the columns to look for a continous group of pieces of one color in a row
-    for (int row = 0; row < ROWS; row++)
-    {
-        // The column winner could be (at least) 0123 or 1234 or 2345 or 3456
-        for (int col = 0; col <= COLUMNS - CONNECT; col++)
-        {
-            if ((positions[row][col + 0] != 0) &&
-                (positions[row][col + 0] == positions[row][col + 1]) &&
-                (positions[row][col + 0] == positions[row][col + 2]) &&
-                (positions[row][col + 0] == positions[row][col + 3]))
-            {
-                printf("row\n");
-                return (positions[row][col + 0] == 'Y') ? "Yellow" : "Red";
-            }
-        }
-    }
-
-    // Iterate through the columns to look for a continous group of pieces of one color in a column
-    for (int col = 0; col < COLUMNS; col++)
-    {
-        // The row winner could be (at least) 0123 or 1234 or 2345
-        for (int row = 0; row <= ROWS - CONNECT; row++)
-        {
-            if ((positions[row + 0][col] != 0) &&
-                (positions[row + 0][col] == positions[row + 1][col]) &&
-                (positions[row + 0][col] == positions[row + 2][col]) &&
-                (positions[row + 0][col] == positions[row + 3][col]))
-            {
-                printf("column\n");
-                return (positions[row + 0][col] == 'Y') ? "Yellow" : "Red";
-            }
-        }
-    }
-
-    // Iterate through the descendant diagonal
-    for (int row = CONNECT - 1; row < ROWS; row++)
-    {
-        for (int col = 0; col <= COLUMNS - CONNECT; col++)
-        {
-            if (positions[row][col] != 0 &&
-                positions[row][col] == positions[row - 1][col + 1] &&
-                positions[row][col] == positions[row - 2][col + 2] &&
-                positions[row][col] == positions[row - 3][col + 3])
-            {
-                printf("descendant\n");
-                return (positions[row][col] == 'Y') ? "Yellow" : "Red";
-            }
-        }
-    }
-
-    // Iterate through the ascendant diagonal
-    for (int row = 0; row <= ROWS - CONNECT; row++)
-    {
-        for (int col = 0; col <= COLUMNS - CONNECT; col++)
-        {
-            if (positions[row][col] != 0 &&
-                positions[row][col] == positions[row + 1][col + 1] &&
-                positions[row][col] == positions[row + 2][col + 2] &&
-                positions[row][col] == positions[row + 3][col + 3])
-            {
-                printf("ascendant\n");
-                return (positions[row][col] == 'Y') ? "Yellow" : "Red";
-            }
-        }
-    }
-
-    return "Draw";
-}
+        // ladders
+        {2, 38},
+        {7, 14},
+        {8, 31},
+        {15, 26},
+        {21, 42},
+        {28, 84},
+        {36, 44},
+        {51, 67},
+        {71, 91},
+        {78, 98},
+        {87, 94},
+        // snakes
+        {16, 6},
+        {49, 11},
+        {46, 25},
+        {64, 60},
+        {62, 19},
+        {74, 53},
+        {89, 68},
+        {95, 75},
+        {99, 80},
+        {92, 88}};
 
 /*****************************************************************************
- * Name         who_is_winner_play_by_play
- * Description  Same as who_is_winner but the evaluation is play by play, instead
- *              of evaluate the final winner with the whole final view of the board.
- *              The issue could happen if someone adds new pieces after the game has finished.
+ * Name         play
+ * Description  Call this method with the value of dice1 and dice2, evaluate the
+ *              current player move and return the result in the board.
  *****************************************************************************/
-std::string who_is_winner_play_by_play(std::vector<std::string> pieces_position_list)
+std::string SnakesLadders::play(int dice1, int dice2)
 {
-    constexpr int ROWS = 6;
-    constexpr int COLUMNS = 7;
-    constexpr int CONNECT = 4;
+    std::string ret;
 
-    char board[ROWS][COLUMNS] = {};
-    int height[COLUMNS] = {};
-
-    auto inside = [&](int r, int c) {
-        return r >= 0 && r < ROWS && c >= 0 && c < COLUMNS;
-    };
-
-    for (const std::string& move : pieces_position_list)
+    if (true == this->gameover)
     {
-        int col = move[0] - 'A';
-        char player = (move.find("Red") != std::string::npos) ? 'R' : 'Y';
-
-        int row = height[col]++;
-        board[row][col] = player;
-
-        // Directions: horizontal, vertical, two diagonals
-        const int directions[4][2] = {
-            {0, 1},
-            {1, 0},
-            {1, 1},
-            {1, -1}
-        };
-
-        for (auto& d : directions)
-        {
-            int count = 1;
-
-            // Forward
-            for (int k = 1; k < CONNECT; k++)
-            {
-                int r = row + d[0] * k;
-                int c = col + d[1] * k;
-                if (!inside(r, c) || board[r][c] != player)
-                    break;
-                count++;
-            }
-
-            // Backward
-            for (int k = 1; k < CONNECT; k++)
-            {
-                int r = row - d[0] * k;
-                int c = col - d[1] * k;
-                if (!inside(r, c) || board[r][c] != player)
-                    break;
-                count++;
-            }
-
-            if (count >= CONNECT)
-                return (player == 'R') ? "Red" : "Yellow";
-        }
+        ret = "Game over!";
+        return ret;
     }
 
-    return "Draw";
-}
+    // Evaluate the new player position
+    this->pos[this->player] += dice1 + dice2;
+
+    // If the player roll too high, "bounces" off the last square and moves back
+    if (this->pos[this->player] > 100)
+    {
+        this->pos[this->player] = 100 - (this->pos[this->player] - 100);
+    }
+
+    // Evaluate the move through snakes and ladders
+    auto move = jumps.find(this->pos[this->player]);
+    if (move != jumps.end())
+    {
+        this->pos[this->player] = move->second;
+    }
+    // Instead of the map a switch-case could be use
+    // switch (this->pos[this->player])
+    // {
+    // case 2: // ladder
+    //     this->pos[this->player] = 38;
+    //     break;
+    // case 7: // ladder
+    //     this->pos[this->player] = 14;
+    //     break;
+    // case 8: // ladder
+    //     this->pos[this->player] = 31;
+    //     break;
+    // case 15: // ladder
+    //     this->pos[this->player] = 26;
+    //     break;
+    // case 21: // ladder
+    //     this->pos[this->player] = 42;
+    //     break;
+    // case 28: // ladder
+    //     this->pos[this->player] = 84;
+    //     break;
+    // case 36: // ladder
+    //     this->pos[this->player] = 44;
+    //     break;
+    // case 51: // ladder
+    //     this->pos[this->player] = 67;
+    //     break;
+    // case 78: // ladder
+    //     this->pos[this->player] = 98;
+    //     break;
+    // case 71: // ladder
+    //     this->pos[this->player] = 91;
+    //     break;
+    // case 87: // ladder
+    //     this->pos[this->player] = 94;
+    //     break;
+    // case 16: // snake
+    //     this->pos[this->player] = 6;
+    //     break;
+    // case 49: // snake
+    //     this->pos[this->player] = 11;
+    //     break;
+    // case 46: // snake
+    //     this->pos[this->player] = 25;
+    //     break;
+    // case 64: // snake
+    //     this->pos[this->player] = 60;
+    //     break;
+    // case 62: // snake
+    //     this->pos[this->player] = 19;
+    //     break;
+    // case 74: // snake
+    //     this->pos[this->player] = 53;
+    //     break;
+    // case 89: // snake
+    //     this->pos[this->player] = 68;
+    //     break;
+    // case 99: // snake
+    //     this->pos[this->player] = 80;
+    //     break;
+    // case 95: // snake
+    //     this->pos[this->player] = 75;
+    //     break;
+    // case 92: // snake
+    //     this->pos[this->player] = 88;
+    //     break;
+    // default:
+    //     break;
+    // }
+
+    // Evaluate winning the game (only if there's no more moves from that player)
+    if (this->pos[this->player] == 100)
+    {
+        ret = "Player " + std::to_string(this->player + 1) + " Wins!";
+        this->gameover = true;
+    }
+    else
+    {
+        ret = "Player " + std::to_string(this->player + 1) + " is on square " + std::to_string(this->pos[this->player]);
+    }
+    // If the dices are equals the player should play again,
+    // if not move the turn to the other player
+    if (dice1 != dice2)
+    {
+
+        // Move to the next player
+        (this->player == 0) ? this->player = 1 : this->player = 0;
+        // this->player = (this->player+1)%2;  // Another way, a little more complicated
+    }
+
+    return ret;
+};

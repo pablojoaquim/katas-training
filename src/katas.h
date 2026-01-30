@@ -35,6 +35,7 @@
  *===========================================================================*/
 #include <stdint.h>
 #include <stddef.h>
+#include <unordered_map>
 
 #ifdef __cplusplus
 /*===========================================================================*
@@ -60,21 +61,56 @@
  *===========================================================================*/
 #ifdef __cplusplus
 // @todo: Add C++ class declarations here.
+
+/*****************************************************************************
+ * Name         Class SnakesLadders
+ * Description  Snakes and Ladders is an ancient Indian board game regarded
+ *              today as a worldwide classic. It is played by two or more
+ *              players on a game board with numbered, gridded squares.
+ *              A number of "ladders" and "snakes" are pictured on the board,
+ *              each connecting two specific squares.
+ *****************************************************************************/
+class SnakesLadders
+{
+private:
+    int player;
+    int pos[2];
+    bool gameover;
+    static const std::unordered_map<int, int> jumps;
+
+public:
+    SnakesLadders();
+
+    /*****************************************************************************
+     * @fn         play
+     * @brief      Call this method with the value of dice1 and dice2, evaluate the 
+     *             current player move and return the result in the board.
+     * @param [in] dice1 - Value of the dice
+     * @param [in] dice2 - Value of the dice
+     * @return     Return "Player n Wins!" where n is the winning player who has 
+     *             landed on square 100 without any remaining moves left.
+     *             Return "Game over!" if a move is attempted after any player has won.
+     *             Otherwise, return "Player n is on square x", where n is the current 
+     *             player and x is the square they are currently on.
+     ******************************************************************************/
+    std::string play(int dice1, int dice2);
+};
 #endif
 
 /*===========================================================================*
  * Exported C Function Prototypes
  *===========================================================================*/
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-// @todo: Add pure C function prototypes here.
+    // @todo: Add pure C function prototypes here.
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
- /*===========================================================================*
+/*===========================================================================*
  * Exported C++ Function Prototypes
  *===========================================================================*/
 #ifdef __cplusplus
@@ -88,30 +124,6 @@ extern "C" {
  * @return     base^exp
  ******************************************************************************/
 double power_optimized(double base, int exp);
-
-/*****************************************************************************
- * @fn         who_is_winner
- * @brief      This is a gameplay for Connect Four. It receives the list of
- *             movements from each player, and determines the winner.
- * @param [in] pieces_position_list - The list of movements of the game in the form:
- *              std::vector<std::string> pieces_position_list
- *              {
- *                "A_Red",
- *                "B_Yellow",
- *                "A_Red",
- *                "B_Yellow",
- *                "A_Red",
- *                "B_Yellow",
- *                "G_Red",
- *                "B_Yellow"
- *              }
- * @return     "Yellow", "Red" or "Draw" accordingly
- ******************************************************************************/
-/*****************************************************************************
- * Name         who_is_winner
- * Description  
- *****************************************************************************/
-std::string who_is_winner(std::vector<std::string> pieces_position_list);
 
 #endif /* __cplusplus */
 
