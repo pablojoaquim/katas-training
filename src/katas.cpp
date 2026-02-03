@@ -249,3 +249,40 @@ long nextBigger(long n)
 
     return next_bigger;
 }
+
+/*****************************************************************************
+ * Name         nextBigger_Permutation
+ * Description  Takes a positive integer and returns the next bigger number
+ *              that can be formed by rearranging its digits.
+ *              Look from the right the next smaller digit than the one at the right side
+ *              2 0 1 7
+ *                  ↑ (1 is smaller than 7)
+ *              Look from that numer the next bigger to the right and do the swap
+ *              The next bigger is: 7
+ *              Do the swap: 2071
+ *****************************************************************************/
+long nextBigger_Permutation(long n)
+{
+    std::string s = std::to_string(n);
+
+    // 1. Encontrar el primer índice i tal que s[i] < s[i+1]
+    int i = s.size() - 2;
+    while (i >= 0 && s[i] >= s[i + 1])
+        i--;
+
+    if (i < 0)
+        return -1; // ya es la permutación más grande
+
+    // 2. Encontrar el dígito más chico a la derecha de i que sea mayor que s[i]
+    int j = s.size() - 1;
+    while (s[j] <= s[i])
+        j--;
+
+    // 3. Swap
+    std::swap(s[i], s[j]);
+
+    // 4. Ordenar el resto
+    std::sort(s.begin() + i + 1, s.end());
+
+    return std::stol(s);
+}
