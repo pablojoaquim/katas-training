@@ -38,6 +38,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <algorithm>
 #include "katas.h"
 #include <vector>
 
@@ -192,16 +193,59 @@ std::vector<std::string> swap(const std::string& in)
  *****************************************************************************/
 long nextBigger(long n)
 {
+    long next_bigger = -1;
+
     std::string input = std::to_string(n);
     std::string output;
-    std::cout << "The input is: " << input << std::endl;
+    // std::cout << "The input is: " << input << std::endl;
 
-    auto perms = swap(input);
+    std::vector<std::string> perms = swap(input);
+    // std::vector<long> numbers;
+    long number;
 
-    for (const auto &p : perms)
+    for (const std::string &p : perms)
     {
-        std::cout << "permutation: " << p << std::endl;
+        // std::cout << "permutation: " << p << std::endl;
+        // numbers.push_back(std::stol(p));
+        number = std::stol(p);
+
+        if(number > n)
+        {
+            if(next_bigger!= -1)
+            {
+                if(number<next_bigger)
+                {
+                    next_bigger = number;
+                }
+            }
+            else
+            {
+                next_bigger = number;
+            }
+        }
     }
 
-    return n;
+    // // Sort the vector in ascending order
+    // std::sort(numbers.begin(), numbers.end());
+
+    // // Look for the next bigger number
+    // for(int i=0; i<numbers.size(); i++)
+    // {
+    //     if(numbers.at(i) == n)
+    //     {
+    //         // Check if the bigger is the provided 
+    //         // number, in such case will be the last 
+    //         // in the sorted vector
+    //         if(i<(numbers.size()-1))
+    //         {
+    //             if(numbers[i] != numbers[i+1])
+    //             {
+    //                 next_bigger = numbers[i+1];
+    //                 break;
+    //             }
+    //         }                
+    //     }
+    // }
+
+    return next_bigger;
 }

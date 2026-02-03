@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::cout << nextBigger(1234) << std::endl;
+    std::cout << nextBigger(10990) << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
