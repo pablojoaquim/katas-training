@@ -160,30 +160,48 @@ double power_optimized(double base, int exp)
     return result;
 }
 
-/*****************************************************************************
- * Name         partsSum
- * Description  The function parts_sums will take as parameter a list
- *              and return a list of the sums of its parts
- *****************************************************************************/
-std::vector<unsigned long long> partsSum(const std::vector<unsigned long long> &ls)
+std::vector<std::string> swap(const std::string& in)
 {
-    unsigned long long sum = 0;
-    std::vector<unsigned long long> result = {};
+    // std::cout << "input: " << in << std::endl;
+    if (in.length() == 1)
+        return {in};
 
-    // Sum of all the elements in the list
-    for (int elem : ls)
+    std::vector<std::string> out;
+
+    for (int i = 0; i < in.length(); i++)
     {
-        sum += elem;
-    }
-    // Add the sum of all the elements to the result list
-    result.push_back(sum);
+        std::string to_swap = in.substr(0, i) + in.substr(i + 1);
+        // std::cout << "to_swap: " << to_swap << std::endl;
 
-    // Add new elements to the result list where each one should be equal to the last one minus the next element in the list
-    for (int elem : ls)
+        std::vector<std::string> from_swap = swap(to_swap);
+
+        for (int j = 0; j < from_swap.size(); j++)
+        {
+            // std::cout << "from_swap: " << from_swap[j] << std::endl;
+            out.push_back(in[i] + from_swap[j]);
+            // std::cout << "out: " << in[i] + from_swap[j] << std::endl;
+        }
+    }
+    return out;
+}
+
+/*****************************************************************************
+ * Name         nextBigger
+ * Description  Takes a positive integer and returns the next bigger number
+ *              that can be formed by rearranging its digits.
+ *****************************************************************************/
+long nextBigger(long n)
+{
+    std::string input = std::to_string(n);
+    std::string output;
+    std::cout << "The input is: " << input << std::endl;
+
+    auto perms = swap(input);
+
+    for (const auto &p : perms)
     {
-        sum -= elem;
-        result.push_back(sum);
+        std::cout << "permutation: " << p << std::endl;
     }
 
-    return result;
+    return n;
 }

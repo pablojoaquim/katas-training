@@ -92,13 +92,7 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::vector<unsigned long long> ls = {0, 1, 3, 6, 10};
-
-    auto v = partsSum(ls);
-    for (int x : v)
-    {
-        std::cout << x << " ";
-    }
+    std::cout << nextBigger(1234) << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
