@@ -92,8 +92,14 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    // std::cout << decode("atC5kcOuKAr!") << std::endl;
-    std::cout << decode("babb") << std::endl;
+    std::cout << decode("atC5kcOuKAr!") << std::endl;
+    std::string msg = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    std::string c = encode(msg);
+    std::string d = decode(c);
+
+    std::cout << "mesg: " << msg << std::endl;
+    std::cout << "encode: " << c << std::endl;
+    std::cout << "decode: " << d << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

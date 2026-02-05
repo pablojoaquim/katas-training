@@ -204,19 +204,7 @@ std::string encode(const std::string &p_what)
  *****************************************************************************/
 std::string decode(const std::string &p_what)
 {
-    // std::string decode_a = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    // std::string encode_a = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
-    // std::string decode_b = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
-    // std::string encode_b = "dhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHab";
-    // std::string decode_c = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
-    // std::string encode_c = "flxVC5WE94UA1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIc";
-    // std::string decode_A = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    // std::string encode_A = "1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA";
-    // std::string decode_abc =   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    // std::string encode_abc =   "bhx,zWyLZ3pOGIhzeXTYtjAaDWiO8miYH 8Uk4XMwc1c,QXBTeK8";
-    // //babb -> ddpF
-
-    std::string cipher = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
+    std::string cipher = "aHqPuRvkM07DoO1AU49EW5CVxlfcIY6.? GXyTwS3BngKZzmNtjeJriLsQ28,Fphdb";
     std::string output;
 
     for (int i = 0; i < p_what.length(); i++)
