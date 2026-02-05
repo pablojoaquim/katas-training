@@ -161,128 +161,76 @@ double power_optimized(double base, int exp)
     return result;
 }
 
-std::vector<std::string> swap(const std::string& in)
-{
-    // std::cout << "input: " << in << std::endl;
-    if (in.length() == 1)
-        return {in};
-
-    std::vector<std::string> out;
-
-    for (int i = 0; i < in.length(); i++)
-    {
-        std::string to_swap = in.substr(0, i) + in.substr(i + 1);
-        // std::cout << "to_swap: " << to_swap << std::endl;
-
-        std::vector<std::string> from_swap = swap(to_swap);
-
-        for (int j = 0; j < from_swap.size(); j++)
-        {
-            // std::cout << "from_swap: " << from_swap[j] << std::endl;
-            out.push_back(in[i] + from_swap[j]);
-            // std::cout << "out: " << in[i] + from_swap[j] << std::endl;
-        }
-    }
-    return out;
-}
-
 /*****************************************************************************
- * Name         nextBigger
- * Description  Takes a positive integer and returns the next bigger number
- *              that can be formed by rearranging its digits.
+ * Name         encode
+ * Description  Takes a string and encode it
  *****************************************************************************/
-long nextBigger(long n)
+std::string encode(const std::string &p_what)
 {
-    long next_bigger = -1;
+    // std::string decode_a = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    // std::string encode_a = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
+    // std::string decode_b = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    // std::string encode_b = "dhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHab";
+    // std::string decode_c = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+    // std::string encode_c = "flxVC5WE94UA1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIc";
+    // std::string decode_A = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    // std::string encode_A = "1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA";
+    // std::string decode_abc =   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    // std::string encode_abc =   "bhx,zWyLZ3pOGIhzeXTYtjAaDWiO8miYH 8Uk4XMwc1c,QXBTeK8";
+    // //babb -> ddpF
 
-    std::string input = std::to_string(n);
+    std::string cipher = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
     std::string output;
-    // std::cout << "The input is: " << input << std::endl;
 
-    std::vector<std::string> perms = swap(input);
-    // std::vector<long> numbers;
-    long number;
-
-    for (const std::string &p : perms)
+    for (int i = 0; i < p_what.length(); i++)
     {
-        // std::cout << "permutation: " << p << std::endl;
-        // numbers.push_back(std::stol(p));
-        number = std::stol(p);
-
-        if(number > n)
+        size_t start = cipher.find(p_what[i]);
+        if (start == std::string::npos)
         {
-            if(next_bigger!= -1)
-            {
-                if(number<next_bigger)
-                {
-                    next_bigger = number;
-                }
-            }
-            else
-            {
-                next_bigger = number;
-            }
+            output.push_back(p_what[i]);
+        }
+        else
+        {
+            size_t idx = (start + i + 1) % cipher.size();
+            output.push_back(cipher[idx]);
         }
     }
-
-    // // Sort the vector in ascending order
-    // std::sort(numbers.begin(), numbers.end());
-
-    // // Look for the next bigger number
-    // for(int i=0; i<numbers.size(); i++)
-    // {
-    //     if(numbers.at(i) == n)
-    //     {
-    //         // Check if the bigger is the provided 
-    //         // number, in such case will be the last 
-    //         // in the sorted vector
-    //         if(i<(numbers.size()-1))
-    //         {
-    //             if(numbers[i] != numbers[i+1])
-    //             {
-    //                 next_bigger = numbers[i+1];
-    //                 break;
-    //             }
-    //         }                
-    //     }
-    // }
-
-    return next_bigger;
+    return output;
 }
 
 /*****************************************************************************
- * Name         nextBigger_Permutation
- * Description  Takes a positive integer and returns the next bigger number
- *              that can be formed by rearranging its digits.
- *              Look from the right the next smaller digit than the one at the right side
- *              2 0 1 7
- *                  ↑ (1 is smaller than 7)
- *              Look from that numer the next bigger to the right and do the swap
- *              The next bigger is: 7
- *              Do the swap: 2071
+ * Name         decode
+ * Description  Takes an encoded string and deecode it
  *****************************************************************************/
-long nextBigger_Permutation(long n)
+std::string decode(const std::string &p_what)
 {
-    std::string s = std::to_string(n);
+    // std::string decode_a = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    // std::string encode_a = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
+    // std::string decode_b = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    // std::string encode_b = "dhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHab";
+    // std::string decode_c = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+    // std::string encode_c = "flxVC5WE94UA1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIc";
+    // std::string decode_A = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    // std::string encode_A = "1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA";
+    // std::string decode_abc =   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    // std::string encode_abc =   "bhx,zWyLZ3pOGIhzeXTYtjAaDWiO8miYH 8Uk4XMwc1c,QXBTeK8";
+    // //babb -> ddpF
 
-    // 1. Encontrar el primer índice i tal que s[i] < s[i+1]
-    int i = s.size() - 2;
-    while (i >= 0 && s[i] >= s[i + 1])
-        i--;
+    std::string cipher = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
+    std::string output;
 
-    if (i < 0)
-        return -1; // ya es la permutación más grande
-
-    // 2. Encontrar el dígito más chico a la derecha de i que sea mayor que s[i]
-    int j = s.size() - 1;
-    while (s[j] <= s[i])
-        j--;
-
-    // 3. Swap
-    std::swap(s[i], s[j]);
-
-    // 4. Ordenar el resto
-    std::sort(s.begin() + i + 1, s.end());
-
-    return std::stol(s);
+    for (int i = 0; i < p_what.length(); i++)
+    {
+        size_t start = cipher.find(p_what[i]);
+        if (start == std::string::npos)
+        {
+            output.push_back(p_what[i]);
+        }
+        else
+        {
+            size_t idx = (start + i + 1) % cipher.size();
+            output.push_back(cipher[idx]);
+        }
+    }
+    return output;
 }

@@ -84,14 +84,20 @@ extern "C"
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         nextBigger
- * @brief      Takes a positive integer and returns the next bigger number 
- *             that can be formed by rearranging its digits.
- * @param [in] n - The input number
- * @return     The next bigger number with the digits rearranged or
- *             -1 if not possible
+ * @fn         encode
+ * @brief      Takes a string and encode it
+ * @param [in] p_what - The string to encode
+ * @return     The encoded string
  ******************************************************************************/
-long nextBigger(long n);
+std::string encode(const std::string &p_what);
+
+/*****************************************************************************
+ * @fn         decode
+ * @brief      Takes an encoded string and decode it
+ * @param [in] p_what - The string to decode
+ * @return     The decoded string
+ ******************************************************************************/
+std::string decode(const std::string& p_what);
 
 #endif /* __cplusplus */
 
