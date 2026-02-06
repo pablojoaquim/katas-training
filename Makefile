@@ -7,6 +7,11 @@ CFLAGS   = -Wall -Wextra -std=c11
 CXXFLAGS = -Wall -Wextra -std=c++17
 
 # ===============================
+# Libs
+# ===============================
+LIBS = -lssl -lcrypto
+
+# ===============================
 # Detect OS
 # ===============================
 ifeq ($(OS),Windows_NT)
@@ -104,7 +109,7 @@ all: .dirs $(TARGET)
 
 # Link with C++ to avoid unresolved C++ symbols
 $(TARGET): $(OBJ_ALL)
-	$(CXX) $(CXXFLAGS) $(OBJ_ALL) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJ_ALL) $(LIBS) -o $(TARGET)
 	@echo ==== Compilation completed: $(TARGET) ====
 
 # Compile C files
@@ -121,7 +126,7 @@ $(OBJ_DIR)/%.o: %.cpp | .dirs
 tests: .dirs $(OBJ_ALL) $(OBJ_ALL_TEST)
 	$(CXX) $(CXXFLAGS) \
 		$(filter-out $(OBJ_DIR)/$(MAIN:.cpp=.o),$(OBJ_ALL)) \
-		$(OBJ_ALL_TEST) -o $(TEST_TARGET)
+		$(OBJ_ALL_TEST) $(LIBS) -o $(TEST_TARGET)
 	@echo ==== Tests built: $(TEST_TARGET) ====
 
 # =================================

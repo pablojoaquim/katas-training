@@ -37,6 +37,9 @@
 #include <vector>
 #include "katas.h"
 #include "parser.h"
+#include "encrypt.h"
+#include <openssl/evp.h>
+#include <openssl/rand.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -61,6 +64,8 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
+constexpr int KEY_SIZE = 32; // AES-256
+constexpr int IV_SIZE = 16;  // CBC
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -87,19 +92,24 @@ int main(int argc, char *argv[])
 {
     (void)argc;
     (void)argv;
-    // interval v[] = {{1, 5}, {10, 20}, {1, 6}, {16, 19}, {5, 11}};
-    // interval v[] = {{1,5},{-1,2},{2,10}};
+
+    unsigned char key[KEY_SIZE];
+    unsigned char iv[IV_SIZE];
+
+    RAND_bytes(key, KEY_SIZE);
+    RAND_bytes(iv, IV_SIZE);
+
+    std::string msg = "Hello world! This is a secret message...";
+    std::vector<unsigned char> data(msg.begin(), msg.end());
+
+    auto encrypted = encrypt(data, key, iv);
+    auto decrypted = decrypt(encrypted, key, iv);
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::cout << decode("atC5kcOuKAr!") << std::endl;
-    std::string msg = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    std::string c = encode(msg);
-    std::string d = decode(c);
-
-    std::cout << "mesg: " << msg << std::endl;
-    std::cout << "encode: " << c << std::endl;
-    std::cout << "decode: " << d << std::endl;
+    std::cout << "Decrypted: "
+              << std::string(decrypted.begin(), decrypted.end())
+              << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
