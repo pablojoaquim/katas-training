@@ -31,6 +31,7 @@
  *===========================================================================*/
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/hmac.h>
 #include <cstring>
 #include <vector>
 #include <iostream>
@@ -69,7 +70,7 @@
  *===========================================================================*/
 /*****************************************************************************
  * Name         encrypt
- * Description  Encrypt a sequence of chars with a key and an IV provided
+ * Description  Encrypt a sequence of chars with a key and an IV provided, using AES-256-CBC
  *****************************************************************************/
 std::vector<unsigned char> encrypt(
     const std::vector<unsigned char> &plaintext,
@@ -96,7 +97,7 @@ std::vector<unsigned char> encrypt(
 
 /*****************************************************************************
  * Name         decrypt
- * Description  Decrypt a cipher, using the key and IV provided
+ * Description  Decrypt a cipher, using the key and IV provided, using AES-256-CBC
  *****************************************************************************/
 std::vector<unsigned char> decrypt(
     const std::vector<unsigned char> &ciphertext,
@@ -119,4 +120,31 @@ std::vector<unsigned char> decrypt(
     plaintext.resize(plaintext_len);
 
     return plaintext;
+}
+
+/*****************************************************************************
+ * Name         sign_hmac
+ * Description  Generate a signature for a message using a key.
+ *              The idea is to have a simmetric key between sender and receiver
+ *              to verify the authenticity of the origin of the message
+ *****************************************************************************/
+std::vector<unsigned char> sign_hmac(
+    const std::vector<unsigned char>& data,
+    const unsigned char* key,
+    size_t key_len)
+{
+    unsigned int len = 0;
+
+    std::vector<unsigned char> hmac(EVP_MAX_MD_SIZE);
+
+    HMAC(
+        EVP_sha256(),
+        key, key_len,
+        data.data(), data.size(),
+        hmac.data(),
+        &len
+    );
+
+    hmac.resize(len);
+    return hmac;
 }

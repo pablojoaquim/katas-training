@@ -38,8 +38,6 @@
 #include "katas.h"
 #include "parser.h"
 #include "encrypt.h"
-#include <openssl/evp.h>
-#include <openssl/rand.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -92,6 +90,9 @@ int main(int argc, char *argv[])
 {
     (void)argc;
     (void)argv;
+
+    std::vector<unsigned char> msg = {
+        'h', 'e', 'l', 'l', 'o', ' ', 's', 'e', 'c', 'u', 'r', 'e'};
 
     unsigned char key[KEY_SIZE];
     unsigned char iv[IV_SIZE];

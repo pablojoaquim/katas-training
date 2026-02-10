@@ -56,6 +56,11 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
+struct SecureMessage {
+    std::array<unsigned char, 16> iv;
+    std::vector<unsigned char> ciphertext;
+    std::vector<unsigned char> hmac;
+};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
