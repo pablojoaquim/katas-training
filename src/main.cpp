@@ -62,8 +62,9 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
-constexpr int KEY_SIZE = 32; // AES-256
-constexpr int IV_SIZE = 16;  // CBC
+constexpr int KEY_SIZE = 32;        // AES-256
+constexpr int IV_SIZE = 16;         // CBC
+constexpr int HMAC_KEY_SIZE = 32;   // HMAC
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -91,22 +92,35 @@ int main(int argc, char *argv[])
     (void)argc;
     (void)argv;
 
-    std::vector<unsigned char> msg = {
-        'h', 'e', 'l', 'l', 'o', ' ', 's', 'e', 'c', 'u', 'r', 'e'};
-
     unsigned char key[KEY_SIZE];
     unsigned char iv[IV_SIZE];
+    unsigned char hmac_key[HMAC_KEY_SIZE];
+
+    std::cout << "=== Start ===" << std::endl;
 
     RAND_bytes(key, KEY_SIZE);
     RAND_bytes(iv, IV_SIZE);
+    RAND_bytes(hmac_key, HMAC_KEY_SIZE);
 
     std::string msg = "Hello world! This is a secret message...";
     std::vector<unsigned char> data(msg.begin(), msg.end());
 
+    // >>>> Tx [encrypted data | iv | sign_hmac] >>>>>>>>
     auto encrypted = encrypt(data, key, iv);
-    auto decrypted = decrypt(encrypted, key, iv);
+    auto sign = sign_hmac(data, hmac_key, HMAC_KEY_SIZE);
 
-    std::cout << "=== Start ===" << std::endl;
+    // <<<< Rx [encrypted data | iv | sign_hmac] <<<<<<<< 
+    auto decrypted = decrypt(encrypted, key, iv);
+    auto sign_to_verify = sign_hmac(decrypted, hmac_key, HMAC_KEY_SIZE);    // The hmac_key shall be shared between sender and receiver
+
+    if(sign == sign_to_verify)
+    {
+        std::cout << "Verification ok" << std::endl;
+    }
+    else
+    {
+        std::cout << "Verification error" << std::endl;
+    }
 
     std::cout << "Decrypted: "
               << std::string(decrypted.begin(), decrypted.end())

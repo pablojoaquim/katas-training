@@ -56,11 +56,6 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
-struct SecureMessage {
-    std::array<unsigned char, 16> iv;
-    std::vector<unsigned char> ciphertext;
-    std::vector<unsigned char> hmac;
-};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -114,6 +109,21 @@ std::vector<unsigned char> decrypt(
     const std::vector<unsigned char> &ciphertext,
     const unsigned char *key,
     const unsigned char *iv);
+
+/*****************************************************************************
+ * Name         sign_hmac
+ * Description  Generate a signature for a message using a key.
+ *              The idea is to have a simmetric key between sender and receiver
+ *              to verify the authenticity of the origin of the message
+ * @param [in] data - The data to calc the mac
+ * @param [in] key - The key to calc the mac
+ * @param [in] key_len
+ * @return     The calculated mac using HMAC
+ *****************************************************************************/
+std::vector<unsigned char> sign_hmac(
+    const std::vector<unsigned char>& data,
+    const unsigned char* key,
+    size_t key_len);
 
 #endif /* __cplusplus */
 
