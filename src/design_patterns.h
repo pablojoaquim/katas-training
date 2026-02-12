@@ -1,9 +1,9 @@
-#ifndef ENCRYPT_H
-#define ENCRYPT_H
+#ifndef DESIGN_PATTERNS_H
+#define DESIGN_PATTERNS_H
 
 /*===========================================================================*/
 /**
- * @file encrypt.h
+ * @file design_patterns.h
  *
  *------------------------------------------------------------------------------
  * Copyright (c) 2025 - Pablo Joaquim
@@ -38,8 +38,6 @@
 /*===========================================================================*
  * Header Files (C++ only)
  *===========================================================================*/
-#include <openssl/evp.h>
-#include <openssl/rand.h>
 #include <cstring>
 #include <vector>
 #include <iostream>
@@ -63,6 +61,37 @@
 #ifdef __cplusplus
 // @todo: Add C++ class declarations here.
 
+// The Singleton class ensures that only one instance of the class
+// exists during the entire lifetime of the program.
+class Singleton
+{
+public:
+    // Provides global access to the single instance.
+    // The instance is created the first time this function is called.
+    static Singleton& getInstance();
+
+    // Example public method
+    void doSomething() const;
+
+private:
+    // Private constructor prevents direct instantiation.
+    Singleton();
+
+    // Private destructor prevents deletion through external code.
+    ~Singleton();
+
+    // Delete copy constructor to prevent copying.
+    Singleton(const Singleton&) = delete;
+
+    // Delete copy assignment operator to prevent assignment.
+    Singleton& operator=(const Singleton&) = delete;
+
+    // Delete move constructor to prevent moving.
+    Singleton(Singleton&&) = delete;
+
+    // Delete move assignment operator to prevent moving.
+    Singleton& operator=(Singleton&&) = delete;
+};
 #endif
 
 /*===========================================================================*
@@ -85,32 +114,6 @@ extern "C"
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         encrypt
- * @brief      Encrypt a sequence of chars with a key and an IV provided
- * @param [in] plaintext - The message to encrypt
- * @param [in] key
- * @param [in] iv
- * @return     The encrypted cipher
- ******************************************************************************/
-std::vector<unsigned char> encrypt(
-    const std::vector<unsigned char> &plaintext,
-    const unsigned char *key,
-    const unsigned char *iv);
-
-/*****************************************************************************
- * Name         decrypt
- * Description  Decrypt a cipher, using the key and IV provided
- * @param [in] plaintext - The ciphertext to decrypt
- * @param [in] key
- * @param [in] iv
- * @return     The original message
- *****************************************************************************/
-std::vector<unsigned char> decrypt(
-    const std::vector<unsigned char> &ciphertext,
-    const unsigned char *key,
-    const unsigned char *iv);
-
-/*****************************************************************************
  * Name         sign_hmac
  * Description  Generate a signature for a message using a key.
  *              The idea is to have a simmetric key between sender and receiver
@@ -120,13 +123,9 @@ std::vector<unsigned char> decrypt(
  * @param [in] key_len
  * @return     The calculated mac using HMAC
  *****************************************************************************/
-std::vector<unsigned char> sign_hmac(
-    const std::vector<unsigned char>& data,
-    const unsigned char* key,
-    size_t key_len);
 
 #endif /* __cplusplus */
 
 /*===========================================================================*/
 /*===========================================================================*/
-#endif /* ENCRYPT_H */
+#endif /* DESIGN_PATTERNS_H */
