@@ -24,7 +24,7 @@ endif
 # Source directories
 # EDIT ONLY HERE!!!!!!!!!!!
 # ===============================
-SRC_DIRS  = src utils
+SRC_DIRS  = src src/design_patterns utils
 TEST_DIRS = test
 MAIN = src/main.cpp
 

@@ -38,7 +38,7 @@
 #include "katas.h"
 #include "parser.h"
 #include "encrypt.h"
-#include "design_patterns.h"
+#include "singleton.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
