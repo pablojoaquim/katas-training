@@ -101,8 +101,9 @@ int main(int argc, char *argv[])
     Logger::getInstance().setSink(&sink);
     Logger::getInstance().setLevel(LogLevel::Debug);
 
-    Logger::getInstance().info("System started");
-    Logger::getInstance().debug("Value received");
+    LOG_INFO("System started");
+    LOG_DEBUG("Value received");
+    LOG_WARN("Speed invalid");
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

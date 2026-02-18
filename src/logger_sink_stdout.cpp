@@ -64,13 +64,29 @@
 /*===========================================================================*
  * Function Definitions
  *===========================================================================*/
+static const char* levelToStr(LogLevel lvl)
+{
+    switch(lvl)
+    {
+        case LogLevel::Debug: return "DEBUG";
+        case LogLevel::Info:  return "INFO";
+        case LogLevel::Warn:  return "WARN";
+        case LogLevel::Error: return "ERROR";
+        default: return "";
+    }
+}
+
 /*****************************************************************************
  * Name         write
  * Description  write message implementation to the stdout as the logging output
  *****************************************************************************/
-void StdoutSink::write(std::string_view msg)
+void StdoutSink::write(const LogRecord& r) noexcept
 {
-    // uart_send(msg.data(), msg.size());
-    std::cout << "[LOG] " << msg << "\n";
+    std::cout
+        << "[" << levelToStr(r.level) << "]\t"
+        << "[" << r.file << ":" << r.line << "]\t"
+        << "[" << r.function << "]\t"
+        << r.message
+        << "\n";
 }
 

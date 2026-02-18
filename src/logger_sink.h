@@ -52,6 +52,23 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
+enum class LogLevel
+{
+    Debug,
+    Info,
+    Warn,
+    Error,
+    Off
+};
+
+struct LogRecord
+{
+    LogLevel level;
+    std::string_view message;
+    const char* file;
+    int line;
+    const char* function;
+};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -64,7 +81,7 @@
 class ILogSink
 {
 public:
-    virtual void write(std::string_view msg) = 0;
+     virtual void write(const LogRecord& record) noexcept = 0;
     virtual ~ILogSink() = default;
 };
 

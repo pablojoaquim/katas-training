@@ -63,7 +63,7 @@
 class StdoutSink : public ILogSink
 {
 public:
-    void write(std::string_view msg) override;
+    void write(const LogRecord& r) noexcept;
 };
 #endif
 

@@ -113,51 +113,62 @@ void Logger::setLevel(LogLevel level)
  * Name         Logger::debug
  * Description  Log something
  *****************************************************************************/
-void Logger::debug(std::string_view msg)
+void Logger::debug(std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func)
 {
-    log(LogLevel::Debug, msg);
+    log({LogLevel::Debug, msg, file, line, func});
 }
+
 
 /*****************************************************************************
  * Name         Logger::info
  * Description  Log something
  *****************************************************************************/
-void Logger::info(std::string_view msg)
+void Logger::info(std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func)
 {
-    log(LogLevel::Info, msg);
+    log({LogLevel::Info, msg, file, line, func});
 }
 
 /*****************************************************************************
  * Name         Logger::warn
  * Description  Log something
  *****************************************************************************/
-void Logger::warn(std::string_view msg)
+void Logger::warn(std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func)
 {
-    log(LogLevel::Warn, msg);
+    log({LogLevel::Warn, msg, file, line, func});
 }
 
 /*****************************************************************************
  * Name         Logger::error
  * Description  Log something
  *****************************************************************************/
-void Logger::error(std::string_view msg)
+void Logger::error(std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func)
 {
-    log(LogLevel::Error, msg);
+    log({LogLevel::Error, msg, file, line, func});
 }
 
 /*****************************************************************************
  * Name         Logger::log
  * Description  Log something if the log level is lower than the current log level
  *****************************************************************************/
-void Logger::log(LogLevel level, std::string_view msg)
+void Logger::log(const LogRecord& record)
 {
-    if (level < currentLevel)
+    if (record.level < currentLevel)
         return;
 
     if (sink)
-        sink->write(msg);
-
-    // std::cout << "[LOG] " << msg << "\n";
+        sink->write(record);
 }
 
 /*****************************************************************************

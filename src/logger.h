@@ -51,18 +51,21 @@
 /*===========================================================================*
  * Exported Preprocessor #define MACROS
  *===========================================================================*/
+#define LOG_DEBUG(msg) \
+    Logger::getInstance().debug(msg, __FILE__, __LINE__, __func__)
+
+#define LOG_INFO(msg) \
+    Logger::getInstance().info(msg, __FILE__, __LINE__, __func__)
+
+#define LOG_WARN(msg) \
+    Logger::getInstance().warn(msg, __FILE__, __LINE__, __func__)
+
+#define LOG_ERROR(msg) \
+    Logger::getInstance().error(msg, __FILE__, __LINE__, __func__)
 
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
-enum class LogLevel
-{
-    Debug,
-    Info,
-    Warn,
-    Error,
-    Off
-};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -86,10 +89,22 @@ public:
     void setSink(ILogSink* s);
 
     // Log something
-    void debug(std::string_view msg);
-    void info (std::string_view msg);
-    void warn (std::string_view msg);
-    void error(std::string_view msg);
+    void debug(std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func);
+    void info (std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func);
+    void warn (std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func);
+    void error(std::string_view msg,
+                   const char* file,
+                   int line,
+                   const char* func);
 
 private:
     // Private constructor prevents direct instantiation.
@@ -111,7 +126,7 @@ private:
     Logger& operator=(Logger&&) = delete;
 
     // Log something
-    void log(LogLevel level, std::string_view msg);
+    void log(const LogRecord& record);
 
     // Store the current logging level
     LogLevel currentLevel {LogLevel::Info};
