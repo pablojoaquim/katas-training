@@ -40,6 +40,7 @@
 #include "encrypt.h"
 #include "singleton.h"
 #include "logger.h"
+#include "logger_sink_stdout.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -96,6 +97,8 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
+    static StdoutSink sink;
+    Logger::getInstance().setSink(&sink);
     Logger::getInstance().setLevel(LogLevel::Debug);
 
     Logger::getInstance().info("System started");

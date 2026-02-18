@@ -35,6 +35,7 @@
 #include <vector>
 #include <iostream>
 #include "logger.h"
+#include "logger_sink_stdout.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -48,26 +49,10 @@
 /*===========================================================================*
  * Local Type Declarations
  *===========================================================================*/
-/*****************************************************************************
- * Name         stdoutSink
- * Description  Interface implementation of the ILogSink for the stdout
- *              This should be in another file, but to simplify we could leave it
- *              here by now!
- *****************************************************************************/
-class stdoutSink : public ILogSink
-{
-public:
-    void write(std::string_view msg) override
-    {
-        // uart_send(msg.data(), msg.size());
-        std::cout << "[LOG] " << msg << "\n";
-    }
-};
 
 /*===========================================================================*
  * Local Object Declarations
  *===========================================================================*/
-static stdoutSink defaultSink;
 
 /*===========================================================================*
  * Local Variables Definitions
@@ -91,7 +76,6 @@ static stdoutSink defaultSink;
 Logger::Logger()
 {
     std::cout << "Logger instance created" << std::endl;
-    sink = &defaultSink;
 }
 
 /*****************************************************************************

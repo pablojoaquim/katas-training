@@ -1,9 +1,9 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef LOGGER_SINK_STDOUT_H
+#define LOGGER_SINK_STDOUT_H
 
 /*===========================================================================*/
 /**
- * @file logger.h
+ * @file logger_sink_stdout.h
  *
  *------------------------------------------------------------------------------
  * Copyright (c) 2025 - Pablo Joaquim
@@ -38,9 +38,6 @@
 /*===========================================================================*
  * Header Files (C++ only)
  *===========================================================================*/
-#include <cstring>
-#include <vector>
-#include <iostream>
 #include "logger_sink.h"
 #endif
 
@@ -55,14 +52,6 @@
 /*===========================================================================*
  * Exported Type Declarations
  *===========================================================================*/
-enum class LogLevel
-{
-    Debug,
-    Info,
-    Warn,
-    Error,
-    Off
-};
 
 /*===========================================================================*
  * Exported Classes (C++ only)
@@ -70,54 +59,11 @@ enum class LogLevel
 #ifdef __cplusplus
 // @todo: Add C++ class declarations here.
 
-// The Logger is implemented as a Singleton class, this ensures that only one 
-// instance of the class exists during the entire lifetime of the program.
-class Logger
+// Interface implementatin to decouple the logging output, in this case using the stdout
+class StdoutSink : public ILogSink
 {
 public:
-    // Provides global access to the single instance.
-    // The instance is created the first time this function is called.
-    static Logger& getInstance();
-
-    // Set the current logging level
-    void setLevel(LogLevel level);
-
-    // Set the sink for the logging
-    void setSink(ILogSink* s);
-
-    // Log something
-    void debug(std::string_view msg);
-    void info (std::string_view msg);
-    void warn (std::string_view msg);
-    void error(std::string_view msg);
-
-private:
-    // Private constructor prevents direct instantiation.
-    Logger();
-
-    // Private destructor prevents deletion through external code.
-    ~Logger();
-
-    // Delete copy constructor to prevent copying.
-    Logger(const Logger&) = delete;
-
-    // Delete copy assignment operator to prevent assignment.
-    Logger& operator=(const Logger&) = delete;
-
-    // Delete move constructor to prevent moving.
-    Logger(Logger&&) = delete;
-
-    // Delete move assignment operator to prevent moving.
-    Logger& operator=(Logger&&) = delete;
-
-    // Log something
-    void log(LogLevel level, std::string_view msg);
-
-    // Store the current logging level
-    LogLevel currentLevel {LogLevel::Info};
-
-    // The current sink
-    ILogSink* sink {nullptr};
+    void write(std::string_view msg) override;
 };
 #endif
 
@@ -144,4 +90,4 @@ extern "C"
 
 /*===========================================================================*/
 /*===========================================================================*/
-#endif /* LOGGER_H */
+#endif /* LOGGER_SINK_STDOUT_H */
