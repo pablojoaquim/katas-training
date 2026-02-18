@@ -39,6 +39,7 @@
 #include "parser.h"
 #include "encrypt.h"
 #include "singleton.h"
+#include "logger.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -95,10 +96,10 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    Singleton::getInstance().doSomething();
-    Singleton::getInstance().doSomething();
+    Logger::getInstance().setLevel(LogLevel::Debug);
 
-    return 0;
+    Logger::getInstance().info("System started");
+    Logger::getInstance().debug("Value received");
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
