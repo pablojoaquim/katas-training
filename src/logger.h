@@ -69,6 +69,15 @@ enum class LogLevel
 #ifdef __cplusplus
 // @todo: Add C++ class declarations here.
 
+// Interface to decouple the logging output of the logging implementation.
+// This is useful if we want to use as output CAN messages, UART, stdout, etc
+class ILogSink
+{
+public:
+    virtual void write(std::string_view msg) = 0;
+    virtual ~ILogSink() = default;
+};
+
 // The Logger is implemented as a Singleton class, this ensures that only one 
 // instance of the class exists during the entire lifetime of the program.
 class Logger
@@ -80,6 +89,9 @@ public:
 
     // Set the current logging level
     void setLevel(LogLevel level);
+
+    // Set the sink for the logging
+    void setSink(ILogSink* s);
 
     // Log something
     void debug(std::string_view msg);
@@ -111,6 +123,9 @@ private:
 
     // Store the current logging level
     LogLevel currentLevel {LogLevel::Info};
+
+    // The current sink
+    ILogSink* sink {nullptr};
 };
 #endif
 
