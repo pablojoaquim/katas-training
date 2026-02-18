@@ -64,6 +64,20 @@
 /*===========================================================================*
  * Function Definitions
  *===========================================================================*/
+// Helper function to obtain a color depending on the logging level
+static const char* levelColor(LogLevel lvl)
+{
+    switch(lvl)
+    {
+        case LogLevel::Debug: return "\033[36m"; // cyan
+        case LogLevel::Info:  return "\033[32m"; // green
+        case LogLevel::Warn:  return "\033[33m"; // yellow
+        case LogLevel::Error: return "\033[31m"; // red
+        default: return "\033[0m";
+    }
+}
+
+// Helper function to obtain a string depending on the logging level
 static const char* levelToStr(LogLevel lvl)
 {
     switch(lvl)
@@ -82,11 +96,16 @@ static const char* levelToStr(LogLevel lvl)
  *****************************************************************************/
 void StdoutSink::write(const LogRecord& r) noexcept
 {
+    const char* color = levelColor(r.level);
+    const char* reset = "\033[0m";
+
     std::cout
+        << color
         << "[" << levelToStr(r.level) << "]\t"
         << "[" << r.file << ":" << r.line << "]\t"
         << "[" << r.function << "]\t"
         << r.message
+        << reset
         << "\n";
 }
 
