@@ -182,7 +182,7 @@ std::string encode(const std::string &p_what)
     std::string cipher = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
     std::string output;
 
-    for (int i = 0; i < p_what.length(); i++)
+    for (unsigned int i = 0; i < p_what.length(); i++)
     {
         size_t start = cipher.find(p_what[i]);
         if (start == std::string::npos)
@@ -207,7 +207,7 @@ std::string decode(const std::string &p_what)
     std::string cipher = "aHqPuRvkM07DoO1AU49EW5CVxlfcIY6.? GXyTwS3BngKZzmNtjeJriLsQ28,Fphdb";
     std::string output;
 
-    for (int i = 0; i < p_what.length(); i++)
+    for (unsigned int i = 0; i < p_what.length(); i++)
     {
         size_t start = cipher.find(p_what[i]);
         if (start == std::string::npos)

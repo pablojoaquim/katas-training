@@ -41,13 +41,12 @@
 #include "singleton.h"
 #include "logger.h"
 #include "logger_sink_stdout.h"
+#include "factory.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
 #define NDEBUG
-
-#define SOCK_PATH "/tmp/echo_socket"
 
 /*===========================================================================*
  * Local Preprocessor #define MACROS
@@ -65,9 +64,6 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
-constexpr int KEY_SIZE = 32;        // AES-256
-constexpr int IV_SIZE = 16;         // CBC
-constexpr int HMAC_KEY_SIZE = 32;   // HMAC
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -104,6 +100,10 @@ int main(int argc, char *argv[])
     LOG_INFO("System started");
     LOG_DEBUG("Value received");
     LOG_WARN("Speed invalid");
+
+    auto device = DeviceFactory::create("light");
+    if (device)
+        device->on();
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
