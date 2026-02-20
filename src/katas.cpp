@@ -132,93 +132,36 @@ bool q_pop(queue_t *q, q_elem *out)
 }
 
 /*****************************************************************************
- * Name         power_optimized
- * Description  Optimized Divide and Conquer Approach (Exponentiation by Squaring)
+ * Name         Methods declaration
  *****************************************************************************/
-double power_optimized(double base, int exp)
+Car::Car()
 {
-    if (exp == 0)
-        return 1;
-    // Handle negative exponents by taking the reciprocal
-    if (exp < 0)
-    {
-        base = 1.0 / base;
-        exp = -exp;
-    }
-    double result = 1.0;
-    while (exp > 0)
-    {
-        // std::cout << "result: " << result << " - base: " << base << " - exp: " << exp << std::endl;
-        // If exponent is odd, multiply result by base
-        if (exp % 2 == 1)
-        {
-            result *= base;
-        }
-        base *= base; // Square the base
-        exp /= 2;     // Halve the exponent
-    }
-    // std::cout << "result: " << result << std::endl;
-    return result;
+    std::cout << "Constructor called" << std::endl;
+    this->Speed = 0;
+    this->Accel = 0;
 }
 
-/*****************************************************************************
- * Name         encode
- * Description  Takes a string and encode it
- *****************************************************************************/
-std::string encode(const std::string &p_what)
+Car::~Car()
 {
-    // std::string decode_a = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    // std::string encode_a = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
-    // std::string decode_b = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
-    // std::string encode_b = "dhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHab";
-    // std::string decode_c = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
-    // std::string encode_c = "flxVC5WE94UA1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIc";
-    // std::string decode_A = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    // std::string encode_A = "1OoD70MkvRuPqHabdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA";
-    // std::string decode_abc =   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    // std::string encode_abc =   "bhx,zWyLZ3pOGIhzeXTYtjAaDWiO8miYH 8Uk4XMwc1c,QXBTeK8";
-    // //babb -> ddpF
-
-    std::string cipher = "bdhpF,82QsLirJejtNmzZKgnB3SwTyXG ?.6YIcflxVC5WE94UA1OoD70MkvRuPqHa";
-    std::string output;
-
-    for (int i = 0; i < p_what.length(); i++)
-    {
-        size_t start = cipher.find(p_what[i]);
-        if (start == std::string::npos)
-        {
-            output.push_back(p_what[i]);
-        }
-        else
-        {
-            size_t idx = (start + i + 1) % cipher.size();
-            output.push_back(cipher[idx]);
-        }
-    }
-    return output;
+    std::cout << "Destructor called" << std::endl;
 }
 
-/*****************************************************************************
- * Name         decode
- * Description  Takes an encoded string and deecode it
- *****************************************************************************/
-std::string decode(const std::string &p_what)
+void Car::SetSpeed(int speed)
 {
-    std::string cipher = "aHqPuRvkM07DoO1AU49EW5CVxlfcIY6.? GXyTwS3BngKZzmNtjeJriLsQ28,Fphdb";
-    std::string output;
+    this->Speed = speed;
+}
 
-    for (int i = 0; i < p_what.length(); i++)
-    {
-        size_t start = cipher.find(p_what[i]);
-        if (start == std::string::npos)
-        {
-            output.push_back(p_what[i]);
-        }
-        else
-        {
-            size_t idx = (start + i + 1) % cipher.size();
-            output.push_back(cipher[idx]);
-        }
-    }
-    return output;
+int Car::GetSpeed()
+{
+    return this->Speed;
+}
+
+void Car::SetAccel(int accel)
+{
+    this->Accel = accel;
+}
+
+void Car::Periodic1SCalc()
+{
+    this->Speed += this->Accel;
 }

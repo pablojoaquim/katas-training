@@ -61,7 +61,22 @@
  *===========================================================================*/
 #ifdef __cplusplus
 // @todo: Add C++ class declarations here.
+class Car
+{
+    public:
+        Car();
+        ~Car();
 
+        void SetSpeed(int speed);
+        int GetSpeed();
+
+        void SetAccel(int accel);
+        void Periodic1SCalc();
+
+    private:
+        int Speed;
+        int Accel;
+};
 #endif
 
 /*===========================================================================*

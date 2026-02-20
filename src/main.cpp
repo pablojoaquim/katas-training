@@ -35,6 +35,8 @@
 #include <cstring>
 #include <cstdint>
 #include <vector>
+#include <thread>
+#include <chrono>
 #include "katas.h"
 #include "parser.h"
 #include "encrypt.h"
@@ -98,33 +100,28 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    RAND_bytes(key, KEY_SIZE);
-    RAND_bytes(iv, IV_SIZE);
-    RAND_bytes(hmac_key, HMAC_KEY_SIZE);
+    // static StdoutSink sink;
+    // Logger::getInstance().setSink(&sink);
+    // Logger::getInstance().setLevel(LogLevel::Debug);
 
-    std::string msg = "Hello world! This is a secret message...";
-    std::vector<unsigned char> data(msg.begin(), msg.end());
+    // LOG_INFO("System started");
+    // LOG_DEBUG("Value received");
+    // LOG_WARN("Speed invalid");
 
-    // >>>> Tx [encrypted data | iv | sign_hmac] >>>>>>>>
-    auto encrypted = encrypt(data, key, iv);
-    auto sign = sign_hmac(data, hmac_key, HMAC_KEY_SIZE);
+    // auto device = DeviceFactory::create("light");
+    // if (device)
+    //     device->on();
 
-    // <<<< Rx [encrypted data | iv | sign_hmac] <<<<<<<< 
-    auto decrypted = decrypt(encrypted, key, iv);
-    auto sign_to_verify = sign_hmac(decrypted, hmac_key, HMAC_KEY_SIZE);    // The hmac_key shall be shared between sender and receiver
+    Car car;
+    car.SetSpeed(20);
+    car.SetAccel(1);
 
-    if(sign == sign_to_verify)
+    for (int i = 0; i < 10; ++i)
     {
-        std::cout << "Verification ok" << std::endl;
+        car.Periodic1SCalc();
+        std::cout << "Speed: " << car.GetSpeed() << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    else
-    {
-        std::cout << "Verification error" << std::endl;
-    }
-
-    std::cout << "Decrypted: "
-              << std::string(decrypted.begin(), decrypted.end())
-              << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
