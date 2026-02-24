@@ -121,6 +121,8 @@ int main(int argc, char *argv[])
         std::cout << "Model Year: " << car.GetModelYear() << std::endl;
         std::cout << "Color: " << car.GetColor() << std::endl;
         std::cout << "Speed: " << car.GetSpeed() << std::endl;
+        car.GetSound();
+
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 

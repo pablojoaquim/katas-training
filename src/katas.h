@@ -73,6 +73,8 @@ class Vehicle
         void SetAccel(int accel);
         void Periodic1SCalc();
 
+        void GetSound();
+
     private:
         int Speed;
         int Accel;
@@ -91,6 +93,8 @@ class Car: public Vehicle
         std::string GetModel();
         int GetModelYear();
         std::string GetColor();
+
+        void GetSound();
         
     private:
         std::string Model;
