@@ -186,3 +186,28 @@ std::string Car::GetModel()
 {
     return this->Model;
 }
+
+void Car::SetModel(std::string model, int model_year)
+{
+    this->Model = model;
+    this->ModelYear = model_year;
+}
+
+void Car::SetModel(std::string model, int model_year, std::string color)
+{
+    this->Model = model;
+    this->ModelYear = model_year;
+    this->Color = color;
+}
+
+int Car::GetModelYear()
+{
+    return this->ModelYear;
+}
+
+std::string Car::GetColor()
+{
+    return this->Color;
+}
+    
+

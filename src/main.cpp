@@ -109,6 +109,8 @@ int main(int argc, char *argv[])
 
     Car car;
     car.SetModel("Sedan");
+    car.SetModel("Sedan", 2020);
+    car.SetModel("Sedan", 2020, "Red");
     car.SetSpeed(20);
     car.SetAccel(1);
 
@@ -116,6 +118,8 @@ int main(int argc, char *argv[])
     {
         car.Periodic1SCalc();
         std::cout << "Model: "  << car.GetModel() << std::endl;
+        std::cout << "Model Year: " << car.GetModelYear() << std::endl;
+        std::cout << "Color: " << car.GetColor() << std::endl;
         std::cout << "Speed: " << car.GetSpeed() << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

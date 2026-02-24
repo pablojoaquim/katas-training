@@ -86,10 +86,16 @@ class Car: public Vehicle
         ~Car();
 
         void SetModel(std::string model);
+        void SetModel(std::string model, int model_year);
+        void SetModel(std::string model, int model_year, std::string color);
         std::string GetModel();
+        int GetModelYear();
+        std::string GetColor();
         
     private:
         std::string Model;
+        int ModelYear;
+        std::string Color;
 };
 #endif
 
