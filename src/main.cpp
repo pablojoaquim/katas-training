@@ -108,12 +108,14 @@ int main(int argc, char *argv[])
     //     device->on();
 
     Car car;
+    car.SetModel("Sedan");
     car.SetSpeed(20);
     car.SetAccel(1);
 
     for (int i = 0; i < 10; ++i)
     {
         car.Periodic1SCalc();
+        std::cout << "Model: "  << car.GetModel() << std::endl;
         std::cout << "Speed: " << car.GetSpeed() << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

@@ -61,11 +61,11 @@
  *===========================================================================*/
 #ifdef __cplusplus
 // @todo: Add C++ class declarations here.
-class Car
+class Vehicle
 {
     public:
-        Car();
-        ~Car();
+        Vehicle();
+        ~Vehicle();
 
         void SetSpeed(int speed);
         int GetSpeed();
@@ -76,6 +76,20 @@ class Car
     private:
         int Speed;
         int Accel;
+};
+
+
+class Car: public Vehicle
+{
+    public:
+        Car();
+        ~Car();
+
+        void SetModel(std::string model);
+        std::string GetModel();
+        
+    private:
+        std::string Model;
 };
 #endif
 

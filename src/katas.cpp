@@ -134,34 +134,55 @@ bool q_pop(queue_t *q, q_elem *out)
 /*****************************************************************************
  * Name         Methods declaration
  *****************************************************************************/
-Car::Car()
+Vehicle::Vehicle()
 {
     std::cout << "Constructor called" << std::endl;
     this->Speed = 0;
     this->Accel = 0;
 }
 
+Vehicle::~Vehicle()
+{
+    std::cout << "Destructor called" << std::endl;
+}
+
+void Vehicle::SetSpeed(int speed)
+{
+    this->Speed = speed;
+}
+
+int Vehicle::GetSpeed()
+{
+    return this->Speed;
+}
+
+void Vehicle::SetAccel(int accel)
+{
+    this->Accel = accel;
+}
+
+void Vehicle::Periodic1SCalc()
+{
+    this->Speed += this->Accel;
+}
+
+Car::Car()
+{
+    std::cout << "Constructor called" << std::endl;
+    this->Model = "";
+}   
+
 Car::~Car()
 {
     std::cout << "Destructor called" << std::endl;
 }
 
-void Car::SetSpeed(int speed)
+void Car::SetModel(std::string model)
 {
-    this->Speed = speed;
+    this->Model = model;
 }
 
-int Car::GetSpeed()
+std::string Car::GetModel()
 {
-    return this->Speed;
-}
-
-void Car::SetAccel(int accel)
-{
-    this->Accel = accel;
-}
-
-void Car::Periodic1SCalc()
-{
-    this->Speed += this->Accel;
+    return this->Model;
 }
