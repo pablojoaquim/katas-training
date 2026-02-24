@@ -166,10 +166,10 @@ void Vehicle::Periodic1SCalc()
     this->Speed += this->Accel;
 }
 
-void Vehicle::GetSound()
-{
-    std::cout << "Vroom!" << std::endl;
-}   
+// void Vehicle::GetSound()
+// {
+//     std::cout << "Vroom!" << std::endl;
+// }   
 
 Car::Car()
 {
@@ -215,7 +215,7 @@ std::string Car::GetColor()
     return this->Color;
 }
 
-void Car::GetSound()
+void Car::GetSound() 
 {
     std::cout << "Beep!" << std::endl;
 }

@@ -73,7 +73,7 @@ class Vehicle
         void SetAccel(int accel);
         void Periodic1SCalc();
 
-        void GetSound();
+        virtual void GetSound() = 0;
 
     private:
         int Speed;
@@ -94,7 +94,7 @@ class Car: public Vehicle
         int GetModelYear();
         std::string GetColor();
 
-        void GetSound();
+        void GetSound() override;
         
     private:
         std::string Model;
