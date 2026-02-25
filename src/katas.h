@@ -60,6 +60,30 @@
  * Exported Classes (C++ only)
  *===========================================================================*/
 #ifdef __cplusplus
+template <typename T>
+int add(T param1, T param2)
+{
+  return param1 + param2;
+}
+
+template <typename T>
+class Box
+{
+    public:
+        Box(T value) 
+        {
+            this->value = value;
+        }
+        
+        T getValue() const 
+        { 
+            return value; 
+        }
+
+    private:
+        T value;
+};
+
 // @todo: Add C++ class declarations here.
 class Vehicle
 {

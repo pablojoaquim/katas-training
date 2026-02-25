@@ -114,6 +114,14 @@ int main(int argc, char *argv[])
     car.SetSpeed(20);
     car.SetAccel(1);
 
+    std::cout << add<int>(5, 10) << std::endl;
+
+    Box<int> intBox(123);
+    std::cout << "Box value: " << intBox.getValue() << std::endl;
+
+    Box<std::string> strBox("Hello, World!");
+    std::cout << "Box value: " << strBox.getValue() << std::endl;
+    
     for (int i = 0; i < 10; ++i)
     {
         car.Periodic1SCalc();
