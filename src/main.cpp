@@ -122,6 +122,9 @@ int main(int argc, char *argv[])
     Box<std::string> strBox("Hello, World!");
     std::cout << "Box value: " << strBox.getValue() << std::endl;
     
+    Pair<int, std::string> pair(42, "Answer");
+    std::cout << "Pair: (" << pair.getFirst() << ", " << pair.getSecond() << ")" << std::endl;
+
     for (int i = 0; i < 10; ++i)
     {
         car.Periodic1SCalc();
