@@ -226,40 +226,42 @@ void filesystem_example()
 {
     try
     {
-        // std::ofstream WriteFile("example.txt");
+        std::ofstream WriteFile("example.txt");
+        // Enable exceptions
+        WriteFile.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
-        // std::cout << std::filesystem::current_path() << std::endl;
+        std::cout << std::filesystem::current_path() << std::endl;
 
-        // if (WriteFile.is_open())
-        // {
-        //     std::cout << "File opened successfully" << std::endl;
-        //     WriteFile << "Info: System started" << std::endl;
-        //     WriteFile << "Debug: Value received" << std::endl;
+        if (WriteFile.is_open())
+        {
+            std::cout << "File opened successfully" << std::endl;
+            WriteFile << "Info: System started" << std::endl;
+            WriteFile << "Debug: Value received" << std::endl;
 
-        //     WriteFile.close();
-        // }
-        // else
-        // {
-        //     std::cerr << "Failed to open file" << std::endl;
-        // }
+            WriteFile.close();
+        }
+        else
+        {
+            std::cerr << "Failed to open file" << std::endl;
+        }
 
         std::ifstream ReadFile("example.txt");
         // Enable exceptions
-        ReadFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        
-        // if (ReadFile.is_open())
-        // {
+        ReadFile.exceptions(std::ifstream::badbit);
+
+        if (ReadFile.is_open())
+        {
             std::string line;
             while (std::getline(ReadFile, line))
             {
                 std::cout << line << std::endl;
             }
             ReadFile.close();
-        // }
-        // else
-        // {
-        //     std::cerr << "Failed to read file" << std::endl;
-        // }
+        }
+        else
+        {
+            std::cerr << "Failed to read file" << std::endl;
+        }
     }
     catch (const std::exception &e)
     {
