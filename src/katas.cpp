@@ -224,36 +224,45 @@ void Car::GetSound()
 
 void filesystem_example()
 {
-    std::ofstream WriteFile("example.txt");
-
-    std::cout << std::filesystem::current_path() << std::endl;
-
-    if (WriteFile.is_open())
+    try
     {
-        std::cout << "File opened successfully" << std::endl;
-        WriteFile << "Info: System started" << std::endl;
-        WriteFile << "Debug: Value received" << std::endl;
+        // std::ofstream WriteFile("example.txt");
 
-        WriteFile.close();
-    }
-    else
-    {
-        std::cerr << "Failed to open file" << std::endl;
-    }
+        // std::cout << std::filesystem::current_path() << std::endl;
 
-    std::ifstream ReadFile("example.txt");
-    if (ReadFile.is_open())
-    {
-        std::string line;
-        while (std::getline(ReadFile, line))
-        {
-            std::cout << line << std::endl;
-        }
-        ReadFile.close();
-    }
-    else
-    {
-        std::cerr << "Failed to read file" << std::endl;
-    }
+        // if (WriteFile.is_open())
+        // {
+        //     std::cout << "File opened successfully" << std::endl;
+        //     WriteFile << "Info: System started" << std::endl;
+        //     WriteFile << "Debug: Value received" << std::endl;
 
+        //     WriteFile.close();
+        // }
+        // else
+        // {
+        //     std::cerr << "Failed to open file" << std::endl;
+        // }
+
+        std::ifstream ReadFile("example.txt");
+        // Enable exceptions
+        ReadFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        
+        // if (ReadFile.is_open())
+        // {
+            std::string line;
+            while (std::getline(ReadFile, line))
+            {
+                std::cout << line << std::endl;
+            }
+            ReadFile.close();
+        // }
+        // else
+        // {
+        //     std::cerr << "Failed to read file" << std::endl;
+        // }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
 }
