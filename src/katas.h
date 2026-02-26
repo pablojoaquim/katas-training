@@ -176,6 +176,8 @@ extern "C"
 #ifdef __cplusplus
 // @todo: Add pure C++ function prototypes here.
 
+void filesystem_example();
+
 /*****************************************************************************
  * @fn         encode
  * @brief      Takes a string and encode it

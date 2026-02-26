@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
+    filesystem_example();
+    
     // static StdoutSink sink;
     // Logger::getInstance().setSink(&sink);
     // Logger::getInstance().setLevel(LogLevel::Debug);
@@ -107,35 +109,35 @@ int main(int argc, char *argv[])
     // if (device)
     //     device->on();
 
-    Car car;
-    car.SetModel("Sedan");
-    car.SetModel("Sedan", 2020);
-    car.SetModel("Sedan", 2020, "Red");
-    car.SetSpeed(20);
-    car.SetAccel(1);
+    // Car car;
+    // car.SetModel("Sedan");
+    // car.SetModel("Sedan", 2020);
+    // car.SetModel("Sedan", 2020, "Red");
+    // car.SetSpeed(20);
+    // car.SetAccel(1);
 
-    std::cout << add<int>(5, 10) << std::endl;
+    // std::cout << add<int>(5, 10) << std::endl;
 
-    Box<int> intBox(123);
-    std::cout << "Box value: " << intBox.getValue() << std::endl;
+    // Box<int> intBox(123);
+    // std::cout << "Box value: " << intBox.getValue() << std::endl;
 
-    Box<std::string> strBox("Hello, World!");
-    std::cout << "Box value: " << strBox.getValue() << std::endl;
+    // Box<std::string> strBox("Hello, World!");
+    // std::cout << "Box value: " << strBox.getValue() << std::endl;
     
-    Pair<int, std::string> pair(42, "Answer");
-    std::cout << "Pair: (" << pair.getFirst() << ", " << pair.getSecond() << ")" << std::endl;
+    // Pair<int, std::string> pair(42, "Answer");
+    // std::cout << "Pair: (" << pair.getFirst() << ", " << pair.getSecond() << ")" << std::endl;
 
-    for (int i = 0; i < 10; ++i)
-    {
-        car.Periodic1SCalc();
-        std::cout << "Model: "  << car.GetModel() << std::endl;
-        std::cout << "Model Year: " << car.GetModelYear() << std::endl;
-        std::cout << "Color: " << car.GetColor() << std::endl;
-        std::cout << "Speed: " << car.GetSpeed() << std::endl;
-        car.GetSound();
+    // for (int i = 0; i < 10; ++i)
+    // {
+    //     car.Periodic1SCalc();
+    //     std::cout << "Model: "  << car.GetModel() << std::endl;
+    //     std::cout << "Model Year: " << car.GetModelYear() << std::endl;
+    //     std::cout << "Color: " << car.GetColor() << std::endl;
+    //     std::cout << "Speed: " << car.GetSpeed() << std::endl;
+    //     car.GetSound();
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+    //     std::this_thread::sleep_for(std::chrono::seconds(1));
+    // }
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

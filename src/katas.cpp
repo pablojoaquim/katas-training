@@ -41,6 +41,8 @@
 #include <algorithm>
 #include "katas.h"
 #include <vector>
+#include <fstream>
+#include <filesystem>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -169,13 +171,13 @@ void Vehicle::Periodic1SCalc()
 // void Vehicle::GetSound()
 // {
 //     std::cout << "Vroom!" << std::endl;
-// }   
+// }
 
 Car::Car()
 {
     std::cout << "Constructor called" << std::endl;
     this->Model = "";
-}   
+}
 
 Car::~Car()
 {
@@ -215,9 +217,43 @@ std::string Car::GetColor()
     return this->Color;
 }
 
-void Car::GetSound() 
+void Car::GetSound()
 {
     std::cout << "Beep!" << std::endl;
 }
-    
 
+void filesystem_example()
+{
+    std::ofstream WriteFile("example.txt");
+
+    std::cout << std::filesystem::current_path() << std::endl;
+
+    if (WriteFile.is_open())
+    {
+        std::cout << "File opened successfully" << std::endl;
+        WriteFile << "Info: System started" << std::endl;
+        WriteFile << "Debug: Value received" << std::endl;
+
+        WriteFile.close();
+    }
+    else
+    {
+        std::cerr << "Failed to open file" << std::endl;
+    }
+
+    std::ifstream ReadFile("example.txt");
+    if (ReadFile.is_open())
+    {
+        std::string line;
+        while (std::getline(ReadFile, line))
+        {
+            std::cout << line << std::endl;
+        }
+        ReadFile.close();
+    }
+    else
+    {
+        std::cerr << "Failed to read file" << std::endl;
+    }
+
+}
