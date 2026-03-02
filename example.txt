@@ -1,2 +1,6 @@
 Info: System started
 Debug: Value received
+Model: Sedan, Year: 2020, Color: Red
+Model: SUV, Year: 2021, Color: Blue
+Model: Coupe, Year: 2019, Color: Black
+Model: Hatchback, Year: 2022, Color: White

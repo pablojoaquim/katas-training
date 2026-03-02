@@ -226,6 +226,17 @@ void filesystem_example()
 {
     try
     {
+        Car car1, car2, car3, car4;
+        car1.SetModel("Sedan", 2020, "Red");
+        car2.SetModel("SUV", 2021, "Blue");
+        car3.SetModel("Coupe", 2019, "Black");
+        car4.SetModel("Hatchback", 2022, "White");
+        std::vector<Car> cars;
+        cars.push_back(car1);
+        cars.push_back(car2);
+        cars.push_back(car3);
+        cars.push_back(car4);
+
         std::ofstream WriteFile("example.txt");
         // Enable exceptions
         WriteFile.exceptions(std::ofstream::failbit | std::ofstream::badbit);
@@ -237,6 +248,11 @@ void filesystem_example()
             std::cout << "File opened successfully" << std::endl;
             WriteFile << "Info: System started" << std::endl;
             WriteFile << "Debug: Value received" << std::endl;
+
+            for (auto &car : cars)
+            {
+                WriteFile << "Model: " << car.GetModel() << ", Year: " << car.GetModelYear() << ", Color: " << car.GetColor() << std::endl;
+            }
 
             WriteFile.close();
         }

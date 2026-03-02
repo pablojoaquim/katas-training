@@ -155,6 +155,7 @@ class Car: public Vehicle
         int ModelYear;
         std::string Color;
 };
+
 #endif
 
 /*===========================================================================*
