@@ -128,6 +128,7 @@ class Vehicle
         void Periodic1SCalc();
 
         friend std::string operator+(const Vehicle& v1, const Vehicle& v2);
+        friend std::ostream& operator<<(std::ostream& os, const Vehicle& v);
 
         virtual void GetSound() = 0;
 
