@@ -127,6 +127,8 @@ class Vehicle
         void SetAccel(int accel);
         void Periodic1SCalc();
 
+        friend std::string operator+(const Vehicle& v1, const Vehicle& v2);
+
         virtual void GetSound() = 0;
 
     private:

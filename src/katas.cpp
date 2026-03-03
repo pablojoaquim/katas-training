@@ -222,6 +222,11 @@ void Car::GetSound()
     std::cout << "Beep!" << std::endl;
 }
 
+std::string operator+(Vehicle& v1, Vehicle& v2)
+{
+    return "Combined speed: " + std::to_string(v1.GetSpeed() + v2.GetSpeed());
+}
+
 void filesystem_example()
 {
     try
@@ -236,6 +241,8 @@ void filesystem_example()
         cars.push_back(car2);
         cars.push_back(car3);
         cars.push_back(car4);
+
+        std::cout << car1 + car2 << std::endl;
 
         std::ofstream WriteFile("example.txt");
         // Enable exceptions
