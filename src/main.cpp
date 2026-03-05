@@ -44,6 +44,7 @@
 #include "logger.h"
 #include "logger_sink_stdout.h"
 #include "factory.h"
+#include "server.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -95,7 +96,9 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    filesystem_example();
+    http_server_example();
+
+    // filesystem_example();
     
     // static StdoutSink sink;
     // Logger::getInstance().setSink(&sink);
