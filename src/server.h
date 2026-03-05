@@ -77,6 +77,15 @@ extern "C" {
  ******************************************************************************/
 void http_server_example (void);
 
+/*****************************************************************************
+ * @fn         http_client_example
+ * @brief      http_client_example demonstrates how to set up a simple HTTP 
+ *             client using the httplib library. It makes a GET request to the
+ *             "/hi" endpoint and prints the response.
+ * @param [in] None
+ * @return     None
+ ******************************************************************************/
+void http_client_example(void);
 
 #ifdef __cplusplus
 } /* extern "C" */

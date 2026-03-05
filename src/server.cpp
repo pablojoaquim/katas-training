@@ -45,10 +45,35 @@ void http_server_example(void)
 {
     httplib::Server svr;
 
-    svr.Get("/hi", [](const httplib::Request &, httplib::Response &res) 
-    {
-        res.set_content("Hello World!", "text/plain");
-    });
+    svr.Get("/hi", [](const httplib::Request &, httplib::Response &res)
+            { res.set_content("Hello World!", "text/plain"); });
 
     svr.listen("localhost", 8080);
+}
+
+/*****************************************************************************
+ * Name         http_client_example
+ * Description  Demonstrate how to set up a simple HTTP client using the httplib library
+ * Parameters   None
+ * Return       None
+ *****************************************************************************/
+void http_client_example(void)
+{
+    // HTTP
+    httplib::Client http_cli("http://yhirose.github.io");
+
+    // HTTPS
+    // httplib::Client https_cli("https://yhirose.github.io");
+
+    if (auto res = http_cli.Get("/hi"))
+    {
+        res->status;
+        res->body;
+        std::cout << res->body << std::endl;
+    }
+    else
+    {
+        auto err = res.error();
+        std::cout << "Error: " << err << std::endl;
+    }
 }

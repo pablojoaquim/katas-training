@@ -96,6 +96,10 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
+    std::cout << "http_client_example:" << std::endl;
+    http_client_example();
+
+    std::cout << "http_server_example:" << std::endl;
     http_server_example();
 
     // filesystem_example();
