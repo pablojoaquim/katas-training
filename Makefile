@@ -26,6 +26,7 @@ endif
 # ===============================
 SRC_DIRS  = src src/design_patterns utils
 TEST_DIRS = test
+ASSETS_DIR = assets
 MAIN = src/main.cpp
 
 # ===============================
@@ -35,6 +36,7 @@ BUILD_DIR     = build
 OBJ_DIR       = $(BUILD_DIR)/obj
 COVERAGE_DIR  = $(BUILD_DIR)/coverage
 CPPCHECK_DIR  = $(BUILD_DIR)/cppcheck
+BUILD_ASSETS_DIR = $(BUILD_DIR)/assets
 
 # ===============================
 # Windows \ → /
@@ -91,6 +93,7 @@ ifeq ($(OS),Windows_NT)
 	if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
 	for %%d in ($(SRC_DIRS)) do if not exist "$(OBJ_DIR)\%%d" mkdir "$(OBJ_DIR)\%%d"
 	for %%d in ($(TEST_DIRS)) do if not exist "$(OBJ_DIR)\%%d" mkdir "$(OBJ_DIR)\%%d"
+	xcopy $(ASSETS_DIR) $(BUILD_ASSETS_DIR) /E /I /Y
 else
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(OBJ_DIR)
@@ -100,6 +103,8 @@ else
 	@for d in $(TEST_DIRS); do \
 		mkdir -p "$(OBJ_DIR)/$$d"; \
 	done
+	mkdir -p $(BUILD_ASSETS_DIR)
+	cp -r $(ASSETS_DIR)/* $(BUILD_ASSETS_DIR)/
 endif
 
 # =================================

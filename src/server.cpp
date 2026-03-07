@@ -44,6 +44,8 @@
 void http_server_example(void)
 {
     httplib::Server svr;
+    
+    svr.set_mount_point("/music", "./build/assets/music");
 
     // Página principal
     svr.Get("/", [](const httplib::Request &, httplib::Response &res)
@@ -55,29 +57,13 @@ void http_server_example(void)
             <p>Play song:</p>
 
             <audio controls>
-                <source src="/song" type="audio/mpeg">
+                  <source src="/music/Genesis.mp3" type="audio/mpeg">
             </audio>
 
         </body>
         </html>
         )";
         res.set_content(html, "text/html"); });
-
-    svr.Get("/song", [](const httplib::Request &, httplib::Response &res)
-            {
-        std::ifstream file("src/music/Genesis.mp3", std::ios::binary);
-
-        if (!file) 
-        {
-            std::cout << "ERROR: song.mp3 not found!" << std::endl;
-            res.status = 404;
-            return;
-        }
-
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-
-        res.set_content(buffer.str(), "audio/mpeg"); });
 
     std::cout << "Mini Spotify running at http://localhost:8080\n";
 
