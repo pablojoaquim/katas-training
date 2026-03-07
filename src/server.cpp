@@ -65,7 +65,7 @@ void http_server_example(void)
 
     svr.Get("/song", [](const httplib::Request &, httplib::Response &res)
             {
-        std::ifstream file("music/Genesis.mp3", std::ios::binary);
+        std::ifstream file("src/music/Genesis.mp3", std::ios::binary);
 
         if (!file) 
         {
