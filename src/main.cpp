@@ -45,6 +45,7 @@
 #include "logger_sink_stdout.h"
 #include "factory.h"
 #include "server.h"
+#include "filters.h"
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -96,14 +97,23 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::cout << "http_client_example:" << std::endl;
-    http_client_example();
+    std::vector<float> signal = {10, 10, 10, 10, 10, 10, 10, 10, 10};
+    LowPassFilter filter(0.166f);
+    for (float sample : signal)
+    {
+        float filtered = filter.filter(sample);
+        std::cout << "Input: " << sample
+                  << " -> Filtered: " << filtered << std::endl;
+    }
 
-    std::cout << "http_server_example:" << std::endl;
-    http_server_example();
+    // std::cout << "http_client_example:" << std::endl;
+    // http_client_example();
+
+    // std::cout << "http_server_example:" << std::endl;
+    // http_server_example();
 
     // filesystem_example();
-    
+
     // static StdoutSink sink;
     // Logger::getInstance().setSink(&sink);
     // Logger::getInstance().setLevel(LogLevel::Debug);
@@ -130,7 +140,7 @@ int main(int argc, char *argv[])
 
     // Box<std::string> strBox("Hello, World!");
     // std::cout << "Box value: " << strBox.getValue() << std::endl;
-    
+
     // Pair<int, std::string> pair(42, "Answer");
     // std::cout << "Pair: (" << pair.getFirst() << ", " << pair.getSecond() << ")" << std::endl;
 
