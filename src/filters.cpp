@@ -68,15 +68,27 @@
 /*****************************************************************************
  * Name         Methods declaration
  *****************************************************************************/
-LowPassFilter::LowPassFilter(float alpha)
-{
-    this->alpha = alpha;
-    this->prev_output = 0.0f;
-}
 
-float LowPassFilter::filter(float input)
+float FIRFilter::filter(float input)
 {
-    float output = this->alpha * input + (1.0f - this->alpha) * this->prev_output;
-    this->prev_output = output;
+    buffer[index] = input;
+
+    float output = 0.0f;
+    int buf_index = index;
+
+    for (size_t i = 0; i < coeffs.size(); i++)
+    {
+        output += coeffs[i] * buffer[buf_index];
+
+        if (buf_index == 0)
+            buf_index = buffer.size() - 1;
+        else
+            buf_index--;
+    }
+
+    index++;
+    if (index >= buffer.size())
+        index = 0;
+
     return output;
 }

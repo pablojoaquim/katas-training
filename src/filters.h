@@ -58,14 +58,19 @@
  * Exported Classes (C++ only)
  *===========================================================================*/
 #ifdef __cplusplus
-class LowPassFilter
+class FIRFilter
 {
 private:
-    float alpha;
-    float prev_output;
+    std::vector<float> coeffs;
+    std::vector<float> buffer;
+    int index;
 
 public:
-    LowPassFilter(float alpha);
+    FIRFilter(const std::vector<float>& coefficients)
+        : coeffs(coefficients),
+          buffer(coefficients.size(), 0.0f),
+          index(0)
+    {}
     float filter(float input);
 };
 

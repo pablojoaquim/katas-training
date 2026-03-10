@@ -97,13 +97,16 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::vector<float> signal = {10, 10, 10, 10, 10, 10, 10, 10, 10};
-    LowPassFilter filter(0.166f);
-    for (float sample : signal)
+    std::vector<float> coeffs = {0.2,0.2,0.2,0.2,0.2};
+
+    FIRFilter fir(coeffs);
+
+    std::vector<float> signal = {10, 12, 50, 11, 10, 9};
+
+    for(float s : signal)
     {
-        float filtered = filter.filter(sample);
-        std::cout << "Input: " << sample
-                  << " -> Filtered: " << filtered << std::endl;
+        float y = fir.filter(s);
+        std::cout << "in: " << s << "  out: " << y << std::endl;
     }
 
     // std::cout << "http_client_example:" << std::endl;
