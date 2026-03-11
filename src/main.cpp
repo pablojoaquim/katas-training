@@ -47,6 +47,9 @@
 #include "server.h"
 #include "filters.h"
 
+#define DR_WAV_IMPLEMENTATION
+#include "dr_wav.h"
+
 /*===========================================================================*
  * Local Preprocessor #define Constants
  *===========================================================================*/
@@ -97,17 +100,73 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::vector<float> coeffs = {0.2,0.2,0.2,0.2,0.2};
+    unsigned int channels;
+    unsigned int sampleRate;
+    drwav_uint64 totalFrameCount;
+
+    float* samples = drwav_open_file_and_read_pcm_frames_f32(
+        "./build/assets/music/voice.wav",
+        &channels,
+        &sampleRate,
+        &totalFrameCount,
+        NULL
+    );
+
+    if (!samples)
+    {
+        std::cout << "Error loading wav\n";
+        return -1;
+    }
+    std::cout << "Frames: " << totalFrameCount << std::endl;
+    std::cout << "Sample rate: " << sampleRate << std::endl;
+
+    size_t totalSamples = totalFrameCount * channels;
+
+    std::vector<float> output(totalSamples);
+
+    // FIR coefficients (moving average 5 taps)
+    std::vector<float> coeffs = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
 
     FIRFilter fir(coeffs);
 
-    std::vector<float> signal = {10, 12, 50, 11, 10, 9};
-
-    for(float s : signal)
+    for (size_t i = 0; i < totalSamples; i++)
     {
-        float y = fir.filter(s);
-        std::cout << "in: " << s << "  out: " << y << std::endl;
+        output[i] = fir.filter(samples[i]);
     }
+
+
+    drwav_data_format format;
+    format.container = drwav_container_riff;
+    format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
+    format.channels = channels;
+    format.sampleRate = sampleRate;
+    format.bitsPerSample = 32;
+
+    drwav wav;
+
+    if (!drwav_init_file_write(&wav, "filtered.wav", &format, NULL))
+    {
+        std::cout << "Error creating wav\n";
+        return -1;
+    }
+
+    drwav_write_pcm_frames(&wav, totalFrameCount, output.data());
+
+    drwav_uninit(&wav);
+
+    drwav_free(samples, NULL);
+
+    // std::vector<float> coeffs = {0.2,0.2,0.2,0.2,0.2};
+
+    // FIRFilter fir(coeffs);
+
+    // std::vector<float> signal = {10, 12, 50, 11, 10, 9};
+
+    // for(float s : signal)
+    // {
+    //     float y = fir.filter(s);
+    //     std::cout << "in: " << s << "  out: " << y << std::endl;
+    // }
 
     // std::cout << "http_client_example:" << std::endl;
     // http_client_example();
