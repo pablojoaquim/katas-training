@@ -124,14 +124,34 @@ int main(int argc, char *argv[])
 
     std::vector<float> output(totalSamples);
 
-    // FIR coefficients (moving average 5 taps)
-    std::vector<float> coeffs = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+    // // FIR coefficients (moving average 5 taps)
+    // std::vector<float> coeffs = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+    // FIRFilter fir(coeffs);
+    // for (size_t i = 0; i < totalSamples; i++)
+    // {
+    //     // output[i] = fir.filter(samples[i]);
+    // }
 
-    FIRFilter fir(coeffs);
+    // IIR Biquad coefficients for a low-pass filter with cutoff frequency of 1000 Hz (?) and Q of 0.707 (Butterworth)
+    // Biquad iir(
+    //     0.0675,
+    //     0.1349,
+    //     0.0675,
+    //     -1.1429,
+    //     0.4128
+    // );
+    // IIR Biquad coefficients for a low-pass filter with cutoff frequency of 100 Hz and Q of 0.707 (Butterworth)
+    Biquad iir(
+        0.00005024141818873903,
+        0.00010048283637747806,
+        0.00005024141818873903,
+        -1.979851353142371,
+        0.9800523188151258
+    );
 
     for (size_t i = 0; i < totalSamples; i++)
     {
-        output[i] = fir.filter(samples[i]);
+        output[i] = iir.filter(samples[i]);
     }
 
 

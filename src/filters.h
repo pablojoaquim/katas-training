@@ -74,6 +74,27 @@ public:
     float filter(float input);
 };
 
+class Biquad
+{
+private:
+
+    float a1, a2;
+    float b0, b1, b2;
+
+    float x1;
+    float x2;
+
+    float y1;
+    float y2;
+
+public:
+
+    Biquad(float B0, float B1, float B2,
+           float A1, float A2);
+
+    float filter(float x);
+};
+
 #endif
 
 /*===========================================================================*

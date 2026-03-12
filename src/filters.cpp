@@ -92,3 +92,38 @@ float FIRFilter::filter(float input)
 
     return output;
 }
+
+Biquad::Biquad(float B0, float B1, float B2,
+               float A1, float A2)
+{
+    b0 = B0;
+    b1 = B1;
+    b2 = B2;
+
+    a1 = A1;
+    a2 = A2;
+
+    x1 = 0;
+    x2 = 0;
+
+    y1 = 0;
+    y2 = 0;
+}
+
+float Biquad::filter(float x)
+{
+    float y =
+        b0 * x +
+        b1 * x1 +
+        b2 * x2 -
+        a1 * y1 -
+        a2 * y2;
+
+    x2 = x1;
+    x1 = x;
+
+    y2 = y1;
+    y1 = y;
+
+    return y;
+}
