@@ -57,3 +57,7 @@ dkms.conf
 # the build folder
 build/
 .vscode/
+
+# sandbox files
+sandbox.cpp
+sandbox.h
