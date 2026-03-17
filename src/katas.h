@@ -198,6 +198,23 @@ std::string encode(const std::string &p_what);
  ******************************************************************************/
 std::string decode(const std::string& p_what);
 
+/*****************************************************************************
+ * Name         is_pangram
+ * Description  A pangram is a sentence that contains every single letter of 
+ *              the alphabet at least once.
+ *****************************************************************************/
+/*****************************************************************************
+ * @fn         is_pangram
+ * @brief      A pangram is a sentence that contains every single letter of 
+ *             the alphabet at least once. For example, the sentence 
+ *             "The quick brown fox jumps over the lazy dog" is a pangram, 
+ *             because it uses the letters A-Z at least once (case is irrelevant).
+ * @param [in] s - The string to detect whether or not it is a pangram. Ignore 
+ *                 numbers and punctuation.
+ * @return     True if it is, False if not
+ ******************************************************************************/
+bool is_pangram(const std::string& s);
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

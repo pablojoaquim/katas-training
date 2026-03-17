@@ -299,3 +299,33 @@ void filesystem_example()
         std::cerr << e.what() << '\n';
     }
 }
+
+/*****************************************************************************
+ * Name         is_pangram
+ * Description  A pangram is a sentence that contains every single letter of 
+ *              the alphabet at least once.
+ *****************************************************************************/
+bool is_pangram(const std::string& s) 
+{
+    unsigned char abc[26]={0};
+
+    for (int i=0; i<s.length(); i++)
+    {
+        char c = s.at(i);
+        if(c>='A' && c<='Z')
+        {
+            c-='A';
+            c+='a';
+        }
+        if(c>='a' && c<='z')
+            abc[c-'a'] = 1;
+    }
+
+    for(int i=0; i<24; i++)
+    {
+        if(abc[i] == 0)
+            return false;
+    }
+
+    return true;
+}
