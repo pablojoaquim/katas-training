@@ -321,7 +321,7 @@ bool is_pangram(const std::string& s)
             abc[c-'a'] = 1;
     }
 
-    for(int i=0; i<24; i++)
+    for(int i=0; i<26; i++)
     {
         if(abc[i] == 0)
             return false;
