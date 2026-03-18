@@ -215,6 +215,15 @@ std::string decode(const std::string& p_what);
  ******************************************************************************/
 bool is_pangram(const std::string& s);
 
+/*****************************************************************************
+ * @fn         add_binary
+ * @brief      Adds two numbers and return the solution in binary represented as strings.
+ * @param [in] a - input1
+ * @param [in] b - input2
+ * @return     A binary number as a string
+ ******************************************************************************/
+std::string add_binary(uint64_t a, uint64_t b);
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

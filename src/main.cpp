@@ -100,8 +100,8 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    const std::string s = "1bcdefghijklmnopqrstuvwxyz";
-    std::cout << is_pangram(s) << std::endl;
+    std::cout << add_binary(51, 12) << std::endl;
+    
     
     std::cout << "===  End  ===" << std::endl;
     return 0;
