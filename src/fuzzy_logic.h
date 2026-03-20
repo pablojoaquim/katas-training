@@ -39,6 +39,10 @@
  * Header Files (C++ only)
  *===========================================================================*/
 #include <cstdint>
+#include <string>
+#include <vector>
+#include <map>
+#include <memory>
 #endif
 
 /*===========================================================================*
@@ -58,6 +62,43 @@
  *===========================================================================*/
 #ifdef __cplusplus
 
+class LinguisticVariable
+{
+    std::string name;   // temperature
+    float minValue;     // 0.0
+    float maxValue;     // 100.0
+    std::map<std::string, MembershipFunction*> fuzzySets;  // cold, warm, hot
+
+    void addFuzzySet(const std::string& setName, MembershipFunction* membershipFunction)
+    {
+        fuzzySets.emplace(setName, membershipFunction);
+    }
+};
+
+class MembershipFunction
+{
+public:
+    virtual float computeMembership(float x) const = 0;
+    virtual ~MembershipFunction() = default;
+};
+
+class TriangularMembershipFunction : public MembershipFunction
+{
+    float points[3];
+
+    float computeMembership(float x) const override
+    {
+        // Implement triangular membership function logic here
+    }
+};
+
+class FuzzyEvaluation
+{
+    float inputValue;
+    const LinguisticVariable& variable;
+    std::map<std::string, float> fuzzyValues;
+};
+
 #endif
 
 /*===========================================================================*
@@ -67,7 +108,7 @@
 extern "C"
 {
 #endif
-    // @todo: Add pure C function prototypes here.
+// @todo: Add pure C function prototypes here.
 
 #ifdef __cplusplus
 } /* extern "C" */
