@@ -46,6 +46,7 @@
 #include "factory.h"
 #include "server.h"
 #include "filters.h"
+#include "fuzzy_logic.h"
 
 #define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
@@ -100,9 +101,20 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::cout << add_binary(51, 12) << std::endl;
-    
-    
+    TriangularMembershipFunction hot = TriangularMembershipFunction(75, 85, 100);
+    TriangularMembershipFunction warm = TriangularMembershipFunction(40, 55, 80);
+    TriangularMembershipFunction cold = TriangularMembershipFunction(0, 35, 45);
+
+    FuzzyType tTemperature = FuzzyType(0, 100);
+    tTemperature.addFuzzySet("hot", &hot);
+    tTemperature.addFuzzySet("warm", &warm);
+    tTemperature.addFuzzySet("cold", &cold);
+
+    FuzzyEvaluation fuzzyTemperature = FuzzyEvaluation(tTemperature, 0);
+    fuzzyTemperature.inputValue = 42;
+
+    fuzzyTemperature.fuzzify();
+
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }

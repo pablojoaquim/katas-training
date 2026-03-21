@@ -43,6 +43,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <iostream>
 #endif
 
 /*===========================================================================*
@@ -62,41 +63,84 @@
  *===========================================================================*/
 #ifdef __cplusplus
 
-class LinguisticVariable
+class MembershipFunction
 {
-    std::string name;   // temperature
-    float minValue;     // 0.0
-    float maxValue;     // 100.0
-    std::map<std::string, MembershipFunction*> fuzzySets;  // cold, warm, hot
+public:
+    virtual float computeMembership(float x) const = 0;
+    virtual ~MembershipFunction() = default;};
 
-    void addFuzzySet(const std::string& setName, MembershipFunction* membershipFunction)
+class TriangularMembershipFunction : public MembershipFunction
+{
+    float a, b, c;
+
+    public:
+    TriangularMembershipFunction(float a, float b, float c)
+    {
+        this->a = a;
+        this->b = b;
+        this->c = c;
+    }
+
+    float computeMembership(float x) const override
+    {
+        // Implement triangular membership function
+        // case 1: outside the range
+        if (x <= a || x >= c)
+            return 0.0f;
+
+            // case 2: peak
+        if (x == b)
+            return 1.0f;
+
+        // case 3: positive slope
+        if (x < b)
+            return (x - a) / (b - a);
+
+        // case 4: negative slope
+        return (c - x) / (c - b);
+    }
+};
+
+class FuzzyType
+{
+    std::string name; // temperature
+    float minValue;   // 0.0
+    float maxValue;   // 100.0
+
+public:
+    std::map<std::string, MembershipFunction *> fuzzySets; // cold, warm, hot
+
+    FuzzyType(float minValue, float maxValue)
+    {
+        this->minValue = minValue;
+        this->maxValue = maxValue;
+    }
+
+    void addFuzzySet(const std::string &setName, MembershipFunction *membershipFunction)
     {
         fuzzySets.emplace(setName, membershipFunction);
     }
 };
 
-class MembershipFunction
-{
-public:
-    virtual float computeMembership(float x) const = 0;
-    virtual ~MembershipFunction() = default;
-};
-
-class TriangularMembershipFunction : public MembershipFunction
-{
-    float points[3];
-
-    float computeMembership(float x) const override
-    {
-        // Implement triangular membership function logic here
-    }
-};
-
 class FuzzyEvaluation
 {
-    float inputValue;
-    const LinguisticVariable& variable;
+    const FuzzyType &type;
     std::map<std::string, float> fuzzyValues;
+
+    public:
+        float inputValue;
+    FuzzyEvaluation(const FuzzyType &type, float in) : type(type), inputValue(in)
+    {
+    }
+
+    void fuzzify()
+    {
+        for (const auto &[name, membershipFunction] : type.fuzzySets)
+        {
+            fuzzyValues[name] = membershipFunction->computeMembership(inputValue);
+            std::cout << "Fuzzy value for " << name << ": " << fuzzyValues[name] << std::endl;
+        }
+    }
 };
 
 #endif
@@ -108,7 +152,7 @@ class FuzzyEvaluation
 extern "C"
 {
 #endif
-// @todo: Add pure C function prototypes here.
+    // @todo: Add pure C function prototypes here.
 
 #ifdef __cplusplus
 } /* extern "C" */
