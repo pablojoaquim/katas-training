@@ -67,13 +67,14 @@ class MembershipFunction
 {
 public:
     virtual float computeMembership(float x) const = 0;
-    virtual ~MembershipFunction() = default;};
+    virtual ~MembershipFunction() = default;
+};
 
 class TriangularMembershipFunction : public MembershipFunction
 {
     float a, b, c;
 
-    public:
+public:
     TriangularMembershipFunction(float a, float b, float c)
     {
         this->a = a;
@@ -88,7 +89,7 @@ class TriangularMembershipFunction : public MembershipFunction
         if (x <= a || x >= c)
             return 0.0f;
 
-            // case 2: peak
+        // case 2: peak
         if (x == b)
             return 1.0f;
 
@@ -103,15 +104,15 @@ class TriangularMembershipFunction : public MembershipFunction
 
 class FuzzyType
 {
-    std::string name; // temperature
-    float minValue;   // 0.0
-    float maxValue;   // 100.0
-
-public:
+    std::string name;                                      // temperature
+    float minValue;                                        // 0.0
+    float maxValue;                                        // 100.0
     std::map<std::string, MembershipFunction *> fuzzySets; // cold, warm, hot
 
-    FuzzyType(float minValue, float maxValue)
+public:
+    FuzzyType(std::string name, float minValue, float maxValue)
     {
+        this->name = name;
         this->minValue = minValue;
         this->maxValue = maxValue;
     }
@@ -120,26 +121,45 @@ public:
     {
         fuzzySets.emplace(setName, membershipFunction);
     }
+
+    std::map<std::string, float> calcFuzzyValues(float input) const
+    {
+        std::map<std::string, float> fuzzyValues;
+        for (const auto &[name, membershipFunction] : fuzzySets)
+        {
+            fuzzyValues[name] = membershipFunction->computeMembership(input);
+        }
+        return fuzzyValues;
+    }
 };
 
-class FuzzyEvaluation
+class FuzzyValues
 {
-    const FuzzyType &type;
+    float input;
+    const FuzzyType &fuzzyType;
     std::map<std::string, float> fuzzyValues;
 
-    public:
-        float inputValue;
-    FuzzyEvaluation(const FuzzyType &type, float in) : type(type), inputValue(in)
+public:
+    FuzzyValues(const FuzzyType &fuzzyType, float in) : fuzzyType(fuzzyType), input(in)
     {
+    }
+
+    void setInput(float in)
+    {
+        input = in;
+    }
+
+    void printFuzzyValues() const
+    {
+        for (const auto &[name, value] : fuzzyValues)
+        {
+            std::cout << "Fuzzy value for " << name << ": " << value << std::endl;
+        }
     }
 
     void fuzzify()
     {
-        for (const auto &[name, membershipFunction] : type.fuzzySets)
-        {
-            fuzzyValues[name] = membershipFunction->computeMembership(inputValue);
-            std::cout << "Fuzzy value for " << name << ": " << fuzzyValues[name] << std::endl;
-        }
+        fuzzyValues = fuzzyType.calcFuzzyValues(input);
     }
 };
 

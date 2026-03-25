@@ -110,10 +110,16 @@ int main(int argc, char *argv[])
     tTemperature.addFuzzySet("warm", &warm);
     tTemperature.addFuzzySet("cold", &cold);
 
-    FuzzyEvaluation fuzzyTemperature = FuzzyEvaluation(tTemperature, 0);
-    fuzzyTemperature.inputValue = 42;
+    FuzzyValues fuzzyTemperature = FuzzyValues(tTemperature, 0);
 
-    fuzzyTemperature.fuzzify();
+    for (float temperature = 0; temperature <= 100; temperature += 10)
+    {
+        fuzzyTemperature.setInputValue(temperature);
+        fuzzyTemperature.fuzzify();
+        std::cout << "Input temperature: " << temperature << std::endl;
+        fuzzyTemperature.printFuzzyValues();
+        std::cout << "-----------------------------" << std::endl;
+    }
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
