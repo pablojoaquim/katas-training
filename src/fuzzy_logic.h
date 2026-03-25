@@ -121,12 +121,16 @@ public:
             return 1.0f;
 
         // Avoid division by zero
-        if (b == a || c == d)
+        if (b == a)
             return 0.0f;
 
         // 3. positive slope
         if (x < b)
             return (x - a) / (b - a);
+
+        // Avoid division by zero
+        if (d == c)
+            return 0.0f;
 
         // 4. negative slope
         return (d - x) / (d - c);
