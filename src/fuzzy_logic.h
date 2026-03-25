@@ -102,6 +102,37 @@ public:
     }
 };
 
+class TrapezoidalMembershipFunction : public MembershipFunction
+{
+    float a, b, c, d;
+
+public:
+    TrapezoidalMembershipFunction(float a, float b, float c, float d)
+        : a(a), b(b), c(c), d(d) {}
+
+    float computeMembership(float x) const override
+    {
+        // Outside the range
+        if (x <= a || x >= d)
+            return 0.0f;
+
+        // 2. plateau
+        if (x >= b && x <= c)
+            return 1.0f;
+
+        // Avoid division by zero
+        if (b == a || c == d)
+            return 0.0f;
+
+        // 3. positive slope
+        if (x < b)
+            return (x - a) / (b - a);
+
+        // 4. negative slope
+        return (d - x) / (d - c);
+    }
+};
+
 class FuzzyType
 {
     std::string name;                                      // temperature
@@ -135,8 +166,8 @@ public:
 
 class FuzzyValues
 {
-    float input;
     const FuzzyType &fuzzyType;
+    float input;
     std::map<std::string, float> fuzzyValues;
 
 public:

@@ -105,18 +105,18 @@ int main(int argc, char *argv[])
     TriangularMembershipFunction warm = TriangularMembershipFunction(40, 55, 80);
     TriangularMembershipFunction cold = TriangularMembershipFunction(0, 35, 45);
 
-    FuzzyType tTemperature = FuzzyType(0, 100);
+    FuzzyType tTemperature = FuzzyType("temperature", 0, 100);
     tTemperature.addFuzzySet("hot", &hot);
     tTemperature.addFuzzySet("warm", &warm);
     tTemperature.addFuzzySet("cold", &cold);
 
     FuzzyValues fuzzyTemperature = FuzzyValues(tTemperature, 0);
 
-    for (float temperature = 0; temperature <= 100; temperature += 10)
+    for (float value = 0; value <= 100; value += 10)
     {
-        fuzzyTemperature.setInputValue(temperature);
+        fuzzyTemperature.setInput(value);
         fuzzyTemperature.fuzzify();
-        std::cout << "Input temperature: " << temperature << std::endl;
+        std::cout << "Input temperature: " << value << std::endl;
         fuzzyTemperature.printFuzzyValues();
         std::cout << "-----------------------------" << std::endl;
     }
