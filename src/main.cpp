@@ -114,12 +114,12 @@ int main(int argc, char *argv[])
     // Temperature sets
     temperature.addFuzzySet("cold", new TriangularMembershipFunction(0, 0, 20));
     temperature.addFuzzySet("warm", new TriangularMembershipFunction(10, 20, 30));
-    temperature.addFuzzySet("hot",  new TriangularMembershipFunction(20, 40, 40));
+    temperature.addFuzzySet("hot", new TriangularMembershipFunction(20, 40, 40));
 
     // Fan speed sets
-    fanSpeed.addFuzzySet("low",    new TriangularMembershipFunction(0, 0, 50));
+    fanSpeed.addFuzzySet("low", new TriangularMembershipFunction(0, 0, 50));
     fanSpeed.addFuzzySet("medium", new TriangularMembershipFunction(25, 50, 75));
-    fanSpeed.addFuzzySet("high",   new TriangularMembershipFunction(50, 100, 100));
+    fanSpeed.addFuzzySet("high", new TriangularMembershipFunction(50, 100, 100));
 
     // =========================
     // 3. REGLAS
@@ -127,19 +127,16 @@ int main(int argc, char *argv[])
     InferenceEngine engine;
 
     engine.addRule(FuzzyRule(
-        { {&temperature, "cold"} },
-        { &fanSpeed, "low" }
-    ));
+        {{&temperature, "cold"}},
+        {&fanSpeed, "low"}));
 
     engine.addRule(FuzzyRule(
-        { {&temperature, "warm"} },
-        { &fanSpeed, "medium" }
-    ));
+        {{&temperature, "warm"}},
+        {&fanSpeed, "medium"}));
 
     engine.addRule(FuzzyRule(
-        { {&temperature, "hot"} },
-        { &fanSpeed, "high" }
-    ));
+        {{&temperature, "hot"}},
+        {&fanSpeed, "high"}));
 
     // =========================
     // 4. INPUT CRISP
@@ -154,7 +151,7 @@ int main(int argc, char *argv[])
 
     // Debug
     std::cout << "Fuzzified temperature:\n";
-    for (const auto& [set, val] : inputs["temperature"])
+    for (const auto &[set, val] : inputs["temperature"])
         std::cout << "  " << set << " = " << val << "\n";
 
     // =========================
@@ -163,7 +160,7 @@ int main(int argc, char *argv[])
     auto outputs = engine.infer(inputs);
 
     std::cout << "\nFuzzy output (fan):\n";
-    for (const auto& [set, val] : outputs["fan"])
+    for (const auto &[set, val] : outputs["fan"])
         std::cout << "  " << set << " = " << val << "\n";
 
     // =========================
@@ -172,12 +169,18 @@ int main(int argc, char *argv[])
     Defuzzifier defuzz;
 
     std::vector<FuzzySet> fanSets = {
-        FuzzySet("low",    new TriangularMembershipFunction(0, 0, 50)),
+        FuzzySet("low", new TriangularMembershipFunction(0, 0, 50)),
         FuzzySet("medium", new TriangularMembershipFunction(25, 50, 75)),
-        FuzzySet("high",   new TriangularMembershipFunction(50, 100, 100))
-    };
+        FuzzySet("high", new TriangularMembershipFunction(50, 100, 100))};
 
-    double result = defuzz.defuzzify(outputs["fan"], fanSets);
+    // double result = defuzz.defuzzify(outputs["fan"], fanSets);
+
+    double result = defuzz.defuzzify(
+        outputs["fan"],
+        fanSpeed.fuzzySets,
+        0.0,  // min
+        100.0 // max
+    );
 
     std::cout << "\nFinal fan speed: " << result << "\n";
 
