@@ -169,9 +169,10 @@ class LinguisticVariable
     LinguisticVariableName name;
     double minValue;
     double maxValue;
-    std::vector<FuzzySet> fuzzySets;
 
 public:
+    std::vector<FuzzySet> fuzzySets;
+
     // Constructor initializes the linguistic variable with a name and a range of values.
     LinguisticVariable(LinguisticVariableName name, double minValue, double maxValue)
         : name(name), minValue(minValue), maxValue(maxValue) {}
@@ -211,7 +212,7 @@ public:
     FuzzyRule(const std::vector<std::pair<LinguisticVariable *, FuzzySetName>> &antecedents, const std::pair<LinguisticVariable *, FuzzySetName> &consequent)
         : antecedents(antecedents), consequent(consequent) {};
 
-    // getConsequent returns the consequent of the fuzzy rule, which is a 
+    // getConsequent returns the consequent of the fuzzy rule, which is a
     // pair of a linguistic variable and a fuzzy set name.
     std::pair<LinguisticVariable *, FuzzySetName> getConsequent() const
     {
@@ -242,7 +243,7 @@ public:
             if (setIt == varIt->second.end())
                 return 0.0;
 
-            // We use the minimum membership value across all 
+            // We use the minimum membership value across all
             // antecedents to determine the activation level of the rule.
             activation = std::min(activation, setIt->second);
         }
@@ -254,6 +255,7 @@ public:
 class InferenceEngine
 {
     std::vector<FuzzyRule> rules;
+
 public:
     // addRule adds a new fuzzy rule to the inference engine.
     void addRule(const FuzzyRule &rule)
@@ -272,7 +274,7 @@ public:
             double activation = rule.evaluate(inputs);
             if (activation > 0.0)
             {
-                // If the rule is activated (i.e., activation > 0), we update the output values 
+                // If the rule is activated (i.e., activation > 0), we update the output values
                 // based on the rule's consequent.
                 const auto &consequent = rule.getConsequent();
                 // We use the maximum activation value for each output fuzzy set to combine the effects of multiple rules.
@@ -295,7 +297,12 @@ public:
 
         for (const auto &fuzzySet : fuzzySets)
         {
-            double membership = fuzzyValues.at(fuzzySet.getName());
+            double membership = 0.0;
+
+            auto it = fuzzyValues.find(fuzzySet.getName());
+            if (it != fuzzyValues.end())
+                membership = it->second;
+
             // For the centroid method, we assume the center of the fuzzy set is at the midpoint of its range.
             // In a real implementation, you would typically calculate the centroid based on the shape of the membership function.
             double centroid = (fuzzySet.getMembership(0) + fuzzySet.getMembership(1)) / 2.0; // Placeholder for actual centroid calculation
@@ -307,86 +314,6 @@ public:
     }
 };
 
-// class FuzzyType
-// {
-//     std::string name;                                      // temperature
-//     float minValue;                                        // 0.0
-//     float maxValue;                                        // 100.0
-//     std::map<std::string, MembershipFunction *> fuzzySets; // cold, warm, hot
-
-// public:
-//     FuzzyType(std::string name, float minValue, float maxValue)
-//     {
-//         this->name = name;
-//         this->minValue = minValue;
-//         this->maxValue = maxValue;
-//     }
-
-//     void addFuzzySet(const std::string &setName, MembershipFunction *membershipFunction)
-//     {
-//         fuzzySets.emplace(setName, membershipFunction);
-//     }
-
-//     std::map<std::string, float> calcFuzzyValues(float input) const
-//     {
-//         std::map<std::string, float> fuzzyValues;
-//         for (const auto &[name, membershipFunction] : fuzzySets)
-//         {
-//             fuzzyValues[name] = membershipFunction->computeMembership(input);
-//         }
-//         return fuzzyValues;
-//     }
-// };
-
-// class FuzzyValues
-// {
-//     const FuzzyType &fuzzyType;
-//     float input;
-//     std::map<std::string, float> fuzzyValues;
-
-// public:
-//     FuzzyValues(const FuzzyType &fuzzyType, float in) : fuzzyType(fuzzyType), input(in)
-//     {
-//     }
-
-//     void setInput(float in)
-//     {
-//         input = in;
-//     }
-
-//     void printFuzzyValues() const
-//     {
-//         for (const auto &[name, value] : fuzzyValues)
-//         {
-//             std::cout << "Fuzzy value for " << name << ": " << value << std::endl;
-//         }
-//     }
-
-//     void fuzzify()
-//     {
-//         fuzzyValues = fuzzyType.calcFuzzyValues(input);
-//     }
-// };
-
-// class FuzzyRule
-// {
-//     FuzzyType &inputType;
-//     std::string inputSetName;
-//     FuzzyType &outputType;
-//     std::string outputSetName;
-
-// public:
-//     FuzzyRule(FuzzyType &inputType, const std::string &inputSetName, FuzzyType &outputType, const std::string &outputSetName)
-//         : inputType(inputType), inputSetName(inputSetName), outputType(outputType), outputSetName(outputSetName);
-
-//         void apply(const FuzzyValues &inputValues, FuzzyValues &outputValues) const
-//     {
-//         float inputMembership = inputValues.fuzzyType.calcFuzzyValues(inputValues.input)[inputSetName];
-//         // For simplicity, we directly set the output membership value to the input membership value.
-//         // In a real implementation, you would typically use a more complex inference mechanism.
-//         outputValues.setInput(inputMembership);
-//     }
-// }
 #endif
 
 /*===========================================================================*

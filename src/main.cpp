@@ -101,29 +101,85 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    TrapezoidalMembershipFunction hot = TrapezoidalMembershipFunction(30, 40, 45, 45);
-    TriangularMembershipFunction warm = TriangularMembershipFunction(20, 30, 35);
-    TriangularMembershipFunction cool = TriangularMembershipFunction(10, 20, 25);
-    TrapezoidalMembershipFunction cold = TrapezoidalMembershipFunction(0, 0, 10, 15);
+    // =========================
+    // 1. VARIABLES
+    // =========================
+    LinguisticVariable temperature("temperature", 0, 40);
+    LinguisticVariable fanSpeed("fan", 0, 100);
 
-    FuzzyType temperature("temperature", 0, 40);
+    // =========================
+    // 2. FUZZY SETS
+    // =========================
 
-    temperature.addFuzzySet("cold", &cold);
-    temperature.addFuzzySet("cool", &cool);
-    temperature.addFuzzySet("warm", &warm);
-    temperature.addFuzzySet("hot", &hot);
+    // Temperature sets
+    temperature.addFuzzySet("cold", new TriangularMembershipFunction(0, 0, 20));
+    temperature.addFuzzySet("warm", new TriangularMembershipFunction(10, 20, 30));
+    temperature.addFuzzySet("hot",  new TriangularMembershipFunction(20, 40, 40));
 
-    FuzzyValues fuzzyTemperature = FuzzyValues(temperature, 0);
+    // Fan speed sets
+    fanSpeed.addFuzzySet("low",    new TriangularMembershipFunction(0, 0, 50));
+    fanSpeed.addFuzzySet("medium", new TriangularMembershipFunction(25, 50, 75));
+    fanSpeed.addFuzzySet("high",   new TriangularMembershipFunction(50, 100, 100));
 
-    for (float value = 0; value <= 40; value += 2.5)
-    {
-        fuzzyTemperature.setInput(value);
-        fuzzyTemperature.fuzzify();
-        std::cout << "Input temperature: " << value << std::endl;
-        fuzzyTemperature.printFuzzyValues();
-        std::cout << "-----------------------------" << std::endl;
-    }
+    // =========================
+    // 3. REGLAS
+    // =========================
+    InferenceEngine engine;
 
+    engine.addRule(FuzzyRule(
+        { {&temperature, "cold"} },
+        { &fanSpeed, "low" }
+    ));
+
+    engine.addRule(FuzzyRule(
+        { {&temperature, "warm"} },
+        { &fanSpeed, "medium" }
+    ));
+
+    engine.addRule(FuzzyRule(
+        { {&temperature, "hot"} },
+        { &fanSpeed, "high" }
+    ));
+
+    // =========================
+    // 4. INPUT CRISP
+    // =========================
+    double inputTemp = 25.0;
+
+    // =========================
+    // 5. FUZZIFY
+    // =========================
+    std::map<LinguisticVariableName, std::map<FuzzySetName, double>> inputs;
+    inputs["temperature"] = temperature.fuzzify(inputTemp);
+
+    // Debug
+    std::cout << "Fuzzified temperature:\n";
+    for (const auto& [set, val] : inputs["temperature"])
+        std::cout << "  " << set << " = " << val << "\n";
+
+    // =========================
+    // 6. INFERENCIA
+    // =========================
+    auto outputs = engine.infer(inputs);
+
+    std::cout << "\nFuzzy output (fan):\n";
+    for (const auto& [set, val] : outputs["fan"])
+        std::cout << "  " << set << " = " << val << "\n";
+
+    // =========================
+    // 7. DEFUZZIFY
+    // =========================
+    Defuzzifier defuzz;
+
+    std::vector<FuzzySet> fanSets = {
+        FuzzySet("low",    new TriangularMembershipFunction(0, 0, 50)),
+        FuzzySet("medium", new TriangularMembershipFunction(25, 50, 75)),
+        FuzzySet("high",   new TriangularMembershipFunction(50, 100, 100))
+    };
+
+    double result = defuzz.defuzzify(outputs["fan"], fanSets);
+
+    std::cout << "\nFinal fan speed: " << result << "\n";
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
