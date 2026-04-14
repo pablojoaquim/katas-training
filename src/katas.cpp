@@ -43,6 +43,7 @@
 #include <vector>
 #include <fstream>
 #include <filesystem>
+#include <unordered_set>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -222,12 +223,12 @@ void Car::GetSound()
     std::cout << "Beep!" << std::endl;
 }
 
-std::string operator+(Vehicle& v1, Vehicle& v2)
+std::string operator+(Vehicle &v1, Vehicle &v2)
 {
     return "Combined speed: " + std::to_string(v1.GetSpeed() + v2.GetSpeed());
 }
 
-std::ostream& operator<<(std::ostream& os, const Vehicle& v)
+std::ostream &operator<<(std::ostream &os, const Vehicle &v)
 {
     os << "Speed: " << v.Speed << ", Accel: " << v.Accel;
     return os;
@@ -302,28 +303,28 @@ void filesystem_example()
 
 /*****************************************************************************
  * Name         is_pangram
- * Description  A pangram is a sentence that contains every single letter of 
+ * Description  A pangram is a sentence that contains every single letter of
  *              the alphabet at least once.
  *****************************************************************************/
-bool is_pangram(const std::string& s) 
+bool is_pangram(const std::string &s)
 {
-    unsigned char abc[26]={0};
+    unsigned char abc[26] = {0};
 
-    for (int i=0; i<s.length(); i++)
+    for (int i = 0; i < s.length(); i++)
     {
         char c = s.at(i);
-        if(c>='A' && c<='Z')
+        if (c >= 'A' && c <= 'Z')
         {
-            c-='A';
-            c+='a';
+            c -= 'A';
+            c += 'a';
         }
-        if(c>='a' && c<='z')
-            abc[c-'a'] = 1;
+        if (c >= 'a' && c <= 'z')
+            abc[c - 'a'] = 1;
     }
 
-    for(int i=0; i<26; i++)
+    for (int i = 0; i < 26; i++)
     {
-        if(abc[i] == 0)
+        if (abc[i] == 0)
             return false;
     }
 
@@ -334,20 +335,96 @@ bool is_pangram(const std::string& s)
  * Name         add_binary
  * Description  Adds two numbers and return the solution in binary represented as strings.
  *****************************************************************************/
-std::string add_binary(uint64_t a, uint64_t b) 
+std::string add_binary(uint64_t a, uint64_t b)
 {
     uint64_t sum = a + b;
 
     std::string binary = "";
-    
-    if(sum == 0)
+
+    if (sum == 0)
         return "0";
 
-    while(sum != 0)
+    while (sum != 0)
     {
-        binary = std::to_string(sum%2) + binary;
+        binary = std::to_string(sum % 2) + binary;
         sum /= 2;
     }
 
     return binary;
+}
+
+/*****************************************************************************
+ * Name         rtrim
+ * Description  Removes trailing whitespace from a string.
+ *****************************************************************************/
+std::string rtrim(std::string str)
+{
+    for (size_t i = str.length(); i > 0; --i)
+    {
+        if (!std::isspace(str[i - 1]))
+        {
+            return str.substr(0, i);
+        }
+    }
+    return "";
+}
+
+/*****************************************************************************
+ * Name         stripComments
+ * Description  Removes comments from a string based on the provided marker characters.
+ *****************************************************************************/
+std::string stripComments(const std::string &str, const std::unordered_set<char> &markers)
+{
+    std::string result;
+    std::vector<std::string> lines;
+
+    for (size_t i = 0, last_pos = 0; i < str.length(); ++i)
+    {
+        if (str[i] == '\n' || i == str.length() - 1)
+        {
+            lines.push_back(str.substr(last_pos, i - last_pos + 1)); // Get the line up to the newline
+            last_pos = i + 1;                                        // Update the position of the last newline
+        }
+    }
+
+    size_t pos = 0;
+    bool found_marker = false;
+    for (const auto &line : lines)
+    {
+        pos = std::string::npos; // Reset position for each line
+        found_marker = false;    // Reset marker found flag for each line
+
+        // Check for each marker in the line and find the earliest occurrence
+        for (auto &marker : markers)
+        {
+            pos = line.find(marker);
+            if (pos != std::string::npos)
+            {
+                // Extract the part of the line before the marker and trim trailing whitespace
+                std::string comment_free_line = rtrim(line.substr(0, pos));
+                // Append the comment-free line to the result
+                result.append(comment_free_line);
+                // If the original line had a newline, we need to maintain it in the result
+                if(line.find('\n') != std::string::npos)
+                {
+                    result.append("\n");
+                }
+                found_marker = true;
+                break; // Stop checking other markers for this line
+            }
+        }
+
+        // No marker found, add the whole line
+        if (!found_marker)
+        {
+            result.append(rtrim(line));
+            // If the original line had a newline, we need to maintain it in the result
+            if(line.find('\n') != std::string::npos)
+            {
+                result.append("\n");
+            }
+        }
+    }
+
+    return result;
 }

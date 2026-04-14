@@ -36,6 +36,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <unordered_map>
+#include <unordered_set>
 
 #ifdef __cplusplus
 /*===========================================================================*
@@ -223,6 +224,15 @@ bool is_pangram(const std::string& s);
  * @return     A binary number as a string
  ******************************************************************************/
 std::string add_binary(uint64_t a, uint64_t b);
+
+/*****************************************************************************
+ * @fn         stripComments
+ * @brief      Removes comments from a string based on the provided marker characters.
+ * @param [in] str - The string from which to remove comments
+ * @param [in] markers - A set of characters that indicate the start of a comment
+ * @return     The string with comments removed
+ ******************************************************************************/
+std::string stripComments(const std::string& str, const std::unordered_set<char>& markers);
 
 #endif /* __cplusplus */
 
