@@ -234,6 +234,18 @@ std::string add_binary(uint64_t a, uint64_t b);
  ******************************************************************************/
 std::string stripComments(const std::string& str, const std::unordered_set<char>& markers);
 
+/*****************************************************************************
+ * @fn         snail
+ * @brief      Traverses a 2D array in a snail pattern and returns the elements in order.
+ *              array = [[1,2,3],
+ *              [4,5,6],
+ *              [7,8,9]]
+ *              snail(array) #=> [1,2,3,6,9,8,7,4,5]
+ * @param [in] snail_map - The 2D array to traverse
+ * @return     A vector containing the elements in snail order
+ ******************************************************************************/
+std::vector<int> snail(const std::vector<std::vector<int>> &snail_map);
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

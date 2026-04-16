@@ -102,9 +102,18 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::string input = "apples, pears # and bananas\ngrapes\nbananas !apples";
-    std::unordered_set<char> markers = {'#', '!'};
-    std::cout << stripComments(input, markers) << std::endl;
+std::vector<int> snail(const std::vector<std::vector<int>> &snail_map);
+    std::vector <std::vector<int>> array = {{1, 2, 3},
+                                            {4, 5, 6},
+                                            {7, 8, 9}};
+    std::vector<int> result = snail(array);
+    std::cout << "Snail result: ";
+    for (const auto &elem : result)
+    {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+
 
     // // =========================
     // // 1. VARIABLES

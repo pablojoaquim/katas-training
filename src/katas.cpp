@@ -428,3 +428,50 @@ std::string stripComments(const std::string &str, const std::unordered_set<char>
 
     return result;
 }
+
+/*****************************************************************************
+ * Name         snail
+ * Description  Traverses a 2D array in a snail pattern and returns the elements in order.
+ *****************************************************************************/
+std::vector<int> snail(const std::vector<std::vector<int>> &snail_map) 
+{
+    std::vector<int> result={};
+
+    int col=0;
+    int row=0;
+
+    int max_col=snail_map[0].size();
+    int max_row=snail_map.size();
+
+    while (col < max_col && row < max_row) {
+        // Traverse right
+        for (int i = col; i < max_col; ++i) {
+            result.push_back(snail_map[row][i]);
+        }
+        row++;
+
+        // Traverse down
+        for (int i = row; i < max_row; ++i) {
+            result.push_back(snail_map[i][max_col - 1]);
+        }
+        max_col--;
+
+        if (row < max_row) {
+            // Traverse left
+            for (int i = max_col - 1; i >= col; --i) {
+                result.push_back(snail_map[max_row - 1][i]);
+            }
+            max_row--;
+        }
+
+        if (col < max_col) {
+            // Traverse up
+            for (int i = max_row - 1; i >= row; --i) {
+                result.push_back(snail_map[i][col]);
+            }
+            col++;
+        }
+    }
+
+  return {result};
+}
