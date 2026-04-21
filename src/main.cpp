@@ -102,18 +102,12 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-std::vector<int> snail(const std::vector<std::vector<int>> &snail_map);
-    std::vector <std::vector<int>> array = {{1, 2, 3},
-                                            {4, 5, 6},
-                                            {7, 8, 9}};
-    std::vector<int> result = snail(array);
-    std::cout << "Snail result: ";
-    for (const auto &elem : result)
-    {
-        std::cout << elem << " ";
+    std::string input = "aaa";
+    std::vector<std::string> perms = permutations(input);
+    std::cout << "Permutations of '" << input << "':\n";
+    for (const auto &perm : perms)    {
+        std::cout << perm << "\n";
     }
-    std::cout << std::endl;
-
 
     // // =========================
     // // 1. VARIABLES

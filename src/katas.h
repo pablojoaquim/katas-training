@@ -246,6 +246,20 @@ std::string stripComments(const std::string& str, const std::unordered_set<char>
  ******************************************************************************/
 std::vector<int> snail(const std::vector<std::vector<int>> &snail_map);
 
+/*****************************************************************************
+ * @fn         permutations
+ * @brief      Given a string, return an array of all permutations of the characters in the string.
+ * @par Examples:
+ * Your function should return ['ab', 'ba']
+ * With input 'abc':
+ * Your function should return ['abc','acb','bac','bca','cab','cba']
+ * With input 'aabb':
+ * Your function should return ['aabb', 'abab', 'abba', 'baab', 'baba', 'bbaa']
+ * @param [in] s - The string to permute
+ * @return     A vector containing all permutations of the input string
+ ******************************************************************************/
+std::vector<std::string> permutations(std::string s);
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

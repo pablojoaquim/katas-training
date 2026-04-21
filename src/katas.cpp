@@ -475,3 +475,41 @@ std::vector<int> snail(const std::vector<std::vector<int>> &snail_map)
 
   return {result};
 }
+
+/*****************************************************************************
+ * Name         permutations
+ * Description  Given a string, return an array of all permutations of the characters in the string.
+ *****************************************************************************/
+std::vector<std::string> permutations_helper(std::string s) 
+{
+    std::vector<std::string> result = {};
+
+    if (s.empty()) {
+        result.push_back("");
+        return result;
+    }
+    else if(s.length() == 1) {
+        result.push_back(s);
+        return result;
+    }
+
+    for (int i=0; i<s.length();i++)
+    {
+        char c = s.at(i);
+        std::string remaining = s.substr(0, i) + s.substr(i + 1);
+        std::vector<std::string> sub_permutations = permutations_helper(remaining);
+
+        for (const auto& perm : sub_permutations) {
+            result.push_back(c + perm);
+        }
+    }
+    return result;
+}
+
+std::vector<std::string> permutations(std::string s)
+{
+    auto result = permutations_helper(s);
+    sort(result.begin(), result.end());
+    result.erase(unique(result.begin(), result.end()), result.end());
+    return result;
+}
