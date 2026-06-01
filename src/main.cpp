@@ -109,6 +109,20 @@ int main(int argc, char *argv[])
         std::cout << perm << "\n";
     }
 
+    std::vector<std::string> palindromeTests = {
+        "Racecar",
+        "A man, a plan, a canal, Panama",
+        "Hello",
+        "No lemon, no melon",
+        "",
+    };
+
+    std::cout << "\nPalindrome detection:\n";
+    for (const auto &text : palindromeTests)
+    {
+        std::cout << "'" << text << "' is " << (is_palindrome(text) ? "a palindrome" : "not a palindrome") << "\n";
+    }
+
     // // =========================
     // // 1. VARIABLES
     // // =========================

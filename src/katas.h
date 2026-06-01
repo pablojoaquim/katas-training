@@ -217,6 +217,14 @@ std::string decode(const std::string& p_what);
 bool is_pangram(const std::string& s);
 
 /*****************************************************************************
+ * @fn         is_palindrome
+ * @brief      Detects whether a string is a palindrome.
+ * @param [in] s - The input string to evaluate
+ * @return     True if the string is a palindrome, false otherwise
+ ******************************************************************************/
+bool is_palindrome(const std::string& s);
+
+/*****************************************************************************
  * @fn         add_binary
  * @brief      Adds two numbers and return the solution in binary represented as strings.
  * @param [in] a - input1

@@ -332,6 +332,42 @@ bool is_pangram(const std::string &s)
 }
 
 /*****************************************************************************
+ * Name         is_palindrome
+ * Description  Detects whether a string is a palindrome.
+ *****************************************************************************/
+bool is_palindrome(const std::string &s)
+{
+    std::string normalized;
+    normalized.reserve(s.length());
+
+    for (char c : s)
+    {
+        unsigned char uc = static_cast<unsigned char>(c);
+        if ((uc >= '0' && uc <= '9') || (uc >= 'A' && uc <= 'Z') || (uc >= 'a' && uc <= 'z'))
+        {
+            if (uc >= 'A' && uc <= 'Z')
+            {
+                uc = static_cast<unsigned char>(uc - 'A' + 'a');
+            }
+            normalized.push_back(static_cast<char>(uc));
+        }
+    }
+
+    size_t left = 0;
+    size_t right = (normalized.empty() ? 0 : normalized.length() - 1);
+
+    while (left < right)
+    {
+        if (normalized[left] != normalized[right])
+            return false;
+        left++;
+        right--;
+    }
+
+    return true;
+}
+
+/*****************************************************************************
  * Name         add_binary
  * Description  Adds two numbers and return the solution in binary represented as strings.
  *****************************************************************************/
