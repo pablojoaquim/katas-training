@@ -29,20 +29,12 @@
 /*===========================================================================*
  * Header Files
  *===========================================================================*/
-#include <cstdint>
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <cstdio>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <vector>
-#include <math.h>
-#include <algorithm>
 #include "katas.h"
-#include <vector>
-#include <fstream>
-#include <filesystem>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -88,32 +80,32 @@ typedef struct queue
  * Function Definitions
  *===========================================================================*/
 
-void printArr(int curr, size_t len, int *arr)
+static void printArr(int curr, size_t len, int *arr)
 {
-    printf("-- %d --- ", curr);
+    std::printf("-- %d --- ", curr);
     for (size_t i = 0; i < len; ++i)
     {
-        printf("%d ", arr[i]);
+        std::printf("%d ", arr[i]);
     }
-    printf("\n");
+    std::printf("\n");
 }
 
-void q_init(queue_t *q)
+static void q_init(queue_t *q)
 {
     q->head = q->tail = q->count = 0;
 }
 
-bool q_is_empty(queue_t *q)
+static bool q_is_empty(queue_t *q)
 {
     return (0 == q->count);
 }
 
-bool q_is_full(queue_t *q)
+static bool q_is_full(queue_t *q)
 {
     return (QUEUE_SIZE == q->count);
 }
 
-bool q_push(queue_t *q, q_elem elem)
+static bool q_push(queue_t *q, q_elem elem)
 {
     if (q_is_full(q))
         return false;
@@ -123,7 +115,7 @@ bool q_push(queue_t *q, q_elem elem)
     return true;
 }
 
-bool q_pop(queue_t *q, q_elem *out)
+static bool q_pop(queue_t *q, q_elem *out)
 {
     if (q_is_empty(q))
         return false;
@@ -137,10 +129,10 @@ bool q_pop(queue_t *q, q_elem *out)
  * Name         Methods declaration
  *****************************************************************************/
 Vehicle::Vehicle()
+    : Speed(0),
+      Accel(0)
 {
     std::cout << "Constructor called" << std::endl;
-    this->Speed = 0;
-    this->Accel = 0;
 }
 
 Vehicle::~Vehicle()
@@ -153,7 +145,7 @@ void Vehicle::SetSpeed(int speed)
     this->Speed = speed;
 }
 
-int Vehicle::GetSpeed()
+int Vehicle::GetSpeed() const
 {
     return this->Speed;
 }
@@ -174,9 +166,11 @@ void Vehicle::Periodic1SCalc()
 // }
 
 Car::Car()
+    : Model(),
+      ModelYear(0),
+      Color()
 {
     std::cout << "Constructor called" << std::endl;
-    this->Model = "";
 }
 
 Car::~Car()
@@ -189,7 +183,7 @@ void Car::SetModel(std::string model)
     this->Model = model;
 }
 
-std::string Car::GetModel()
+std::string Car::GetModel() const
 {
     return this->Model;
 }
@@ -207,12 +201,12 @@ void Car::SetModel(std::string model, int model_year, std::string color)
     this->Color = color;
 }
 
-int Car::GetModelYear()
+int Car::GetModelYear() const
 {
     return this->ModelYear;
 }
 
-std::string Car::GetColor()
+std::string Car::GetColor() const
 {
     return this->Color;
 }
@@ -222,7 +216,7 @@ void Car::GetSound()
     std::cout << "Beep!" << std::endl;
 }
 
-std::string operator+(Vehicle& v1, Vehicle& v2)
+std::string operator+(const Vehicle &v1, const Vehicle &v2)
 {
     return "Combined speed: " + std::to_string(v1.GetSpeed() + v2.GetSpeed());
 }
