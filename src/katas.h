@@ -3,7 +3,7 @@
 
 /*===========================================================================*/
 /**
- * @file kata.h
+ * @file katas.h
  *
  *------------------------------------------------------------------------------
  * Copyright (c) 2025 - Pablo Joaquim
@@ -35,13 +35,17 @@
  *===========================================================================*/
 #include <stdint.h>
 #include <stddef.h>
+<<<<<<< HEAD
 #include <unordered_map>
 #include <unordered_set>
+=======
+>>>>>>> recover-detached-work
 
 #ifdef __cplusplus
 /*===========================================================================*
  * Header Files (C++ only)
  *===========================================================================*/
+#include <iostream>
 #include <string>
 #endif
 
@@ -120,10 +124,10 @@ class Vehicle
 {
     public:
         Vehicle();
-        ~Vehicle();
+        virtual ~Vehicle();
 
         void SetSpeed(int speed);
-        int GetSpeed();
+        int GetSpeed() const;
 
         void SetAccel(int accel);
         void Periodic1SCalc();
@@ -143,14 +147,14 @@ class Car: public Vehicle
 {
     public:
         Car();
-        ~Car();
+        ~Car() override;
 
         void SetModel(std::string model);
         void SetModel(std::string model, int model_year);
         void SetModel(std::string model, int model_year, std::string color);
-        std::string GetModel();
-        int GetModelYear();
-        std::string GetColor();
+        std::string GetModel() const;
+        int GetModelYear() const;
+        std::string GetColor() const;
 
         void GetSound() override;
         
@@ -269,7 +273,4 @@ std::vector<int> snail(const std::vector<std::vector<int>> &snail_map);
 std::vector<std::string> permutations(std::string s);
 
 #endif /* __cplusplus */
-
-/*===========================================================================*/
-/*===========================================================================*/
 #endif /* KATAS_H */
