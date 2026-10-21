@@ -46,9 +46,13 @@
 #include "factory.h"
 #include "server.h"
 #include "filters.h"
+#include <iomanip>
+#include <sstream>
+#include <openssl/evp.h>
 
 #define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
+#include <mutex>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -87,6 +91,257 @@ extern "C"
 {
 }
 
+/*===========================================================================*
+ * Simple C++ Objects - Polymorphism Example
+ *===========================================================================*/
+class Animal
+{
+    private:
+    std::string name;
+
+    public:
+
+    Animal(std::string name)
+    : name(name)
+    {
+            std::cout << "=== Object Created ===" << std::endl;
+    }
+
+    virtual void shape()
+    {
+        std::cout << "=== Animal Shape ===" << std::endl;
+    }
+
+    virtual void sound() final
+    {
+        std::cout << "=== Animal Sound ===" << std::endl;
+    }
+
+    ~Animal()
+    {
+            std::cout << "=== Object Destroyed ===" << std::endl;
+    }
+};
+
+class Cat : public Animal
+{
+    public:
+    Cat(std::string name) : Animal(name) {}
+
+    void shape() override final
+    {
+        std::cout << "=== Cat Shape ===" << std::endl;
+    }
+};
+
+class Dog : public Animal
+{
+    public:
+    Dog(std::string name) : Animal(name) {}
+
+    void shape() override
+    {
+        std::cout << "=== Dog Shape ===" << std::endl;
+    }
+};
+
+class Grandanes : public Dog
+{
+    public:
+    Grandanes(std::string name) : Dog(name) {}
+
+    void shape() override
+    {
+        std::cout << "=== Grandanes Shape ===" << std::endl;
+    }
+};
+
+void test_polymorphism()
+{
+    Animal* pAnimal;
+
+    Cat cat1 = Cat("Whiskers");
+    Dog dog1 = Dog("Buddy");
+    Grandanes grandanes1 = Grandanes("Max");
+
+    pAnimal = &cat1;
+    pAnimal->shape();
+
+    pAnimal = &dog1;
+    pAnimal->shape();
+
+    pAnimal = &grandanes1;
+    pAnimal->shape();
+
+    cat1.shape();
+    dog1.shape();
+    grandanes1.shape();
+
+    cat1.sound();
+    dog1.sound();
+    grandanes1.sound();
+}
+
+/*===========================================================================*
+ * Templates Example
+ *===========================================================================*/
+class Shape
+{
+    public:
+    virtual double perimeter() const = 0;
+};
+
+class Rectangle : public Shape
+{
+    private:
+    double width;
+    double height;
+
+    public:
+    Rectangle(double w, double h) : width(w), height(h) {}
+
+    double perimeter() const override
+    {
+        return 2 * (width + height);
+    }
+};
+class Circle : public Shape
+{
+    private:
+    double radius;
+
+    public:
+    Circle(double r) : radius(r) {}
+
+    double perimeter() const override
+    {
+        return 2 * 3.14159265358979323846 * radius;
+    }
+};
+
+template <typename T>
+void print_perimeter (T shape)
+{
+    std::cout << "Perimeter: " << shape.perimeter() << std::endl;
+}
+
+void test_template_shapes()
+{
+    Rectangle rect(3.0, 4.0);
+    Circle circ(5.0);
+
+    print_perimeter(rect);
+    print_perimeter(circ);
+}
+
+/*===========================================================================*
+ * Singleton Example
+ *===========================================================================*/
+void test_singleton()
+{
+    Singleton& s1 = Singleton::getInstance();
+    Singleton& s2 = Singleton::getInstance();
+
+    std::cout << "s1 address: " << &s1 << std::endl;
+    std::cout << "s2 address: " << &s2 << std::endl;
+}
+
+/*===========================================================================*
+ * Smart Pointers Example
+ *===========================================================================*/
+void test_smart_pointers()
+{
+    std::unique_ptr<int> smart_p = std::make_unique<int>(30);
+    std::cout << "*smart_p = " << *smart_p << std::endl;
+
+    auto shared_smart_p = std::make_shared<int>(40);
+    std::shared_ptr<int> shared_smart_p_copy = shared_smart_p;
+    std::cout << "*shared_smart_p = " << *shared_smart_p << std::endl;
+    std::cout << "*shared_smart_p_copy = " << *shared_smart_p_copy << std::endl;
+    *shared_smart_p = 20;
+    std::cout << "*shared_smart_p = " << *shared_smart_p << std::endl;
+    std::cout << "*shared_smart_p_copy = " << *shared_smart_p_copy << std::endl;
+    *shared_smart_p_copy = 50;
+    std::cout << "*shared_smart_p = " << *shared_smart_p << std::endl;
+    std::cout << "*shared_smart_p_copy = " << *shared_smart_p_copy << std::endl;
+}
+
+/*===========================================================================*
+ * Threads Example
+ *===========================================================================*/
+std::mutex mtx;
+int resource = 0;
+
+void task1() {
+    for(int i=0; i<10; i++)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::cout << "Thread 1 is running. ID: " << std::this_thread::get_id() << "\n";
+
+        mtx.lock();
+        resource++;
+        std::cout << "Resource: " << resource << std::endl;
+        mtx.unlock();
+    }
+}
+
+void task2() {
+    for(int i=0; i<10; i++)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::cout << "Thread 2 is running. ID: " << std::this_thread::get_id() << "\n";
+
+        // mtx.lock();
+        std::lock_guard<std::mutex> lock(mtx);
+        resource--;
+        std::cout << "Resource: " << resource << std::endl;
+        // mtx.unlock();
+    }
+}
+
+void test_threads()
+{
+    std::thread t1(task1);
+    std::thread t2(task2);
+    t1.join();
+    t2.join();
+}
+
+/*===========================================================================*
+ * Cryptography Example
+ *===========================================================================*/
+std::string sha256(const std::string &input) {
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hashLength = 0;
+
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+
+    if (ctx == nullptr)
+        throw std::runtime_error("Cannot create digest context");
+
+    if (EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr) != 1 ||
+        EVP_DigestUpdate(ctx, input.data(), input.size()) != 1 ||
+        EVP_DigestFinal_ex(ctx, hash, &hashLength) != 1)
+    {
+        EVP_MD_CTX_free(ctx);
+        throw std::runtime_error("SHA-256 failed");
+    }
+
+    EVP_MD_CTX_free(ctx);
+
+    std::ostringstream result;
+
+    for (unsigned int i = 0; i < hashLength; ++i)
+    {
+        result << std::hex
+               << std::setw(2)
+               << std::setfill('0')
+               << static_cast<unsigned int>(hash[i]);
+    }
+
+    return result.str();
+}
+
 /*****************************************************************************
  * @fn         main
  * @brief      The main entry point
@@ -99,144 +354,25 @@ int main(int argc, char *argv[])
     (void)argv;
 
     std::cout << "=== Start ===" << std::endl;
+    
+    // test_polymorphism();
+    
+    // test_template_shapes();
 
-    unsigned int channels;
-    unsigned int sampleRate;
-    drwav_uint64 totalFrameCount;
+    // test_singleton();
 
-    float* samples = drwav_open_file_and_read_pcm_frames_f32(
-        "./build/assets/music/voice.wav",
-        &channels,
-        &sampleRate,
-        &totalFrameCount,
-        NULL
-    );
+    // test_threads();
+    
+    // test_smart_pointers();
 
-    if (!samples)
-    {
-        std::cout << "Error loading wav\n";
-        return -1;
-    }
-    std::cout << "Frames: " << totalFrameCount << std::endl;
-    std::cout << "Sample rate: " << sampleRate << std::endl;
+    const std::string message = "Hello, cryptography!";
+    std::cout << "Message: " << message << '\n';
+    std::cout << "SHA-256: " << sha256(message) << '\n';
 
-    size_t totalSamples = totalFrameCount * channels;
-
-    std::vector<float> output(totalSamples);
-
-    // // FIR coefficients (moving average 5 taps)
-    // std::vector<float> coeffs = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-    // FIRFilter fir(coeffs);
-    // for (size_t i = 0; i < totalSamples; i++)
-    // {
-    //     // output[i] = fir.filter(samples[i]);
-    // }
-
-    // IIR Biquad coefficients for a low-pass filter with cutoff frequency of 1000 Hz (?) and Q of 0.707 (Butterworth)
-    // Biquad iir(
-    //     0.0675,
-    //     0.1349,
-    //     0.0675,
-    //     -1.1429,
-    //     0.4128
-    // );
-    // IIR Biquad coefficients for a low-pass filter with cutoff frequency of 100 Hz and Q of 0.707 (Butterworth)
-    Biquad iir(
-        0.00005024141818873903,
-        0.00010048283637747806,
-        0.00005024141818873903,
-        -1.979851353142371,
-        0.9800523188151258
-    );
-
-    for (size_t i = 0; i < totalSamples; i++)
-    {
-        output[i] = iir.filter(samples[i]);
-    }
-
-
-    drwav_data_format format;
-    format.container = drwav_container_riff;
-    format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
-    format.channels = channels;
-    format.sampleRate = sampleRate;
-    format.bitsPerSample = 32;
-
-    drwav wav;
-
-    if (!drwav_init_file_write(&wav, "filtered.wav", &format, NULL))
-    {
-        std::cout << "Error creating wav\n";
-        return -1;
-    }
-
-    drwav_write_pcm_frames(&wav, totalFrameCount, output.data());
-
-    drwav_uninit(&wav);
-
-    drwav_free(samples, NULL);
-
-    // std::vector<float> coeffs = {0.2,0.2,0.2,0.2,0.2};
-
-    // FIRFilter fir(coeffs);
-
-    // std::vector<float> signal = {10, 12, 50, 11, 10, 9};
-
-    // for(float s : signal)
-    // {
-    //     float y = fir.filter(s);
-    //     std::cout << "in: " << s << "  out: " << y << std::endl;
-    // }
-
-    // std::cout << "http_client_example:" << std::endl;
-    // http_client_example();
-
-    // std::cout << "http_server_example:" << std::endl;
-    // http_server_example();
-
-    // filesystem_example();
-
-    // static StdoutSink sink;
-    // Logger::getInstance().setSink(&sink);
-    // Logger::getInstance().setLevel(LogLevel::Debug);
-
-    // LOG_INFO("System started");
-    // LOG_DEBUG("Value received");
-    // LOG_WARN("Speed invalid");
-
-    // auto device = DeviceFactory::create("light");
-    // if (device)
-    //     device->on();
-
-    // Car car;
-    // car.SetModel("Sedan");
-    // car.SetModel("Sedan", 2020);
-    // car.SetModel("Sedan", 2020, "Red");
-    // car.SetSpeed(20);
-    // car.SetAccel(1);
-
-    // std::cout << add<int>(5, 10) << std::endl;
-
-    // Box<int> intBox(123);
-    // std::cout << "Box value: " << intBox.getValue() << std::endl;
-
-    // Box<std::string> strBox("Hello, World!");
-    // std::cout << "Box value: " << strBox.getValue() << std::endl;
-
-    // Pair<int, std::string> pair(42, "Answer");
-    // std::cout << "Pair: (" << pair.getFirst() << ", " << pair.getSecond() << ")" << std::endl;
-
-    // for (int i = 0; i < 10; ++i)
-    // {
-    //     car.Periodic1SCalc();
-    //     std::cout << "Model: "  << car.GetModel() << std::endl;
-    //     std::cout << "Model Year: " << car.GetModelYear() << std::endl;
-    //     std::cout << "Color: " << car.GetColor() << std::endl;
-    //     std::cout << "Speed: " << car.GetSpeed() << std::endl;
-    //     car.GetSound();
-
-    //     std::this_thread::sleep_for(std::chrono::seconds(1));
-    // }
+    std::cout << "\nChanging one character...\n";
+    std::cout << "SHA-256: "
+              << sha256("Hello, cryptography?")
+              << '\n';
 
     std::cout << "===  End  ===" << std::endl;
     return 0;
