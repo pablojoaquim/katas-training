@@ -92,145 +92,6 @@ extern "C"
 {
 }
 
-/*===========================================================================*
- * Simple C++ Objects - Polymorphism Example
- *===========================================================================*/
-class Instrument
-{
-    int volume;
-
-    public:
-        Instrument(int v) : volume(v) {}
-        virtual void play() = 0;
-        virtual ~Instrument() {}
-        void setVolume(int v)
-        {
-            volume = v;
-        }
-        int getVolume() const
-        {
-            return volume;
-        }
-};
-
-class Material
-{
-    std::string type;
-    public:
-        Material(const std::string &t) : type(t) {}
-        virtual ~Material() {}
-        std::string getType() const
-        {
-            return type;
-        }
-};
-
-class Guitar : public Instrument, public Material
-{
-    public:
-        Guitar(int v, const std::string &t) : Instrument(v), Material(t) {}
-        void play() override
-        {
-            std::cout << "Playing guitar at volume " << getVolume() << " with material " << getType() << std::endl;
-        }
-};
-
-class BigGuitar : public Guitar
-{
-    public:
-        BigGuitar(int v, const std::string &t) : Guitar(v, t) {}
-        void play() override
-        {
-            std::cout << "Playing big guitar at volume " << getVolume() << " with material " << getType() << std::endl;
-        }
-};
-
-class SongsSingleton
-{
-    private:
-        static SongsSingleton *instance;
-        SongsSingleton() {}
-
-    public:
-        static SongsSingleton *getInstance()
-        {
-            if (!instance)
-            {
-                instance = new SongsSingleton();
-            }
-            return instance;
-        }
-
-        void doSomething()
-        {
-            std::cout << "Doing something with the SongsSingleton instance." << std::endl;
-        }
-};
-
-SongsSingleton *SongsSingleton::instance = nullptr;
-
-std::mutex mtx;
-
-void functionTask1(void)
-{
-    std::unique_lock<std::mutex> lock(mtx, std::defer_lock);
-    lock.lock();
-    SongsSingleton *songs = SongsSingleton::getInstance();
-    songs->doSomething();
-    lock.unlock();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-}
-
-void functionTask2(void)
-{
-    std::unique_lock<std::mutex> lock(mtx, std::defer_lock);
-    lock.lock();
-    SongsSingleton *songs = SongsSingleton::getInstance();
-    songs->doSomething();
-    lock.unlock();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-}
-
-void testThreads(void)
-{
-    std::thread t1(functionTask1);
-    std::thread t2(functionTask2);
-
-    t1.join();
-    t2.join();
-}
-
-template <typename T>
-T sum(T a, T b)
-{
-    return a + b;
-}
-
-template <typename T>
-std::pair<T, T> makePair (T a, T b)
-{
-    return std::make_pair(a, b);
-}
-
-std::vector<int> str2arr(const std::string &s)
-{
-    std::unique_ptr<std::vector<int>> result = std::make_unique<std::vector<int>>();
-    std::vector<int> result;
-    for (char c : s)
-    {
-        if (std::isdigit(c))
-        {
-            result->push_back(c - '0');
-        }
-    }
-    return *result;
-}
-
-
-
-
 /*****************************************************************************
  * @fn         main
  * @brief      The main entry point
@@ -243,8 +104,10 @@ int main(int argc, char *argv[])
     (void)argv;
 
     std::cout << "=== Start ===" << std::endl;
-    Guitar g(10, "wood");
-    g.play();
+
+    std::string morseCode = ".... . -.--   .--- ..- -.. .";
+    std::string decoded = decodeMorse(morseCode);
+    std::cout << "Decoded Morse: " << decoded << std::endl;
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

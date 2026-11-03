@@ -509,3 +509,78 @@ std::vector<int> snail(const std::vector<std::vector<int>> &snail_map)
   return {result};
 }
 
+/*****************************************************************************
+ * Name         decodeMorse
+ * Description  Decodes a Morse code string into a human-readable string.
+ *****************************************************************************/
+const std::unordered_map<std::string, std::string> MORSE_CODE = {
+    {".-", "A"},    {"-...", "B"},  {"-.-.", "C"},  {"-..", "D"},
+    {".", "E"},     {"..-.", "F"},  {"--.", "G"},   {"....", "H"},
+    {"..", "I"},    {".---", "J"},  {"-.-", "K"},   {".-..", "L"},
+    {"--", "M"},    {"-.", "N"},    {"---", "O"},   {".--.", "P"},
+    {"--.-", "Q"},  {".-.", "R"},   {"...", "S"},   {"-", "T"},
+    {"..-", "U"},   {"...-", "V"},  {".--", "W"},   {"-..-", "X"},
+    {"-.--", "Y"},  {"--..", "Z"},
+
+    {"-----", "0"}, {".----", "1"}, {"..---", "2"}, {"...--", "3"},
+    {"....-", "4"}, {".....", "5"}, {"-....", "6"}, {"--...", "7"},
+    {"---..", "8"}, {"----.", "9"}
+};
+
+std::string decodeMorse(const std::string& morseCode)
+{
+    std::vector<std::string> words;
+    std::string word;
+
+    size_t pos = 0;
+    size_t start = 0;
+    size_t word_end = 0;
+    std::string token;
+    std::string result;
+
+    while (pos < morseCode.length()) {
+        pos = morseCode.find("   ", start);
+        if (pos == std::string::npos) {
+            word = morseCode.substr(start);
+            start = morseCode.length();
+        } else {
+            word = morseCode.substr(start, pos - start);
+            start = pos + 3;
+        }
+        words.push_back(word);
+    }
+
+    for (const auto& w : words) {
+        size_t start = 0;
+        pos = 0;
+        while(pos < w.length())
+        {
+            pos = w.find(" ", pos);
+
+            if (pos == std::string::npos) {
+                pos = w.length();
+            }
+            token = w.substr(start, pos-start);
+            // std::cout << start << "-" << pos << " >> " << token << std::endl;
+            
+            if(token != "")
+            {
+                result += MORSE_CODE.at(token);
+            }
+            
+            start = pos + 1;
+            pos += 1;
+        }
+        result += " "; // Add space between words
+    }
+
+    // Remove spaces from the beginning and end of the result string
+    while(!result.empty() && result[0] == ' ') {
+        result.erase(result.begin()); // Remove leading space
+    }
+    while(!result.empty() && result.back() == ' ') {
+        result.pop_back(); // Remove trailing space
+    }
+
+    return result;
+}

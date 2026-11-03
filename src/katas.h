@@ -269,5 +269,13 @@ std::vector<int> snail(const std::vector<std::vector<int>> &snail_map);
  ******************************************************************************/
 std::vector<std::string> permutations(std::string s);
 
+/*****************************************************************************
+ * @fn         decodeMorse
+ * @brief      Decodes a Morse code string into a human-readable string.
+ * @param [in] morseCode - The Morse code string to decode
+ * @return     The decoded human-readable string
+ ******************************************************************************/
+std::string decodeMorse(const std::string& morseCode);
+
 #endif /* __cplusplus */
 #endif /* KATAS_H */
