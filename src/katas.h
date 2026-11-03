@@ -35,11 +35,8 @@
  *===========================================================================*/
 #include <stdint.h>
 #include <stddef.h>
-<<<<<<< HEAD
 #include <unordered_map>
 #include <unordered_set>
-=======
->>>>>>> recover-detached-work
 
 #ifdef __cplusplus
 /*===========================================================================*
