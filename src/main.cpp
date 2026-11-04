@@ -105,9 +105,19 @@ int main(int argc, char *argv[])
 
     std::cout << "=== Start ===" << std::endl;
 
-    std::string morseCode = ".... . -.--   .--- ..- -.. .";
+    // std::string morseCode = ".... . -.--   .--- ..- -.. .";
+    //std::string bits = "1100110011001100000011000000111111001100111111001111110000000000000011001111110011111100111111000000110011001111110000001111110011001100000011"; // Example bit string
+    std::string bits = "01110";
+    
+    std::string morseCode = decodeBits(bits);
+    std::cout << "Morse Code: " << morseCode << std::endl;
+
     std::string decoded = decodeMorse(morseCode);
     std::cout << "Decoded Morse: " << decoded << std::endl;
+
+
+    // Expected: equal to ".... . -.--   .--- ..- -.. ."
+            //    Actual: ".... . -.--    .--- ..- -.. ."
 
     std::cout << "===  End  ===" << std::endl;
     return 0;

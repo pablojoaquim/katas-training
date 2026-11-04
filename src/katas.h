@@ -277,5 +277,13 @@ std::vector<std::string> permutations(std::string s);
  ******************************************************************************/
 std::string decodeMorse(const std::string& morseCode);
 
+/*****************************************************************************
+ * @fn         decodeBits
+ * @brief      Decodes a string of bits into a Morse code string.
+ * @param [in] bits - The string of bits to decode
+ * @return     The decoded Morse code string
+ ******************************************************************************/
+std::string decodeBits(const std::string& bits);
+
 #endif /* __cplusplus */
 #endif /* KATAS_H */

@@ -534,7 +534,6 @@ std::string decodeMorse(const std::string& morseCode)
 
     size_t pos = 0;
     size_t start = 0;
-    size_t word_end = 0;
     std::string token;
     std::string result;
 
@@ -561,7 +560,7 @@ std::string decodeMorse(const std::string& morseCode)
                 pos = w.length();
             }
             token = w.substr(start, pos-start);
-            // std::cout << start << "-" << pos << " >> " << token << std::endl;
+            std::cout << start << "-" << pos << " >> " << token << std::endl;
             
             if(token != "")
             {
@@ -583,4 +582,101 @@ std::string decodeMorse(const std::string& morseCode)
     }
 
     return result;
+}
+
+/*****************************************************************************
+ * Name         decodeBits
+ * Description  Decodes a string of bits into a Morse code string.
+ *****************************************************************************/
+std::string decodeBits(const std::string& bits) 
+{
+    std::string morseCode = "";
+
+    // Remove extra leading and trailing zeros
+    size_t firstOne = bits.find('1');
+    size_t lastOne = bits.rfind('1');
+    std::string trimmedBits = bits.substr(firstOne, lastOne - firstOne + 1);
+
+    // Find the rate of the signal (the length of the shortest sequence of 1s or 0s)
+    int minLength = trimmedBits.length();
+    char currentChar = trimmedBits[0];
+    int count = 1;
+    for (size_t i = 1; i < trimmedBits.length(); i++) 
+    {
+        if (trimmedBits[i] == currentChar) 
+        {
+            count++;
+        } 
+        else 
+        {
+            if (count < minLength) 
+            {
+                minLength = count;
+            }
+            currentChar = trimmedBits[i];
+            count = 1;
+        }
+    }
+    if (count < minLength) 
+    {
+        minLength = count;
+    }
+
+    std::cout << minLength << std::endl;
+
+    // Convert the bit string to Morse code using the determined rate
+    // "Dot" – is 1 time unit long.
+    // "Dash" – is 3 time units long.
+    // Pause between dots and dashes in a character – is 1 time unit long.
+    // Pause between characters inside a word – is 3 time units long.
+    // Pause between words – is 7 time units long.
+    int cnt_dots_and_dashes=0;
+    int cnt_pauses = 0;
+    for (size_t i=0; i<trimmedBits.length(); i+=minLength)
+    {
+        std::string segment = trimmedBits.substr(i, minLength);
+        if (segment[0] == '1') 
+        {
+            cnt_dots_and_dashes++;
+            cnt_pauses = 0;
+        } 
+        else 
+        {
+            cnt_pauses++;
+            if(cnt_pauses == 1)
+            {
+                if(cnt_dots_and_dashes == 1)
+                {
+                    morseCode += ".";
+                }
+                if(cnt_dots_and_dashes == 3)
+                {
+                    morseCode += "-";
+                }
+                cnt_dots_and_dashes = 0;
+            }
+            if(cnt_pauses == 3)
+            {
+                morseCode += " ";
+            }
+            if(cnt_pauses == 7)
+            {
+                morseCode.pop_back(); // Remove the previously added space
+                morseCode += "   ";
+            }            
+        }
+    }
+
+    // check for any remaining dots or dashes at the end of the signal
+    if(cnt_dots_and_dashes == 1)
+    {
+        morseCode += ".";
+    }
+    if(cnt_dots_and_dashes == 3)
+    {
+        morseCode += "-";
+    }
+
+    // std::cout << morseCode << std::endl;
+    return morseCode;
 }
